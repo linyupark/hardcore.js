@@ -1,0 +1,47 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body>
+  <script src="../build/bundle.js"></script>
+  <script>
+    var 汽车 = function(name){
+      this.name = name;
+      HC.observable(this);
+      this.on("启动", function(){
+        console.log(this.name + "嘟嘟嘟...");
+        this.off("启动");
+      });
+      this.on("鸣笛", function(){
+        console.log(this.name + "滴滴滴...");
+      });
+      this.on("启动 鸣笛", function(){
+        console.log(this.name + "驾驶中");
+      });
+      this.on("刹车", function(ms){
+        var _this = this;
+        console.log(this.name + "嘎...");
+        setTimeout(function(){
+          _this.trigger("熄火", ms);
+        }, ms);
+      });
+      this.on("熄火", function(ms){
+        console.log("停车花了"+ms/1000+"秒");
+      });
+    };
+
+    var 奥迪 = new 汽车("奥迪");
+    奥迪.trigger("启动");
+    setTimeout(function(){
+      奥迪.trigger("鸣笛");
+      setTimeout(function(){
+        奥迪.trigger("鸣笛");
+      }, 1000);
+      setTimeout(function(){
+        奥迪.trigger("刹车", 3000);
+      }, 1000);
+    }, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# general
+*~
+*.log
+Thumbs.db
+node_modules
+
+#node
+**/node_modules/
+
+# Except this file
+!.gitignore

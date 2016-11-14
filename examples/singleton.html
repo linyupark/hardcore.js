@@ -1,0 +1,19 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body>
+  <script src="../build/bundle.js"></script>
+  <script>
+  var F = function(name){
+    this.name = name;
+    console.log("name:", name);
+  }
+  var SF = HC.createSingleton(F);
+  var lin = new SF("lin");
+  var lin2 = new SF("lin2");
+  console.log(lin ===lin2);
+  </script>
+</body>
+</html>
