@@ -72,9 +72,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       try {
         for (var _iterator = events_array[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var _ev_name = _step.value;
+          var _e = _step.value;
 
-          fn(_ev_name);
+          fn(_e);
         }
       } catch (err) {
         _didIteratorError = true;
@@ -110,9 +110,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         scanEvents(events, function (name) {
           (_callbacks[name] = _callbacks[name] || []).push(fn);
           if (el.__emited[name]) {
-            // 有寄存的执行后销毁
             fn.apply(el, el.__emited[name]);
-            delete el.__emited[name];
           }
         });
         // 支持chain写法
@@ -120,6 +118,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     });
 
+    /**
+     * 解除某自定义事件
+     */
     Object.defineProperty(el, "off", {
       value: function value(events, fn) {
         if (events === "*" && !fn) _callbacks = {};else {
@@ -129,24 +130,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 if (_callbacks[name][_i] == fn) _callbacks[name].splice(_i, 1);
               }
             } else delete _callbacks[name];
+            delete el.__emited[name];
           });
         }
         return el;
-      }
-    });
-
-    Object.defineProperty(el, "once", {
-      value: function value(events, fn) {
-        function on() {
-          el.off(events, on);
-
-          for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
-          }
-
-          fn.apply(el, args);
-        }
-        return el.on(events, on);
       }
     });
 
@@ -155,8 +142,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      */
     Object.defineProperty(el, "emit", {
       value: function value(events) {
-        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-          args[_key3 - 1] = arguments[_key3];
+        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          args[_key2 - 1] = arguments[_key2];
         }
 
         scanEvents(events, function (name) {
@@ -690,6 +677,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   };
 
   /**
+   * 生成 hash
+   * @param  {string} s 
+   * @return {hash}
+   */
+  var hashCode = function hashCode(s) {
+    return s.split("").reduce(function (a, b) {
+      a = (a << 5) - a + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+  };
+
+  /**
    * 在浏览器关闭之前缓存ajax获取的json数据
    * @param  {[type]}   url      [description]
    * @param  {Function} callback [description]
@@ -698,14 +697,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   var cacheJSON = function cacheJSON(url) {
     var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
-    var name = url.replace(/^http[s]?:\/\//, "");
-    if ("localStorage" in window && cookie.get(decodeURIComponent(name))) {
+    var name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
+    if ("localStorage" in window && cookie.get("" + name)) {
       return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
     }
     try {
       xhr(url).done(function (res) {
         // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
-        cookie.set(decodeURIComponent(name), "y");
+        cookie.set(name, "y");
         window.localStorage.setItem(name, JSON.stringify(res));
         callback.call(null, res);
       });
@@ -720,7 +719,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     xhr: xhr,
     cookie: cookie,
     search2obj: search2obj,
-    typeOf: typeOf
+    typeOf: typeOf,
+    hashCode: hashCode
   };
 
   var Loader = function () {
@@ -793,8 +793,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function batchDepend() {
         var _this5 = this;
 
-        for (var _len4 = arguments.length, batches = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-          batches[_key4] = arguments[_key4];
+        for (var _len3 = arguments.length, batches = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          batches[_key3] = arguments[_key3];
         }
 
         if (batches.length < 2) {
@@ -941,8 +941,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (this.config.debug === true && typeof window.console !== "undefined") {
           var _window$console;
 
-          for (var _len5 = arguments.length, msg = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-            msg[_key5 - 1] = arguments[_key5];
+          for (var _len4 = arguments.length, msg = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+            msg[_key4 - 1] = arguments[_key4];
           }
 
           window.console[type] && (_window$console = window.console)[type].apply(_window$console, msg);

@@ -270,20 +270,32 @@ const loadFile = (type = "script", url, options) => {
 };
 
 /**
+ * 生成 hash
+ * @param  {string} s 
+ * @return {hash}
+ */
+const hashCode = s => {
+  return s.split("").reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+};
+
+/**
  * 在浏览器关闭之前缓存ajax获取的json数据
  * @param  {[type]}   url      [description]
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
 const cacheJSON = (url, callback=()=>{}) => {
-  const name = url.replace(/^http[s]?:\/\//, "");
-  if("localStorage" in window && cookie.get(decodeURIComponent(name))){
+  const name = "_cache_"+hashCode(url.replace(/^http[s]?:\/\//, ""));
+  if("localStorage" in window && cookie.get(`${name}`)){
     return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
   }
   try{
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
-      cookie.set(decodeURIComponent(name), "y");
+      cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.call(null, res);
     });
@@ -298,7 +310,8 @@ export default {
   xhr,
   cookie,
   search2obj,
-  typeOf
+  typeOf,
+  hashCode
 };
 
 export {

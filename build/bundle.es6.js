@@ -31,17 +31,17 @@ const observable = (el = {}) => {
    */
   let _callbacks = {},
 
-    /**
-     * 将空格分隔的事件名连同索引传递到fn
-     * @param  {string}   events [description]
-     * @param  {Function} fn     [description]
-     */
-    scanEvents = (events, fn) => {
-      const events_array = events.split(" ");
-      for (const _ev_name of events_array) {
-        fn(_ev_name);
-      }
-    };
+  /**
+   * 将空格分隔的事件名连同索引传递到fn
+   * @param  {string}   events [description]
+   * @param  {Function} fn     [description]
+   */
+  scanEvents = (events, fn) => {
+    const events_array = events.split(" ");
+    for(const _e of events_array){
+      fn(_e);
+    }
+  };
 
   /**
    * 寄存器
@@ -57,13 +57,11 @@ const observable = (el = {}) => {
    */
   Object.defineProperty(el, "on", {
     value(events, fn){
-      if (typeof fn !== "function") return el;
+      if(typeof fn !== "function")  return el;
       scanEvents(events, (name) => {
         (_callbacks[name] = _callbacks[name] || []).push(fn);
         if(el.__emited[name]){
-          // 有寄存的执行后销毁
           fn.apply(el, el.__emited[name]);
-          delete el.__emited[name];
         }
       });
       // 支持chain写法
@@ -71,30 +69,25 @@ const observable = (el = {}) => {
     }
   });
 
+  /**
+   * 解除某自定义事件
+   */
   Object.defineProperty(el, "off", {
     value(events, fn){
-      if (events === "*" && !fn) _callbacks = {};
-      else {
+      if(events === "*" && !fn) _callbacks = {};
+      else{
         scanEvents(events, (name) => {
-          if (typeof fn === "function") {
-            for (const _i in _callbacks[name]) {
-              if (_callbacks[name][_i] == fn)
+          if(typeof fn === "function"){
+            for(const _i in _callbacks[name]){
+              if(_callbacks[name][_i] == fn) 
                 _callbacks[name].splice(_i, 1);
             }
-          } else delete _callbacks[name];
+          }
+          else delete _callbacks[name];
+          delete el.__emited[name];
         });
       }
       return el;
-    }
-  });
-
-  Object.defineProperty(el, "once", {
-    value(events, fn){
-      function on(...args) {
-        el.off(events, on);
-        fn.apply(el, args);
-      }
-      return el.on(events, on);
     }
   });
 
@@ -105,7 +98,7 @@ const observable = (el = {}) => {
     value(events, ...args){
       scanEvents(events, (name) => {
         const fns = _callbacks[name] || [];
-        for (const _fn of fns) {
+        for(const _fn of fns){
           _fn.apply(el, [name].concat(args));
         }
         if(fns.length === 0){
@@ -113,7 +106,7 @@ const observable = (el = {}) => {
           el.__emited[name] = [name].concat(args);
         }
         // callback记录中有*，则任意name都要触发*所持fn
-        if (_callbacks["*"] && name !== "*")
+        if(_callbacks["*"] && name !== "*")
           el.emit.apply(el, ["*", name].concat(args));
       });
       return el;
@@ -498,20 +491,32 @@ const loadFile = (type = "script", url, options) => {
 };
 
 /**
+ * 生成 hash
+ * @param  {string} s 
+ * @return {hash}
+ */
+const hashCode = s => {
+  return s.split("").reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+};
+
+/**
  * 在浏览器关闭之前缓存ajax获取的json数据
  * @param  {[type]}   url      [description]
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
 const cacheJSON = (url, callback=()=>{}) => {
-  const name = url.replace(/^http[s]?:\/\//, "");
-  if("localStorage" in window && cookie.get(decodeURIComponent(name))){
+  const name = "_cache_"+hashCode(url.replace(/^http[s]?:\/\//, ""));
+  if("localStorage" in window && cookie.get(`${name}`)){
     return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
   }
   try{
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
-      cookie.set(decodeURIComponent(name), "y");
+      cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.call(null, res);
     });
@@ -526,7 +531,8 @@ var utils = {
   xhr,
   cookie,
   search2obj,
-  typeOf
+  typeOf,
+  hashCode
 };
 
 class Loader {
