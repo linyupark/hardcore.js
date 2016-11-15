@@ -44,6 +44,12 @@ const observable = (el = {}) => {
     };
 
   /**
+   * 寄存器
+   * @type {[type]}
+   */
+  el.__emited = el.__emited || {};
+
+  /**
    * object defineProperty 默认 
    * writable : false, configurable : false, enumerable : false
    * 避免被复写
@@ -54,6 +60,11 @@ const observable = (el = {}) => {
       if (typeof fn !== "function") return el;
       scanEvents(events, (name) => {
         (_callbacks[name] = _callbacks[name] || []).push(fn);
+        if(el.__emited[name]){
+          // 有寄存的执行后销毁
+          fn.apply(el, el.__emited[name]);
+          delete el.__emited[name];
+        }
       });
       // 支持chain写法
       return el;
@@ -97,6 +108,10 @@ const observable = (el = {}) => {
         for (const _fn of fns) {
           _fn.apply(el, [name].concat(args));
         }
+        if(fns.length === 0){
+          // 寄存未匹配到的事件
+          el.__emited[name] = [name].concat(args);
+        }
         // callback记录中有*，则任意name都要触发*所持fn
         if (_callbacks["*"] && name !== "*")
           el.emit.apply(el, ["*", name].concat(args));
@@ -109,9 +124,131 @@ const observable = (el = {}) => {
 
 };
 
+
+
+/**
+ * 模拟标准Promise类
+ */
+let Promise;
+let EmitterPromise = class {
+
+  constructor(rr=()=>{}){
+    if(rr.length === 0){
+      throw new Error("Promise needs (resolve, reject) at least one function name.");
+    }
+    observable(this);
+    this._resolve = (value) => {
+      this.emit("resolve", value);
+      this.off("reject");
+    };
+    if(rr.length === 1){
+      rr.call(this, this._resolve);
+    }
+    else{
+      this._reject = (reason) => {
+        this.emit("reject", reason);
+        this.off("resolve");
+      };
+      rr.call(this, this._resolve, this._reject);
+    }
+    this.__chain_value;
+    return this;
+  }
+
+  /**
+   * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => { 
+      console.log(values);
+    }, reason => {
+      console.log(reason)
+    });
+   * @param  {Array}  iterable [p1,p2,p3..]
+   * @return {EmitterPromise}
+   */
+  static all(iterable=[]){
+    let values = [];
+    return new EmitterPromise((resolve, reject) => {
+      for(let _p of iterable){
+        _p.then(value => {
+          values.push(value);
+          if(values.length === iterable.length){
+            resolve(values);
+          }
+        }).catch(reason => {
+          reject(reason);
+        });
+      }
+    });
+  }
+
+  /**
+   * 直接触发 resolve
+   * @param  {mixed} value
+   * @return {EmitterPromise}
+   */
+  static resolve(value){
+    return new EmitterPromise((resolve) => {
+      setTimeout(function(){
+        resolve(value);
+      }, 0);
+    });
+  }
+
+  /**
+   * 直接触发 reject
+   * @param  {mixed} reason
+   * @return {EmitterPromise}
+   */
+  static reject(reason){
+    return new EmitterPromise((resolve, reject) => {
+      setTimeout(function(){
+        reject(reason);
+      }, 0);
+      resolve;
+    });
+  }
+
+  /**
+   * 当resolve执行时触发
+   * @param  {Function} cb 执行回调
+   * @return {EmitterPromise}
+   */
+  then(cb=()=>{}, _catch){
+    this.on("resolve", (e, value) => {
+      try{
+        this.__chain_value = cb.call(null, this.__chain_value || value);
+      } catch(e) {
+        this.emit("reject", e);
+      }
+    });
+    if(typeof _catch === "function"){
+      this.catch(_catch);
+    }
+    return this;
+  }
+
+  /**
+   * 当reject执行时触发
+   * @param  {Function} cb 执行回调
+   * @return {EmitterPromise}
+   */
+  catch(cb=()=>{}){
+    this.on("reject", (e, reason) => {
+      cb.call(null, reason);
+    });
+    return this;
+  }
+};
+
+// 当支持原生promise的时候Promise替换成原生
+Promise = EmitterPromise;
+if("Promise" in window){
+  Promise = window.Promise;
+}
+
 var trick = {
   observable,
-  createSingleton
+  createSingleton,
+  Promise
 };
 
 /**
@@ -303,7 +440,85 @@ const cookie = {
 
 };
 
+/**
+ * 私有函数，动态加载文件
+ * @param  {String} type   加载远程文件类型 [script,link,img]
+ * @param  {String} url    地址
+ * @param  {Object} opts   附加配置
+ * @return null
+ */
+const loadFile = (type = "script", url, options) => {
+  let el = document.createElement(type),
+    src = {
+      script: "src",
+      link: "href",
+      img: "src"
+    },
+    opts = assign({
+      position: "head",
+      attrs: {},
+      success() {},
+      error() {}
+    }, options),
+    tags = document[opts.position].getElementsByTagName(type);
 
+  if (!src.hasOwnProperty(type)) {
+    throw new Error(`File type:${type} is not support dynamic load.`);
+  }
+  if (typeof url === "undefined") {
+    throw new Error("Load file url is required.");
+  }
+  // 扩展属性
+  if (Object.keys(opts.attrs).length) {
+    for (let _attr in opts.attrs) {
+      el[_attr] = opts.attrs[_attr];
+    }
+  }
+  el[src[type]] = url;
+  if (tags.length > 0) {
+    // 一些老版本的安卓babel编译的of会报错，尽量少用of
+    for (let _tag in tags) {
+      if (tags[_tag][src[type]] === url) return;
+    }
+  }
+  if (type === "link") {
+    el.rel = "stylesheet";
+  }
+  el.addEventListener("load", opts.success, false);
+  el.addEventListener("error", () => {
+    opts.error.call(null, el);
+    // 删除标签
+    for(const _tag of document[opts.position].getElementsByTagName(type)){
+      if(_tag == el){
+        _tag.parentNode.removeChild(_tag);
+      }
+    }
+  }, false);
+  document[opts.position].appendChild(el);
+};
+
+/**
+ * 在浏览器关闭之前缓存ajax获取的json数据
+ * @param  {[type]}   url      [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+const cacheJSON = (url, callback=()=>{}) => {
+  const name = url.replace(/^http[s]?:\/\//, "");
+  if("localStorage" in window && cookie.get(decodeURIComponent(name))){
+    return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
+  }
+  try{
+    xhr(url).done(res => {
+      // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+      cookie.set(decodeURIComponent(name), "y");
+      window.localStorage.setItem(name, JSON.stringify(res));
+      callback.call(null, res);
+    });
+  } catch(e){
+    throw e;
+  }
+};
 
 var utils = {
   assign,
@@ -313,6 +528,105 @@ var utils = {
   search2obj,
   typeOf
 };
+
+class Loader {
+
+  /**
+   * 支持加载的文件类型
+   * @return {object}
+   */
+  static get types(){
+    return {
+      js: "script", css: "link"
+    };
+  }
+
+  /**
+   * 别名加载资源
+   * @param  {string}    url   有资源信息的json文件地址
+   * @param  {array} alias 别名组合
+   * @return {promise}
+   */
+  static jsonDepend(url, alias=[]){
+    let batches = [];
+    return new trick.Promise((resolve, reject) => {
+      cacheJSON(url, json => {
+        for(const _name of alias){
+          if(json[_name]){
+            batches.push(json[_name]);
+          }
+        }
+        this.batchDepend.apply(this, batches)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(i => {
+          reject(i);
+        });
+      });
+    });
+  }
+
+  /**
+   * 依赖载入
+   * @param  {array} batches [前置资源,...],[后置,...]
+   * @return {promise}
+   */
+  static batchDepend(...batches){
+    if(batches.length < 2){
+      return this.batch(batches);
+    }
+    return new trick.Promise((resolve, reject) => {
+      let checker = (i) => {
+        if(i < batches.length){
+          this.batch(batches[i])
+          .then(() => {
+            checker(i+1);
+          })
+          .catch(i => {
+            reject(i);
+          });
+        }
+        else{
+          resolve(batches);
+        }
+      };
+      checker(0);
+    });
+  }
+
+  /**
+   * 并行载入
+   * @param  {Array}  resource [资源,...]
+   * @return {promise}
+   */
+  static batch(resource = []) {
+    let promise_batch = [];
+    for (const _res of resource) {
+      promise_batch.push(new trick.Promise((resolve, reject) => {
+        let ext = _res.split(".").pop(),
+          attrs = {}, _i = resource.indexOf(_res);
+        if (ext === "js") {
+          attrs.defer = true;
+        }
+        if (!this.types[ext]) reject(_res, "文件格式不支持");
+        else {
+          loadFile(this.types[ext], _res, {
+            attrs: attrs,
+            success() {
+              resolve(_res);
+            },
+            error() {
+              reject(_i);
+            }
+          });
+        }
+      }));
+    }
+    return trick.Promise.all(promise_batch);
+  }
+
+}
 
 const HC = class {
 
@@ -388,6 +702,7 @@ const HC = class {
 };
 HC.trick = trick;
 HC.utils = utils;
+HC.Loader = Loader;
 
 exports.HC = HC;
 

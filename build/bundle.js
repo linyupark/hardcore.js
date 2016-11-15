@@ -1,6 +1,6 @@
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -93,6 +93,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     };
 
     /**
+     * 寄存器
+     * @type {[type]}
+     */
+    el.__emited = el.__emited || {};
+
+    /**
      * object defineProperty 默认 
      * writable : false, configurable : false, enumerable : false
      * 避免被复写
@@ -103,6 +109,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (typeof fn !== "function") return el;
         scanEvents(events, function (name) {
           (_callbacks[name] = _callbacks[name] || []).push(fn);
+          if (el.__emited[name]) {
+            // 有寄存的执行后销毁
+            fn.apply(el, el.__emited[name]);
+            delete el.__emited[name];
+          }
         });
         // 支持chain写法
         return el;
@@ -160,7 +171,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
               _fn.apply(el, [name].concat(args));
             }
-            // callback记录中有*，则任意name都要触发*所持fn
           } catch (err) {
             _didIteratorError2 = true;
             _iteratorError2 = err;
@@ -176,6 +186,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }
           }
 
+          if (fns.length === 0) {
+            // 寄存未匹配到的事件
+            el.__emited[name] = [name].concat(args);
+          }
+          // callback记录中有*，则任意name都要触发*所持fn
           if (_callbacks["*"] && name !== "*") el.emit.apply(el, ["*", name].concat(args));
         });
         return el;
@@ -185,9 +200,182 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return el;
   };
 
+  /**
+   * 模拟标准Promise类
+   */
+  var Promise = void 0;
+  var EmitterPromise = function () {
+    function EmitterPromise() {
+      var _this2 = this;
+
+      var rr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+      _classCallCheck(this, EmitterPromise);
+
+      if (rr.length === 0) {
+        throw new Error("Promise needs (resolve, reject) at least one function name.");
+      }
+      observable(this);
+      this._resolve = function (value) {
+        _this2.emit("resolve", value);
+        _this2.off("reject");
+      };
+      if (rr.length === 1) {
+        rr.call(this, this._resolve);
+      } else {
+        this._reject = function (reason) {
+          _this2.emit("reject", reason);
+          _this2.off("resolve");
+        };
+        rr.call(this, this._resolve, this._reject);
+      }
+      this.__chain_value;
+      return this;
+    }
+
+    /**
+     * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => { 
+        console.log(values);
+      }, reason => {
+        console.log(reason)
+      });
+     * @param  {Array}  iterable [p1,p2,p3..]
+     * @return {EmitterPromise}
+     */
+
+
+    _createClass(EmitterPromise, [{
+      key: "then",
+
+
+      /**
+       * 当resolve执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+      value: function then() {
+        var _this3 = this;
+
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+        var _catch = arguments[1];
+
+        this.on("resolve", function (e, value) {
+          try {
+            _this3.__chain_value = cb.call(null, _this3.__chain_value || value);
+          } catch (e) {
+            _this3.emit("reject", e);
+          }
+        });
+        if (typeof _catch === "function") {
+          this.catch(_catch);
+        }
+        return this;
+      }
+
+      /**
+       * 当reject执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: "catch",
+      value: function _catch() {
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+        this.on("reject", function (e, reason) {
+          cb.call(null, reason);
+        });
+        return this;
+      }
+    }], [{
+      key: "all",
+      value: function all() {
+        var iterable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var values = [];
+        return new EmitterPromise(function (resolve, reject) {
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var _p = _step3.value;
+
+              _p.then(function (value) {
+                values.push(value);
+                if (values.length === iterable.length) {
+                  resolve(values);
+                }
+              }).catch(function (reason) {
+                reject(reason);
+              });
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+        });
+      }
+
+      /**
+       * 直接触发 resolve
+       * @param  {mixed} value
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: "resolve",
+      value: function resolve(value) {
+        return new EmitterPromise(function (resolve) {
+          setTimeout(function () {
+            resolve(value);
+          }, 0);
+        });
+      }
+
+      /**
+       * 直接触发 reject
+       * @param  {mixed} reason
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: "reject",
+      value: function reject(reason) {
+        return new EmitterPromise(function (resolve, reject) {
+          setTimeout(function () {
+            reject(reason);
+          }, 0);
+          resolve;
+        });
+      }
+    }]);
+
+    return EmitterPromise;
+  }();
+
+  // 当支持原生promise的时候Promise替换成原生
+  Promise = EmitterPromise;
+  if ("Promise" in window) {
+    Promise = window.Promise;
+  }
+
   var trick = {
     observable: observable,
-    createSingleton: createSingleton
+    createSingleton: createSingleton,
+    Promise: Promise
   };
 
   /**
@@ -385,13 +573,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      */
     get: function get() {
       var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator3 = document.cookie.split("; ")[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var _cookie = _step3.value;
+        for (var _iterator4 = document.cookie.split("; ")[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var _cookie = _step4.value;
 
           var _cookie$split = _cookie.split("="),
               _cookie$split2 = _slicedToArray(_cookie$split, 2),
@@ -403,19 +591,126 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           }
         }
       } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
           }
         } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
+    }
+  };
+
+  /**
+   * 私有函数，动态加载文件
+   * @param  {String} type   加载远程文件类型 [script,link,img]
+   * @param  {String} url    地址
+   * @param  {Object} opts   附加配置
+   * @return null
+   */
+  var loadFile = function loadFile() {
+    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "script";
+    var url = arguments[1];
+    var options = arguments[2];
+
+    var el = document.createElement(type),
+        src = {
+      script: "src",
+      link: "href",
+      img: "src"
+    },
+        opts = assign({
+      position: "head",
+      attrs: {},
+      success: function success() {},
+      error: function error() {}
+    }, options),
+        tags = document[opts.position].getElementsByTagName(type);
+
+    if (!src.hasOwnProperty(type)) {
+      throw new Error("File type:" + type + " is not support dynamic load.");
+    }
+    if (typeof url === "undefined") {
+      throw new Error("Load file url is required.");
+    }
+    // 扩展属性
+    if (Object.keys(opts.attrs).length) {
+      for (var _attr in opts.attrs) {
+        el[_attr] = opts.attrs[_attr];
+      }
+    }
+    el[src[type]] = url;
+    if (tags.length > 0) {
+      // 一些老版本的安卓babel编译的of会报错，尽量少用of
+      for (var _tag in tags) {
+        if (tags[_tag][src[type]] === url) return;
+      }
+    }
+    if (type === "link") {
+      el.rel = "stylesheet";
+    }
+    el.addEventListener("load", opts.success, false);
+    el.addEventListener("error", function () {
+      opts.error.call(null, el);
+      // 删除标签
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = document[opts.position].getElementsByTagName(type)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var _tag2 = _step5.value;
+
+          if (_tag2 == el) {
+            _tag2.parentNode.removeChild(_tag2);
+          }
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+    }, false);
+    document[opts.position].appendChild(el);
+  };
+
+  /**
+   * 在浏览器关闭之前缓存ajax获取的json数据
+   * @param  {[type]}   url      [description]
+   * @param  {Function} callback [description]
+   * @return {[type]}            [description]
+   */
+  var cacheJSON = function cacheJSON(url) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+
+    var name = url.replace(/^http[s]?:\/\//, "");
+    if ("localStorage" in window && cookie.get(decodeURIComponent(name))) {
+      return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
+    }
+    try {
+      xhr(url).done(function (res) {
+        // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+        cookie.set(decodeURIComponent(name), "y");
+        window.localStorage.setItem(name, JSON.stringify(res));
+        callback.call(null, res);
+      });
+    } catch (e) {
+      throw e;
     }
   };
 
@@ -427,6 +722,180 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     search2obj: search2obj,
     typeOf: typeOf
   };
+
+  var Loader = function () {
+    function Loader() {
+      _classCallCheck(this, Loader);
+    }
+
+    _createClass(Loader, null, [{
+      key: "jsonDepend",
+
+
+      /**
+       * 别名加载资源
+       * @param  {string}    url   有资源信息的json文件地址
+       * @param  {array} alias 别名组合
+       * @return {promise}
+       */
+      value: function jsonDepend(url) {
+        var _this4 = this;
+
+        var alias = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        var batches = [];
+        return new trick.Promise(function (resolve, reject) {
+          cacheJSON(url, function (json) {
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+              for (var _iterator6 = alias[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                var _name = _step6.value;
+
+                if (json[_name]) {
+                  batches.push(json[_name]);
+                }
+              }
+            } catch (err) {
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                  _iterator6.return();
+                }
+              } finally {
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
+                }
+              }
+            }
+
+            _this4.batchDepend.apply(_this4, batches).then(function (res) {
+              resolve(res);
+            }).catch(function (i) {
+              reject(i);
+            });
+          });
+        });
+      }
+
+      /**
+       * 依赖载入
+       * @param  {array} batches [前置资源,...],[后置,...]
+       * @return {promise}
+       */
+
+    }, {
+      key: "batchDepend",
+      value: function batchDepend() {
+        var _this5 = this;
+
+        for (var _len4 = arguments.length, batches = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          batches[_key4] = arguments[_key4];
+        }
+
+        if (batches.length < 2) {
+          return this.batch(batches);
+        }
+        return new trick.Promise(function (resolve, reject) {
+          var checker = function checker(i) {
+            if (i < batches.length) {
+              _this5.batch(batches[i]).then(function () {
+                checker(i + 1);
+              }).catch(function (i) {
+                reject(i);
+              });
+            } else {
+              resolve(batches);
+            }
+          };
+          checker(0);
+        });
+      }
+
+      /**
+       * 并行载入
+       * @param  {Array}  resource [资源,...]
+       * @return {promise}
+       */
+
+    }, {
+      key: "batch",
+      value: function batch() {
+        var _this6 = this;
+
+        var resource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var promise_batch = [];
+        var _iteratorNormalCompletion7 = true;
+        var _didIteratorError7 = false;
+        var _iteratorError7 = undefined;
+
+        try {
+          var _loop = function _loop() {
+            var _res = _step7.value;
+
+            promise_batch.push(new trick.Promise(function (resolve, reject) {
+              var ext = _res.split(".").pop(),
+                  attrs = {},
+                  _i = resource.indexOf(_res);
+              if (ext === "js") {
+                attrs.defer = true;
+              }
+              if (!_this6.types[ext]) reject(_res, "文件格式不支持");else {
+                loadFile(_this6.types[ext], _res, {
+                  attrs: attrs,
+                  success: function success() {
+                    resolve(_res);
+                  },
+                  error: function error() {
+                    reject(_i);
+                  }
+                });
+              }
+            }));
+          };
+
+          for (var _iterator7 = resource[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+            _loop();
+          }
+        } catch (err) {
+          _didIteratorError7 = true;
+          _iteratorError7 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion7 && _iterator7.return) {
+              _iterator7.return();
+            }
+          } finally {
+            if (_didIteratorError7) {
+              throw _iteratorError7;
+            }
+          }
+        }
+
+        return trick.Promise.all(promise_batch);
+      }
+    }, {
+      key: "types",
+
+
+      /**
+       * 支持加载的文件类型
+       * @return {object}
+       */
+      get: function get() {
+        return {
+          js: "script", css: "link"
+        };
+      }
+    }]);
+
+    return Loader;
+  }();
 
   var HC = function () {
     function HC() {
@@ -472,8 +941,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (this.config.debug === true && typeof window.console !== "undefined") {
           var _window$console;
 
-          for (var _len4 = arguments.length, msg = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-            msg[_key4 - 1] = arguments[_key4];
+          for (var _len5 = arguments.length, msg = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+            msg[_key5 - 1] = arguments[_key5];
           }
 
           window.console[type] && (_window$console = window.console)[type].apply(_window$console, msg);
@@ -489,7 +958,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: "log",
       value: function log() {
-        var _this2 = this;
+        var _this7 = this;
 
         var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -505,20 +974,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           if (e.message !== "Script error.") {
             var _msg = e.filename + " (" + e.message + "[" + e.lineno + ":" + e.colno + "])";
             errors.push(_msg);
-            _this2.console("error", _msg);
+            _this7.console("error", _msg);
           }
           msg = errors.join("\n");
           logger.emit("error", msg);
           // 有跳转页面
-          if (!_this2.config.debug && _this2.config.errorPageUrl) {
-            location.href = _this2.config.errorPageUrl + "?from=" + location.href + "&msg=" + msg;
+          if (!_this7.config.debug && _this7.config.errorPageUrl) {
+            location.href = _this7.config.errorPageUrl + "?from=" + location.href + "&msg=" + msg;
           }
           // 抽样提交
-          if (_this2.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this2.config.reportChance)) {
-            utils.xhr(_this2.config.reportUrl, {
+          if (_this7.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this7.config.reportChance)) {
+            utils.xhr(_this7.config.reportUrl, {
               method: "POST", data: { message: msg }
             });
-            _this2.console("info", "Error message reported.");
+            _this7.console("info", "Error message reported.");
           }
           return true;
         }, false);
@@ -530,6 +999,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   }();
   HC.trick = trick;
   HC.utils = utils;
+  HC.Loader = Loader;
 
   exports.HC = HC;
 })(this.window = this.window || {});

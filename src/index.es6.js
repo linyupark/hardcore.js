@@ -1,5 +1,6 @@
 import trick from "./trick.es6.js";
 import utils from "./utils.es6.js";
+import {Loader} from "./loader.es6.js";
 
 const HC = class {
 
@@ -75,6 +76,7 @@ const HC = class {
 };
 HC.trick = trick;
 HC.utils = utils;
+HC.Loader = Loader;
 
 export {
   HC

@@ -212,8 +212,6 @@ const cookie = {
 
 };
 
-
-
 /**
  * 私有函数，动态加载文件
  * @param  {String} type   加载远程文件类型 [script,link,img]
@@ -259,8 +257,39 @@ const loadFile = (type = "script", url, options) => {
     el.rel = "stylesheet";
   }
   el.addEventListener("load", opts.success, false);
-  el.addEventListener("error", opts.error, false);
+  el.addEventListener("error", () => {
+    opts.error.call(null, el);
+    // 删除标签
+    for(const _tag of document[opts.position].getElementsByTagName(type)){
+      if(_tag == el){
+        _tag.parentNode.removeChild(_tag);
+      }
+    }
+  }, false);
   document[opts.position].appendChild(el);
+};
+
+/**
+ * 在浏览器关闭之前缓存ajax获取的json数据
+ * @param  {[type]}   url      [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+const cacheJSON = (url, callback=()=>{}) => {
+  const name = url.replace(/^http[s]?:\/\//, "");
+  if("localStorage" in window && cookie.get(decodeURIComponent(name))){
+    return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
+  }
+  try{
+    xhr(url).done(res => {
+      // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+      cookie.set(decodeURIComponent(name), "y");
+      window.localStorage.setItem(name, JSON.stringify(res));
+      callback.call(null, res);
+    });
+  } catch(e){
+    throw e;
+  }
 };
 
 export default {
@@ -274,6 +303,7 @@ export default {
 
 export {
   loadFile,
+  cacheJSON,
   tagContent,
   tagRemove
 };
