@@ -1,0 +1,69 @@
+{
+  "angular.js": [{
+    "ver": "1.5",
+    "": ["angular-animate.min.js", "angular-cookies.min.js", "angular-route.min.js", "angular-sanitize.min.js", "angular.min.js"],
+    "i18n": ["angular-locale_zh-hans-cn.js"]
+  }],
+  "jquery": ["2.2", "1.12", "1.11.0", "1.8"],
+  "jquery.cookie": ["1.4"],
+  "zepto": ["1.2"],
+  "bootstrap": [{
+    "ver": "3.3",
+    "fonts": ["glyphicons-halflings-regular.svg"],
+    "js": ["bootstrap.min.js", "npm.js"],
+    "css": ["bootstrap-theme.min.css", "bootstrap.min.css"]
+  }, {
+    "ver": "2.3",
+    "img": ["glyphicons-halflings-white.png", "glyphicons-halflings.png"],
+    "js": ["bootstrap.min.js"],
+    "css": ["bootstrap.min.css", "bootstrap-responsive.min.css"]
+  }],
+  "vue": ["2.0", "1.0"],
+  "moment.js": ["2.15"],
+  "handlebars.js": [{
+    "ver": "4.0",
+    "js": ["handlebars.runtime.min.js", "handlebars.min.js"]
+  }],
+  "vue-validator": [{
+    "ver": "2.1",
+    "": ["vue-validator.min.js"]
+  }],
+  "hammer.js": ["2.0"],
+  "animate.css": [{
+    "ver": "3.5",
+    "css": ["animate.min.css"]
+  }],
+  "Swiper": [{
+    "ver": "3.4",
+    "js": ["swiper.min.js"],
+    "css": ["swiper.min.css"]
+  }],
+  "es6-promise": [{
+    "ver": "4.0",
+    "js": ["es6-promise.auto.min.js", "es6-promise.min.js"]
+  }],
+  "fetch": ["1.0"],
+  "font-awesome": [{
+    "ver": "4.7",
+    "css": ["font-awesome.min.css"],
+    "fonts": ["fontawesome-webfont.svg"]
+  }],
+  "jBox": [{
+    "ver": "0.3",
+    "js": ["jBox.min.js"],
+    "css": ["jBox.min.css"]
+  }],
+  "jquery.dotdotdot": ["1.7"],
+  "knockout": ["3.4"],
+  "normalize": [{
+    "ver": "5.0",
+    "css": ["normalize.min.css"]
+  }],
+  "piwik": ["2.16"],
+  "underscore.js": ["1.8"],
+  "video.js": [{
+    "ver": "5.12",
+    "": ["video.min.js"],
+    "alt": ["video-js-cdn.min.css", "video.novtt.min.js"]
+  }]
+}

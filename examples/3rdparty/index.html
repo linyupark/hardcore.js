@@ -1,0 +1,272 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>第三方库CDN</title>
+  <style>
+    *{padding: 0;margin: 0; font-family: STHeiti, Tahoma;}
+    ::-webkit-input-placeholder{color: #eee;}
+    h1{color: #337ab7; text-align: center; padding: 20px;}
+    app{font-size: 16px;}
+    .search-index{text-align: center; padding-bottom: 10px;}
+    .search-index input{padding: 4px 12px; font-size: 18px; outline: none; width: 80%; text-align: center; border: none; border-bottom: 1px solid #ccc;}
+    .tag-list{text-align: center; font-size: 12px;width: 80%; margin: 0 auto;}
+    .tag-list a{color: #fff; background: #999; border-radius: 2px; display: inline-block; padding: 2px 5px; text-decoration: none; text-shadow: 1px 1px 0 #666; margin-top: 3px;}
+    .tag-list a:active{text-shadow: none; }
+    .result-list dd{padding: 20px 0 40px 0;}
+    .result-list, .memo{width: 80%; margin: 20px auto;}
+    .result-list label{font-weight: bold; font-size: 24px; color: #337ab7; margin: 0 0 10px 30px;}
+    .result-list small{font-size: 12px; color: #999;}
+    .result-list dd>p{margin: 15px 0 0 10%;}
+    .result-list dd>p input{width: 80%; font-size: 12px; padding: 4px 10px; margin-top: 5px; outline: none; border: none; border-bottom: 1px solid #eee; }
+    .result-list dd>p a{text-decoration: none; font-size: 20px; vertical-align: bottom; color: #9dcc97;}
+    .result-list small>raw>a{font-size: 12px;}
+    .memo{ width: 78%; font-size: 12px; background: #edf7ec; color: #999; padding: 10px; line-height: 1.6; border-radius: 5px; }
+    .flash{text-align: center;font-size: 14px;}
+    .flash input, .flash button{ padding:5px 10px; font-size: 14px;}
+    .flash input{width: 50%;}
+  </style>
+  <link rel="icon" href="//jsfiddle.net/favicon.png">
+</head>
+<body>
+  
+  <h1>第三方库CDN</h1>
+  <app></app>
+  <reflash-cdn></reflash-cdn>
+  
+  <script src="//cdn.bootcss.com/riot/2.6.5/riot.min.js" defer></script>
+  <script>
+
+    // 资源数据
+    var _cdn_data;
+
+    var _cdn_memo = {
+      "jquery_1.8": 'PC端支持旧浏览器中兼容性最好的版本',
+      "jquery_1.11.0": '项目在用版本,暂保留,如测试1.12没问题可升级',
+      "vue_2.0": '<a href="http://caniuse.com/#feat=es5">浏览器支持列表</a>',
+      "normalize_5.0": '项目中未使用，如测试后没问题可升级'
+    };
+
+    document.addEventListener("DOMContentLoaded", function(){
+
+      // raw
+      riot.tag("raw", '', function(opts){
+        var _this = this;
+        setTimeout(function(){
+          _this.root.innerHTML = _this.opts.html || "";
+        }, 0);
+      }); 
+
+      // 结果列表
+      riot.tag("result-list", '\
+      <dl if="{var.cdn_list.length > 0}">\
+      <dd each="{cdn in var.cdn_list}">\
+        <label>{cdn.name}</label>\
+        <p each="{res in cdn[cdn.name]}">\
+          {res.version}\
+          <small>\
+            <raw html="{var.memo[cdn.name+\'_\'+res.version]}"></raw>\
+          </small>\
+          <br> \
+          <input if="{res.url}" onclick="{fn.select}" type="text" value="//res.winbaoxian.com/3rdparty/{res.url}">\
+          <a if="{res.url}" target="_blank" href="//res.winbaoxian.com/3rdparty/{res.url}">@</a>\
+          <span if="{res.url_list}" each="{url in res.url_list}">\
+            <input type="text" onclick="{fn.select}" value="//res.winbaoxian.com/3rdparty/{url}">\
+            <a target="_blank" href="//res.winbaoxian.com/3rdparty/{url}">@</a><br>\
+          </span>\
+        </p>\
+      </dd>\
+      </dl>\
+      ', function(opts){
+        var _this = this;
+        // 变量
+        this.var = {
+          cdn_list: [],
+          memo: _cdn_memo
+        };
+        // 函数
+        this.fn = {
+          select: function(e){
+            e.target.select();
+          }
+        };
+        // 事件
+        this.on("clean", function(){
+          _this.var.cdn_list = [];
+          _this.update();
+        });
+        this.on("push", function(cdn){
+          var data = {
+            name: cdn.name
+          };
+          data[cdn.name] = [];
+          if(!cdn.res instanceof Array) return;
+          if(typeof cdn.res[0] === "string"){
+            // 资源为单文件
+            cdn.res.forEach(function(ver){
+              data[cdn.name].push({
+                version: ver,
+                url: cdn.name+"/"+ver+"/"+cdn.name.replace(".js", "")+".min.js"
+              });
+            });
+          }
+          else if(typeof cdn.res[0] === "object"){
+            // 资源为对象
+            cdn.res.forEach(function(bundle, i){
+              data[cdn.name][i] = {};
+              data[cdn.name][i].version = bundle.ver;
+              data[cdn.name][i].url_list = data[cdn.name][i].url_list || [];
+              Object.keys(bundle).forEach(function(type){
+                if(type !== "ver"){
+                  bundle[type].forEach(function(url){
+                    data[cdn.name][i].url_list.push(
+                      type === "" ? 
+                      cdn.name+"/"+bundle.ver+"/"+url : 
+                      cdn.name+"/"+bundle.ver+"/"+type+"/"+url);
+                  });
+                }
+              });
+            });
+          }
+          _this.var.cdn_list.push(data);
+          _this.update();
+          // console.log("push data:", data);
+        });
+      });
+
+      // 索引建议
+      riot.tag("search-index", '\
+        <input type="text" name="search" oninput="{fn.check_query}" placeholder="Search..">\
+      ', function(opts){
+        var _this = this;
+        // 变量
+        this.var = {
+          data: {},
+          result: [],
+          timer: null,
+          key: ""
+        };
+        // 函数
+        this.fn = {
+          check_query: function(e){
+            _this.var.result = [];
+            clearTimeout(_this.var.timer);
+            _this.trigger("waiting");
+            if(e.target.value.length < 1) return;
+            _this.var.timer = setTimeout(function(){
+              _this.trigger("query", e.target.value);
+            }, 300);
+          }
+        };
+        // 事件
+        this
+        .on("query", function(key){
+          Object.keys(_this.var.data).forEach(function(name){
+            var reg = new RegExp(key, "i");
+            name.search(reg) !== -1 && 
+            _this.trigger("got", {
+              name: name, res: _this.var.data[name]
+            });
+          });
+        })
+        .on("mount", function(){
+          _this.search.select();
+        });
+      });
+
+      // main
+      riot.tag("app", '\
+        <p class="search-index"><search-index/></p>\
+        <p class="tag-list">\
+          <i each="{tag in var.tag_list}">\
+          <a href="javascript:;" onclick="{fn.tag_search}">{tag}</a>\
+          </i>\
+        </p>\
+        <p class="memo">\
+          * 引入多个 js 则 &lt;script&gt; 标签加上 defer 属性，且按照依赖顺序引入，页面执行脚本要在 DOMContentLoaded 触发后运行;<br>\
+          * 全项目通用 js 及第三方库请放置 &lt;head&gt; 内，且要放置在 &lt;link&gt; 以其他标签下，当前业务相关的 js 请在 &lt;body&gt; 内引入;\
+        </p>\
+        <div class="result-list"><result-list/></div>\
+      ', function(opts){
+        var _this = this;
+        // 变量
+        this.var = {
+          tag_list: [],
+          data: _cdn_data,
+          memo: null
+        };
+        // 函数
+        this.fn = {
+          tag_search: function(e){
+            _this.tags["result-list"].trigger("clean");
+            _this.tags["search-index"].trigger("query", e.item.tag);
+          }
+        };
+        // 事件
+        this.on("mount", function(){
+          var tag_search = _this.tags["search-index"],
+              tag_result = _this.tags["result-list"];
+          // 传输数据
+          tag_search.var.data = _this.var.data;
+          // 获得可提供点击的库名
+          Object.keys(_this.var.data).forEach(function(tag){
+            _this.var.tag_list.push(tag);
+          });
+          // 得到资源信息
+          tag_search.on("got", function(cdn){
+            // 推送到结果列表
+            tag_result.trigger("push", cdn);
+            // 显示备注
+            _this.var.memo = _cdn_memo[cdn.name];
+            _this.update();
+          });
+          // 重新输入则清空列表
+          tag_search.on("waiting", function(){
+            tag_result.trigger("clean");
+          });
+          _this.update();
+        })
+      });
+
+      var _xhr = new XMLHttpRequest();
+      _xhr.open("GET", "./package.json", true);
+      _xhr.onload = function(e){
+        if(e.target.status === 200 || e.target.status === 304){
+          _cdn_data = JSON.parse(e.target.responseText);
+          // 挂载
+          riot.mount("app");
+        }
+      };
+      _xhr.send();
+
+      // flash cdn
+      riot.route("/flash", function() {
+        riot.tag("reflash-cdn", '\
+          <p class="flash"><input type="text" name="cdn" value="" placeholder="//文件地址">\
+          <button onclick="{reflash}">刷新缓存{status}</button></p>', 
+        function(opts){
+          var _this = this;
+          this.reflash = function(){
+            _this.status = "";
+            if(!this.cdn.value || this.cdn.value === "") return;
+            var _xhr = new XMLHttpRequest();
+            _xhr.open("POST", "//service.winbaoxian.cn/aliyun/cdnrefresh", true);
+            _xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            _xhr.onload = function(e){
+              if(e.target.status === 200 || e.target.status === 304){
+                _this.status = "ok";
+                _this.update();
+              }
+            };
+            _xhr.send("path="+encodeURIComponent(this.cdn.value));
+          };
+        });
+        riot.mount("reflash-cdn");
+      })
+      riot.route.start(true);
+
+    });
+
+  </script>
+</body>
+</html>
