@@ -6,19 +6,8 @@
 <body>
   <script src="../build/bundle.js"></script>
   <script>
-
-  // Promise.resolve('resolved').then(function(result) {
-  //   console.log('Direct Resolved Promise.');
-  //   return new Promise(function(resolve) {
-  //     setTimeout(function(){console.log("number"); resolve(123);}, 1000);
-  //   });
-  // }).then(function(result) {
-  //   console.log('Chained Resolved Promise.');
-  //   console.log(result);
-  //   return 1234;
-  // }).then(function(num){
-  //   console.log(num);
-  // });
+  
+  HC.config();
 
   HC.Promise.resolve('resolved')
   .then(function(result) {

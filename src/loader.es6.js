@@ -31,11 +31,11 @@ export class Loader {
           }
         }
         this.batchDepend.apply(this, batches)
-        .then(res => {
-          resolve(res);
+        .then(files => {
+          resolve(files);
         })
-        .catch(i => {
-          reject(i);
+        .catch(file => {
+          reject(file);
         });
       });
     });
@@ -51,18 +51,19 @@ export class Loader {
       return this.batch(batches);
     }
     return new Promise((resolve, reject) => {
-      let checker = (i) => {
+      let checker = (i, files=[]) => {
         if(i < batches.length){
           this.batch(batches[i])
-          .then(() => {
-            checker(i+1);
+          .then(file => {
+            files = files.concat(file);
+            checker(i+1, files);
           })
-          .catch(i => {
-            reject(i);
+          .catch(file => {
+            reject(file);
           });
         }
         else{
-          resolve(batches);
+          resolve(files);
         }
       };
       checker(0);
@@ -79,7 +80,7 @@ export class Loader {
     for (const _res of resource) {
       promise_batch.push(new Promise((resolve, reject) => {
         let ext = _res.split(".").pop(),
-          attrs = {}, _i = resource.indexOf(_res);
+          attrs = {}, file = _res.split("/").pop();
         if (ext === "js") {
           attrs.defer = true;
         }
@@ -88,10 +89,10 @@ export class Loader {
           loadFile(this.types[ext], _res, {
             attrs: attrs,
             success() {
-              resolve(_res);
+              resolve(file);
             },
             error() {
-              reject(_i);
+              reject(file);
             }
           });
         }

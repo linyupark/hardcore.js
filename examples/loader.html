@@ -13,28 +13,13 @@
   <script src="../build/bundle.js"></script>
   <script>
     HC.config();
-    // HC.Loader.batch(["http://res.winbaoxian.com/3rdparty/jquery/1.8/jquery.min.js"])
-    // .then(function(res){
-    //   HC.Loader.batch(["http://res.winbaoxian.com/3rdparty/jBox/0.3/js/jBox.min.js","http://res.winbaoxian.com/3rdparty/jBox/0.3/css/jBox.min.css"])
-    //   .then(function(){
-    //     $('.tooltip').jBox('Tooltip');
-    //   });
-    // })
-    // .catch(function(i){
-    //   HC.console("info", i);
-    // });
-
-    // HC.Loader.batchDepend(
-    //   ["http://res.winbaoxian.com/3rdparty/jquery/1.8/jquery.min.js"],
-    //   ["http://res.winbaoxian.com/3rdparty/jBox/0.3/js/jBox.min.js", 
-    //   "http://res.winbaoxian.com/3rdparty/jBox/0.3/css/jBox.min.css"])
-    // .then(function(){
-    //   $('.tooltip').jBox('Tooltip');
-    // });
-
-    HC.Loader.jsonDepend("./loader.json", ["jquery1.8", "jBox"]).then(function(res){
-      console.log(res);
+    HC.Loader.jsonDepend("./loader.json", ["jquery1.8", "jBox"])
+    .then(function(files){
+      console.log(files);
       $('.tooltip').jBox('Tooltip');
+    })
+    .catch(function(err_file){
+      console.log(err_file);
     });
     
   </script>

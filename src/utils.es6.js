@@ -257,15 +257,14 @@ const loadFile = (type = "script", url, options) => {
     el.rel = "stylesheet";
   }
   el.addEventListener("load", opts.success, false);
+  el.addEventListener("error", opts.error, false);
   el.addEventListener("error", () => {
-    opts.error.call(null, el);
     // 删除标签
-    for(const _tag of document[opts.position].getElementsByTagName(type)){
-      if(_tag == el){
-        _tag.parentNode.removeChild(_tag);
-      }
+    let i = 0, tags = document[opts.position].getElementsByTagName(type);
+    for(; i < tags.length; i++){
+      if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
     }
-  }, false);
+  }, {once: true});
   document[opts.position].appendChild(el);
 };
 

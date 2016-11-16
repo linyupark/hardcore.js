@@ -111,7 +111,15 @@ let EmitterPromise = class {
    */
   catch(cb=()=>{}){
     this.on("reject", (e, reason) => {
-      cb.call(null, reason);
+      try{
+        let result = cb.call(null, reason);
+        if(result){
+          this.emit("resolve", result);
+        }
+      }
+      catch(e) {
+        throw new Error(e);
+      }
     });
     return this;
   }

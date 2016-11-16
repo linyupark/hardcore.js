@@ -260,15 +260,14 @@ const loadFile = (type = "script", url, options) => {
     el.rel = "stylesheet";
   }
   el.addEventListener("load", opts.success, false);
+  el.addEventListener("error", opts.error, false);
   el.addEventListener("error", () => {
-    opts.error.call(null, el);
     // 删除标签
-    for(const _tag of document[opts.position].getElementsByTagName(type)){
-      if(_tag == el){
-        _tag.parentNode.removeChild(_tag);
-      }
+    let i = 0, tags = document[opts.position].getElementsByTagName(type);
+    for(; i < tags.length; i++){
+      if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
     }
-  }, false);
+  }, {once: true});
   document[opts.position].appendChild(el);
 };
 
@@ -531,7 +530,15 @@ let EmitterPromise = class {
    */
   catch(cb=()=>{}){
     this.on("reject", (e, reason) => {
-      cb.call(null, reason);
+      try{
+        let result = cb.call(null, reason);
+        if(result){
+          this.emit("resolve", result);
+        }
+      }
+      catch(e) {
+        throw new Error(e);
+      }
     });
     return this;
   }
@@ -571,11 +578,11 @@ class Loader {
           }
         }
         this.batchDepend.apply(this, batches)
-        .then(res => {
-          resolve(res);
+        .then(files => {
+          resolve(files);
         })
-        .catch(i => {
-          reject(i);
+        .catch(file => {
+          reject(file);
         });
       });
     });
@@ -591,18 +598,19 @@ class Loader {
       return this.batch(batches);
     }
     return new Promise((resolve, reject) => {
-      let checker = (i) => {
+      let checker = (i, files=[]) => {
         if(i < batches.length){
           this.batch(batches[i])
-          .then(() => {
-            checker(i+1);
+          .then(file => {
+            files = files.concat(file);
+            checker(i+1, files);
           })
-          .catch(i => {
-            reject(i);
+          .catch(file => {
+            reject(file);
           });
         }
         else{
-          resolve(batches);
+          resolve(files);
         }
       };
       checker(0);
@@ -619,7 +627,7 @@ class Loader {
     for (const _res of resource) {
       promise_batch.push(new Promise((resolve, reject) => {
         let ext = _res.split(".").pop(),
-          attrs = {}, _i = resource.indexOf(_res);
+          attrs = {}, file = _res.split("/").pop();
         if (ext === "js") {
           attrs.defer = true;
         }
@@ -628,10 +636,10 @@ class Loader {
           loadFile(this.types[ext], _res, {
             attrs: attrs,
             success() {
-              resolve(_res);
+              resolve(file);
             },
             error() {
-              reject(_i);
+              reject(file);
             }
           });
         }
