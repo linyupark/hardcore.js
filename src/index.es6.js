@@ -1,6 +1,8 @@
-import trick from "./trick.es6.js";
+import * as trick from "./trick.es6.js";
 import utils from "./utils.es6.js";
 import {Loader} from "./loader.es6.js";
+import {emitter} from "./emitter.es6.js";
+import {Promise} from "./promise.es6.js";
 
 const HC = class {
 
@@ -44,7 +46,7 @@ const HC = class {
    * @return {null}
    */
   static log(start=true){
-    let errors = [], msg, logger = trick.observable();
+    let errors = [], msg, logger = emitter();
     window.onerror = () => { return true; };
     if(!start) return;
     window.addEventListener("error", (e) => {
@@ -77,6 +79,8 @@ const HC = class {
 HC.trick = trick;
 HC.utils = utils;
 HC.Loader = Loader;
+HC.emitter = emitter;
+HC.Promise = Promise;
 
 export {
   HC

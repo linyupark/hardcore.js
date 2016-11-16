@@ -8,7 +8,7 @@
   <script>
     var 汽车 = function(name){
       this.name = name;
-      HC.trick.observable(this);
+      HC.emitter(this);
       this.once("启动", function(){
         console.log(this.name + "嘟嘟嘟...");
       });
@@ -22,6 +22,7 @@
         var _this = this;
         console.log(this.name + "嘎...");
         setTimeout(function(){
+          _this.emit("熄火", ms);
           _this.emit("熄火", ms);
         }, ms);
       });

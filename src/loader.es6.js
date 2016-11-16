@@ -1,7 +1,7 @@
 import {
   loadFile, cacheJSON
 } from "./utils.es6.js";
-import trick from "./trick.es6.js";
+import {Promise} from "./promise.es6.js";
 
 export class Loader {
 
@@ -23,7 +23,7 @@ export class Loader {
    */
   static jsonDepend(url, alias=[]){
     let batches = [];
-    return new trick.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       cacheJSON(url, json => {
         for(const _name of alias){
           if(json[_name]){
@@ -50,7 +50,7 @@ export class Loader {
     if(batches.length < 2){
       return this.batch(batches);
     }
-    return new trick.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let checker = (i) => {
         if(i < batches.length){
           this.batch(batches[i])
@@ -77,7 +77,7 @@ export class Loader {
   static batch(resource = []) {
     let promise_batch = [];
     for (const _res of resource) {
-      promise_batch.push(new trick.Promise((resolve, reject) => {
+      promise_batch.push(new Promise((resolve, reject) => {
         let ext = _res.split(".").pop(),
           attrs = {}, _i = resource.indexOf(_res);
         if (ext === "js") {
@@ -97,7 +97,7 @@ export class Loader {
         }
       }));
     }
-    return trick.Promise.all(promise_batch);
+    return Promise.all(promise_batch);
   }
 
 }
