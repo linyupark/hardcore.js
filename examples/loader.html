@@ -32,7 +32,7 @@
     //   $('.tooltip').jBox('Tooltip');
     // });
 
-    HC.Loader.jsonDepend("http://127.0.0.1/lab/hardcore.js/examples/loader.json", ["jquery1.8", "jBox"]).then(function(res){
+    HC.Loader.jsonDepend("./loader.json", ["jquery1.8", "jBox"]).then(function(res){
       console.log(res);
       $('.tooltip').jBox('Tooltip');
     });
