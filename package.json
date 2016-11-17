@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "description": "",
   "scripts": {
-    "dev": "onchange ./src/* -- npm run rollup & onchange ./build/bundle.es6.js -- npm run babel",
-    "prerollup": "reset && eslint ./src/*",
+    "macdev": "onchange ./src/* -- npm run rollup & onchange ./build/bundle.es6.js -- npm run babel",
+    "windev": "start onchange ./src/* -- npm run rollup && start onchange ./build/bundle.es6.js -- npm run babel",
+    "prerollup": "eslint ./src/*",
     "rollup": "rollup ./src/index.es6.js -o ./build/bundle.es6.js -f iife -n window",
     "babel": "babel -o ./build/bundle.js ./build/bundle.es6.js",
     "uglifyjs": "uglifyjs ./build/bundle.js -m -o ./dist/wylib.min.js --source-map ./dist/wylib.min.map",

@@ -528,10 +528,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }
           }
 
-          if (fns.length === 0) {
-            // 寄存未匹配到的事件
-            el.__emited[name] = [name].concat(args);
-          }
+          el.__emited[name] = [name].concat(args);
           // callback记录中有*，则任意name都要触发*所持fn
           if (_callbacks["*"] && name !== "*") el.emit.apply(el, ["*", name].concat(args));
         });
