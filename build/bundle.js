@@ -627,14 +627,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
 
-        this.on("reject", function (e, reason) {
+        this.once("reject", function (e, reason) {
           try {
             var result = cb.call(null, reason);
             if (result) {
               _this4.emit("resolve", result);
             }
           } catch (e) {
-            throw new Error(e);
+            _this4.emit("reject", e);
           }
         });
         return this;

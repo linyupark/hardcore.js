@@ -110,7 +110,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   catch(cb=()=>{}){
-    this.on("reject", (e, reason) => {
+    this.once("reject", (e, reason) => {
       try{
         let result = cb.call(null, reason);
         if(result){
@@ -118,7 +118,7 @@ let EmitterPromise = class {
         }
       }
       catch(e) {
-        throw new Error(e);
+        this.emit("reject", e);
       }
     });
     return this;
