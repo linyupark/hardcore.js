@@ -35,7 +35,10 @@ export const emitter = (el = {}) => {
     value(events, fn){
       if(typeof fn !== "function")  return el;
       scanEvents(events, (name) => {
-        (_callbacks[name] = _callbacks[name] || []).push(fn);
+        _callbacks[name] = _callbacks[name] || [];
+        if(_callbacks[name].indexOf(fn) === -1){
+          _callbacks[name].push(fn);
+        }
         if(el.__emited[name]){
           fn.apply(el, el.__emited[name]);
         }
@@ -84,7 +87,7 @@ export const emitter = (el = {}) => {
     value(events, ...args){
       scanEvents(events, (name) => {
         const fns = _callbacks[name] || [];
-        for(const _fn of fns){
+        for(let _fn of fns){
           _fn.apply(el, [name].concat(args));
         }
         if(fns.length === 0){

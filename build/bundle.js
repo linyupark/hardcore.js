@@ -446,7 +446,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function value(events, fn) {
         if (typeof fn !== "function") return el;
         scanEvents(events, function (name) {
-          (_callbacks[name] = _callbacks[name] || []).push(fn);
+          _callbacks[name] = _callbacks[name] || [];
+          if (_callbacks[name].indexOf(fn) === -1) {
+            _callbacks[name].push(fn);
+          }
           if (el.__emited[name]) {
             fn.apply(el, el.__emited[name]);
           }
@@ -628,13 +631,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
 
         this.once("reject", function (e, reason) {
+          var result = void 0;
           try {
-            var result = cb.call(null, reason);
-            if (result) {
-              _this4.emit("resolve", result);
-            }
+            if (_this4.__no_throw) return;
+            result = cb.call(null, reason);
+            _this4.__no_throw = true;
+            if (result) _this4.emit("resolve", result);
           } catch (e) {
             _this4.emit("reject", e);
+            if (!_this4.__no_throw && _this4.__emited.reject[1] === e) {
+              throw e;
+            }
           }
         });
         return this;
@@ -719,9 +726,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
-  if ("Promise" in window) {
-    Promise = window.Promise;
-  }
+
+  // import {emitter} from "./emitter.es6.js";
 
   var Loader = function () {
     function Loader() {
@@ -743,41 +749,140 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var alias = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-        var batches = [];
-        return new Promise(function (resolve, reject) {
-          cacheJSON(url, function (json) {
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+        var batches = [],
+            backup_files = [];
+        var replace_res = function replace_res(file) {
+          // 查找备份资源
+          var backup_file = false;
+          var _iteratorNormalCompletion5 = true;
+          var _didIteratorError5 = false;
+          var _iteratorError5 = undefined;
 
-            try {
-              for (var _iterator5 = alias[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                var _name = _step5.value;
+          try {
+            for (var _iterator5 = backup_files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+              var _f = _step5.value;
 
-                if (json[_name]) {
-                  batches.push(json[_name]);
-                }
-              }
-            } catch (err) {
-              _didIteratorError5 = true;
-              _iteratorError5 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                  _iterator5.return();
-                }
-              } finally {
-                if (_didIteratorError5) {
-                  throw _iteratorError5;
-                }
+              if (_f.split("/").pop() === file.name) {
+                backup_file = _f;
               }
             }
+          } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                _iterator5.return();
+              }
+            } finally {
+              if (_didIteratorError5) {
+                throw _iteratorError5;
+              }
+            }
+          }
 
-            _this5.batchDepend.apply(_this5, batches).then(function (files) {
-              resolve(files);
-            }).catch(function (file) {
-              reject(file);
-            });
+          if (!backup_file) return false;
+          // 替换资源
+          for (var _i in batches) {
+            for (var _j in batches[_i]) {
+              if (batches[_i][_j] === file.res) {
+                batches[_i][_j] = backup_file;
+                backup_files.splice(backup_files.indexOf(backup_file), 1);
+              }
+            }
+          }
+          return batches;
+        };
+
+        cacheJSON(url, function (json) {
+          var import_files = void 0;
+          var _iteratorNormalCompletion6 = true;
+          var _didIteratorError6 = false;
+          var _iteratorError6 = undefined;
+
+          try {
+            for (var _iterator6 = alias[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+              var _name = _step6.value;
+
+              if (!json[_name]) return;
+              // 过滤重复的文件，将其放入备份
+              import_files = [];
+              var _iteratorNormalCompletion7 = true;
+              var _didIteratorError7 = false;
+              var _iteratorError7 = undefined;
+
+              try {
+                for (var _iterator7 = json[_name][Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                  var _f = _step7.value;
+
+                  var exist = false;
+                  var _iteratorNormalCompletion8 = true;
+                  var _didIteratorError8 = false;
+                  var _iteratorError8 = undefined;
+
+                  try {
+                    for (var _iterator8 = import_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                      var _ipf = _step8.value;
+
+                      if (_ipf.split("/").pop() === _f.split("/").pop()) {
+                        exist = true;
+                        backup_files.push(_f);
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError8 = true;
+                    _iteratorError8 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                        _iterator8.return();
+                      }
+                    } finally {
+                      if (_didIteratorError8) {
+                        throw _iteratorError8;
+                      }
+                    }
+                  }
+
+                  exist || import_files.push(_f);
+                }
+              } catch (err) {
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                    _iterator7.return();
+                  }
+                } finally {
+                  if (_didIteratorError7) {
+                    throw _iteratorError7;
+                  }
+                }
+              }
+
+              batches.push(import_files);
+            }
+          } catch (err) {
+            _didIteratorError6 = true;
+            _iteratorError6 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                _iterator6.return();
+              }
+            } finally {
+              if (_didIteratorError6) {
+                throw _iteratorError6;
+              }
+            }
+          }
+
+          return _this5.batchDepend.apply(_this5, batches).catch(function (file) {
+            replace_res(file);
+            return batches;
+          }).then(function (batches) {
+            return _this5.batchDepend.apply(_this5, batches);
           });
         });
       }
@@ -791,7 +896,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'batchDepend',
       value: function batchDepend() {
-        var _this6 = this;
+        var promise_list = [];
 
         for (var _len4 = arguments.length, batches = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
           batches[_key4] = arguments[_key4];
@@ -800,23 +905,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (batches.length < 2) {
           return this.batch(batches);
         }
-        return new Promise(function (resolve, reject) {
-          var checker = function checker(i) {
-            var files = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-            if (i < batches.length) {
-              _this6.batch(batches[i]).then(function (file) {
-                files = files.concat(file);
-                checker(i + 1, files);
-              }).catch(function (file) {
-                reject(file);
-              });
-            } else {
-              resolve(files);
-            }
-          };
-          checker(0);
-        });
+        for (var _i in batches) {
+          promise_list.push(this.batch(batches[_i]));
+        }
+        return Promise.all(promise_list);
       }
 
       /**
@@ -828,18 +920,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'batch',
       value: function batch() {
-        var _this7 = this;
+        var _this6 = this;
 
         var resource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
         var promise_batch = [];
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
+        var _iteratorNormalCompletion9 = true;
+        var _didIteratorError9 = false;
+        var _iteratorError9 = undefined;
 
         try {
           var _loop = function _loop() {
-            var _res = _step6.value;
+            var _res = _step9.value;
 
             promise_batch.push(new Promise(function (resolve, reject) {
               var ext = _res.split(".").pop(),
@@ -848,34 +940,37 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               if (ext === "js") {
                 attrs.defer = true;
               }
-              if (!_this7.types[ext]) reject(_res, "文件格式不支持");else {
-                loadFile(_this7.types[ext], _res, {
+              if (!_this6.types[ext]) reject(_res, "文件格式不支持");else {
+                loadFile(_this6.types[ext], _res, {
                   attrs: attrs,
                   success: function success() {
                     resolve(file);
                   },
                   error: function error() {
-                    reject(file);
+                    reject({
+                      res: _res,
+                      name: file
+                    });
                   }
                 });
               }
             }));
           };
 
-          for (var _iterator6 = resource[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          for (var _iterator9 = resource[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
             _loop();
           }
         } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
+          _didIteratorError9 = true;
+          _iteratorError9 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-              _iterator6.return();
+            if (!_iteratorNormalCompletion9 && _iterator9.return) {
+              _iterator9.return();
             }
           } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
+            if (_didIteratorError9) {
+              throw _iteratorError9;
             }
           }
         }
@@ -961,7 +1056,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'log',
       value: function log() {
-        var _this8 = this;
+        var _this7 = this;
 
         var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -977,20 +1072,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           if (e.message !== "Script error.") {
             var _msg = e.filename + ' (' + e.message + '[' + e.lineno + ':' + e.colno + '])';
             errors.push(_msg);
-            _this8.console("error", _msg);
+            _this7.console("error", _msg);
           }
           msg = errors.join("\n");
           logger.emit("error", msg);
           // 有跳转页面
-          if (!_this8.config.debug && _this8.config.errorPageUrl) {
-            location.href = _this8.config.errorPageUrl + '?from=' + location.href + '&msg=' + msg;
+          if (!_this7.config.debug && _this7.config.errorPageUrl) {
+            location.href = _this7.config.errorPageUrl + '?from=' + location.href + '&msg=' + msg;
           }
           // 抽样提交
-          if (_this8.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this8.config.reportChance)) {
-            utils.xhr(_this8.config.reportUrl, {
+          if (_this7.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this7.config.reportChance)) {
+            utils.xhr(_this7.config.reportUrl, {
               method: "POST", data: { message: msg }
             });
-            _this8.console("info", "Error message reported.");
+            _this7.console("info", "Error message reported.");
           }
           return true;
         }, false);

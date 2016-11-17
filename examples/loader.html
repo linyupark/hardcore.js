@@ -13,14 +13,7 @@
   <script src="../build/bundle.js"></script>
   <script>
     HC.config();
-    HC.Loader.jsonDepend("./loader.json", ["jquery1.8", "jBox"])
-    .then(function(files){
-      console.log(files);
-      $('.tooltip').jBox('Tooltip');
-    })
-    .catch(function(err_file){
-      console.log(err_file);
-    });
+    HC.Loader.jsonDepend("./loader.json", ["jquery1.8", "jBox"]);
     
   </script>
 </body>

@@ -352,7 +352,10 @@ const emitter = (el = {}) => {
     value(events, fn){
       if(typeof fn !== "function")  return el;
       scanEvents(events, (name) => {
-        (_callbacks[name] = _callbacks[name] || []).push(fn);
+        _callbacks[name] = _callbacks[name] || [];
+        if(_callbacks[name].indexOf(fn) === -1){
+          _callbacks[name].push(fn);
+        }
         if(el.__emited[name]){
           fn.apply(el, el.__emited[name]);
         }
@@ -401,7 +404,7 @@ const emitter = (el = {}) => {
     value(events, ...args){
       scanEvents(events, (name) => {
         const fns = _callbacks[name] || [];
-        for(const _fn of fns){
+        for(let _fn of fns){
           _fn.apply(el, [name].concat(args));
         }
         if(fns.length === 0){
@@ -530,14 +533,17 @@ let EmitterPromise = class {
    */
   catch(cb=()=>{}){
     this.once("reject", (e, reason) => {
+      let result;
       try{
-        let result = cb.call(null, reason);
-        if(result){
-          this.emit("resolve", result);
-        }
-      }
-      catch(e) {
+        if(this.__no_throw) return;
+        result = cb.call(null, reason);
+        this.__no_throw = true;
+        if(result) this.emit("resolve", result);
+      } catch(e) {
         this.emit("reject", e);
+        if(!this.__no_throw && this.__emited.reject[1] === e){
+          throw e;
+        }
       }
     });
     return this;
@@ -546,9 +552,8 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if("Promise" in window){
-  Promise = window.Promise;
-}
+
+// import {emitter} from "./emitter.es6.js";
 
 class Loader {
 
@@ -569,21 +574,53 @@ class Loader {
    * @return {promise}
    */
   static jsonDepend(url, alias=[]){
-    let batches = [];
-    return new Promise((resolve, reject) => {
-      cacheJSON(url, json => {
-        for(const _name of alias){
-          if(json[_name]){
-            batches.push(json[_name]);
+    let batches = [], backup_files = [];
+    let replace_res = (file) => {
+      // 查找备份资源
+      let backup_file = false;
+      for(const _f of backup_files){
+        if(_f.split("/").pop() === file.name){
+          backup_file = _f;
+        }
+      }
+      if(!backup_file) return false;
+      // 替换资源
+      for(const _i in batches){
+        for(const _j in batches[_i]){
+          if(batches[_i][_j] === file.res){
+            batches[_i][_j] = backup_file;
+            backup_files.splice(backup_files.indexOf(backup_file), 1);
           }
         }
-        this.batchDepend.apply(this, batches)
-        .then(files => {
-          resolve(files);
-        })
-        .catch(file => {
-          reject(file);
-        });
+      }
+      return batches;
+    };
+
+    cacheJSON(url, json => {
+      let import_files;
+      for(const _name of alias){
+        if(!json[_name]) return;
+        // 过滤重复的文件，将其放入备份
+        import_files = [];
+        for(const _f of json[_name]){
+          let exist = false;
+          for(const _ipf of import_files){
+            if(_ipf.split("/").pop() === _f.split("/").pop()){
+              exist = true;
+              backup_files.push(_f);
+            }
+          }
+          exist ||  import_files.push(_f);
+        }
+        batches.push(import_files);
+      }
+      return this.batchDepend.apply(this, batches)
+      .catch(file => {
+        replace_res(file);
+        return batches;
+      })
+      .then(batches => {
+        return this.batchDepend.apply(this, batches);
       });
     });
   }
@@ -594,27 +631,14 @@ class Loader {
    * @return {promise}
    */
   static batchDepend(...batches){
+    let promise_list = [];
     if(batches.length < 2){
       return this.batch(batches);
     }
-    return new Promise((resolve, reject) => {
-      let checker = (i, files=[]) => {
-        if(i < batches.length){
-          this.batch(batches[i])
-          .then(file => {
-            files = files.concat(file);
-            checker(i+1, files);
-          })
-          .catch(file => {
-            reject(file);
-          });
-        }
-        else{
-          resolve(files);
-        }
-      };
-      checker(0);
-    });
+    for(const _i in batches){
+      promise_list.push(this.batch(batches[_i]));
+    }
+    return Promise.all(promise_list);
   }
 
   /**
@@ -639,7 +663,10 @@ class Loader {
               resolve(file);
             },
             error() {
-              reject(file);
+              reject({
+                res: _res,
+                name: file
+              });
             }
           });
         }

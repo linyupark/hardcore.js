@@ -111,14 +111,17 @@ let EmitterPromise = class {
    */
   catch(cb=()=>{}){
     this.once("reject", (e, reason) => {
+      let result;
       try{
-        let result = cb.call(null, reason);
-        if(result){
-          this.emit("resolve", result);
-        }
-      }
-      catch(e) {
+        if(this.__no_throw) return;
+        result = cb.call(null, reason);
+        this.__no_throw = true;
+        if(result) this.emit("resolve", result);
+      } catch(e) {
         this.emit("reject", e);
+        if(!this.__no_throw && this.__emited.reject[1] === e){
+          throw e;
+        }
       }
     });
     return this;
@@ -127,8 +130,8 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if("Promise" in window){
-  Promise = window.Promise;
-}
+// if("Promise" in window){
+//   Promise = window.Promise;
+// }
 
 export {Promise};

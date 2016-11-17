@@ -2,6 +2,7 @@ import {
   loadFile, cacheJSON
 } from "./utils.es6.js";
 import {Promise} from "./promise.es6.js";
+// import {emitter} from "./emitter.es6.js";
 
 export class Loader {
 
@@ -22,21 +23,53 @@ export class Loader {
    * @return {promise}
    */
   static jsonDepend(url, alias=[]){
-    let batches = [];
-    return new Promise((resolve, reject) => {
-      cacheJSON(url, json => {
-        for(const _name of alias){
-          if(json[_name]){
-            batches.push(json[_name]);
+    let batches = [], backup_files = [];
+    let replace_res = (file) => {
+      // 查找备份资源
+      let backup_file = false;
+      for(const _f of backup_files){
+        if(_f.split("/").pop() === file.name){
+          backup_file = _f;
+        }
+      }
+      if(!backup_file) return false;
+      // 替换资源
+      for(const _i in batches){
+        for(const _j in batches[_i]){
+          if(batches[_i][_j] === file.res){
+            batches[_i][_j] = backup_file;
+            backup_files.splice(backup_files.indexOf(backup_file), 1);
           }
         }
-        this.batchDepend.apply(this, batches)
-        .then(files => {
-          resolve(files);
-        })
-        .catch(file => {
-          reject(file);
-        });
+      }
+      return batches;
+    };
+
+    cacheJSON(url, json => {
+      let import_files;
+      for(const _name of alias){
+        if(!json[_name]) return;
+        // 过滤重复的文件，将其放入备份
+        import_files = [];
+        for(const _f of json[_name]){
+          let exist = false;
+          for(const _ipf of import_files){
+            if(_ipf.split("/").pop() === _f.split("/").pop()){
+              exist = true;
+              backup_files.push(_f);
+            }
+          }
+          exist ||  import_files.push(_f);
+        }
+        batches.push(import_files);
+      }
+      return this.batchDepend.apply(this, batches)
+      .catch(file => {
+        replace_res(file);
+        return batches;
+      })
+      .then(batches => {
+        return this.batchDepend.apply(this, batches);
       });
     });
   }
@@ -47,27 +80,14 @@ export class Loader {
    * @return {promise}
    */
   static batchDepend(...batches){
+    let promise_list = [];
     if(batches.length < 2){
       return this.batch(batches);
     }
-    return new Promise((resolve, reject) => {
-      let checker = (i, files=[]) => {
-        if(i < batches.length){
-          this.batch(batches[i])
-          .then(file => {
-            files = files.concat(file);
-            checker(i+1, files);
-          })
-          .catch(file => {
-            reject(file);
-          });
-        }
-        else{
-          resolve(files);
-        }
-      };
-      checker(0);
-    });
+    for(const _i in batches){
+      promise_list.push(this.batch(batches[_i]));
+    }
+    return Promise.all(promise_list);
   }
 
   /**
@@ -92,7 +112,10 @@ export class Loader {
               resolve(file);
             },
             error() {
-              reject(file);
+              reject({
+                res: _res,
+                name: file
+              });
             }
           });
         }

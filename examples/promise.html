@@ -7,7 +7,27 @@
   <script src="../build/bundle.js"></script>
   <script>
   
-  HC.config();
+  // HC.config();
+
+  // var jsonPromise = new HC.Promise(function(resolve, reject) {
+  //   HC.utils.xhr("//fp.ip-api.com/json", {
+  //     cache: true,
+  //     data: {test: "1"},
+  //     done: function(res){
+  //       // console.log("xhr result:", res.query);
+  //       resolve(res.query);
+  //     },
+  //     fail: function() {
+  //       reject('json xhr failed.');
+  //     }
+  //   });
+  // });
+  // setTimeout(function() {
+  //   jsonPromise.then(function(result) {
+  //     console.log('xhr got json:');
+  //     console.dir(result);
+  //   })
+  // }, 1000);
 
   HC.Promise.resolve('resolved').then(function(result) {
     console.log('Direct Resolved Promise.');
@@ -21,38 +41,39 @@
     console.log(error);
   });
 
-  setTimeout(function(){
-    HC.Promise.resolve('resolved')
-    .then(function(result) {
-      console.log('Direct Resolved Promise.');
-      return new HC.Promise(function(resolve) {
-        setTimeout(function(){console.log("number"); resolve(123);}, 100);
-      });
-    }).then(function(result) {
-      console.log('Chained Resolved Promise.');
-      console.log(result);
-      return 1234;
-    }).then(function(num){
-      console.log(num);
-    })
-    .then(function(num){
-      return new HC.Promise(function(resolve) {
-        setTimeout(function(){console.log("number2"); resolve(456);}, 100);
-      });
-    })
-    .then(function(num){
-      console.log(num);
-    });
-  }, 2000);
+  // setTimeout(function(){
+  //   HC.Promise.resolve('resolved')
+  //   .then(function(result) {
+  //     console.log('Direct Resolved Promise.');
+  //     return new HC.Promise(function(resolve) {
+  //       setTimeout(function(){console.log("number"); resolve(123);}, 100);
+  //     });
+  //   }).then(function(result) {
+  //     console.log('Chained Resolved Promise.');
+  //     console.log(result);
+  //     return 1234;
+  //   }).then(function(num){
+  //     console.log(num);
+  //   })
+  //   .then(function(num){
+  //     return new HC.Promise(function(resolve) {
+  //       setTimeout(function(){console.log("number2"); resolve(456);}, 100);
+  //     });
+  //   })
+  //   .then(function(num){
+  //     console.log(num);
+  //   });
+  // }, 2000);
 
   setTimeout(function(){
-    HC.Promise.reject(new Error('just a error')).catch(function(error) {
-      console.log('Direct Rejected Promise.');
-      return 'I rectified the error';
-    }).then(function(result) {
-      console.log('Chained Resolved Promise.');
-      console.log(result);
-    });
+    // HC.Promise.reject(new Error('just a error')).catch(function(error) {
+    //   console.log('Direct Rejected Promise.');
+    //   return 'I rectified the error';
+    // }).then(function(result) {
+    //   console.log('Chained Resolved Promise.');
+    //   console.log(result);
+    // });
+    // // 
     // HC.Promise.reject(new Error('just a error')).catch(function(error) {
     //   console.log('Direct Rejected Promise.');
     //   throw new Error('piped error.');
@@ -60,14 +81,15 @@
     // }).catch(function(error) {
     //   console.log('Chained Rejected Promise.');
     //   console.log(error);
-    //   throw new Error('piped error two.');
-    // }).catch(function(error) {
-    //   console.log('Chained Rejected Promise.');
-    //   console.log(error);
     // });
-  }, 4000);
+    
+  }, 2000);
 
-  
+  // HC.Promise.reject(new Error('just a error')).catch(function(error) {
+  //   console.log('Direct Rejected Promise.');
+  //   throw new Error('piped error.');
+  //   return 'should never reach this';
+  // });
   </script>
 </body>
 </html>
