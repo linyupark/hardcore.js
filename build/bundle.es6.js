@@ -479,6 +479,9 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   static resolve(value){
+    if(value instanceof Promise){
+      return value;
+    }
     return new EmitterPromise((resolve) => {
       setTimeout(function(){
         resolve(value);

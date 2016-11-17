@@ -103,6 +103,11 @@
       console.log("2dn " + result);
     });
   }, 2000);
+
+
+  HC.Promise.resolve(HC.Promise.resolve(123)).then(function(result){
+    console.log(result);
+  });
   </script>
 </body>
 </html>

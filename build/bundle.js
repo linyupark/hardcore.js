@@ -693,6 +693,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'resolve',
       value: function resolve(value) {
+        if (value instanceof Promise) {
+          return value;
+        }
         return new EmitterPromise(function (resolve) {
           setTimeout(function () {
             resolve(value);
