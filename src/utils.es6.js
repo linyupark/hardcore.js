@@ -258,13 +258,13 @@ const loadFile = (type = "script", url, options) => {
   }
   el.addEventListener("load", opts.success, false);
   el.addEventListener("error", opts.error, false);
-  el.addEventListener("error", () => {
-    // 删除标签
-    let i = 0, tags = document[opts.position].getElementsByTagName(type);
-    for(; i < tags.length; i++){
-      if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
-    }
-  }, {once: true});
+  // el.addEventListener("error", () => {
+  //   // 删除标签
+  //   let i = 0, tags = document[opts.position].getElementsByTagName(type);
+  //   for(; i < tags.length; i++){
+  //     if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
+  //   }
+  // }, {once: true});
   document[opts.position].appendChild(el);
 };
 

@@ -328,14 +328,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }
     el.addEventListener("load", opts.success, false);
     el.addEventListener("error", opts.error, false);
-    el.addEventListener("error", function () {
-      // 删除标签
-      var i = 0,
-          tags = document[opts.position].getElementsByTagName(type);
-      for (; i < tags.length; i++) {
-        if (tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
-      }
-    }, { once: true });
+    // el.addEventListener("error", () => {
+    //   // 删除标签
+    //   let i = 0, tags = document[opts.position].getElementsByTagName(type);
+    //   for(; i < tags.length; i++){
+    //     if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
+    //   }
+    // }, {once: true});
     document[opts.position].appendChild(el);
   };
 
@@ -539,13 +538,278 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return el;
   };
 
+  var Loader = function () {
+    function Loader() {
+      _classCallCheck(this, Loader);
+    }
+
+    _createClass(Loader, null, [{
+      key: 'jsonDepend',
+
+
+      /**
+       * 别名加载资源
+       * @param  {string}    url   有资源信息的json文件地址
+       * @param  {array} alias 别名组合
+       * @return {promise}
+       */
+      value: function jsonDepend(url) {
+        var _this2 = this;
+
+        var alias = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        var batches = [],
+            backup_files = [],
+            em = emitter();
+        var replace_res = function replace_res(file) {
+          // 查找备份资源
+          var backup_file = false;
+          var _iteratorNormalCompletion4 = true;
+          var _didIteratorError4 = false;
+          var _iteratorError4 = undefined;
+
+          try {
+            for (var _iterator4 = backup_files[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+              var _f = _step4.value;
+
+              if (_f.split("/").pop() === file.name) {
+                backup_file = _f;
+              }
+            }
+          } catch (err) {
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                _iterator4.return();
+              }
+            } finally {
+              if (_didIteratorError4) {
+                throw _iteratorError4;
+              }
+            }
+          }
+
+          if (!backup_file) return false;
+          // 替换资源
+          for (var _i in batches) {
+            for (var _j in batches[_i]) {
+              if (batches[_i][_j] === file.res) {
+                batches[_i][_j] = backup_file;
+                backup_files.splice(backup_files.indexOf(backup_file), 1);
+              }
+            }
+          }
+          return batches;
+        };
+
+        em.on("batches::ready", function () {
+          _this2.batchDepend.apply(_this2, batches).once("fail", function (e, file, name) {
+            replace_res({ res: file, name: name }) && em.emit("batches::ready");
+          });
+        });
+
+        cacheJSON(url, function (json) {
+          var import_files = void 0;
+          var _iteratorNormalCompletion5 = true;
+          var _didIteratorError5 = false;
+          var _iteratorError5 = undefined;
+
+          try {
+            for (var _iterator5 = alias[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+              var _name = _step5.value;
+
+              if (!json[_name]) return;
+              // 过滤重复的文件，将其放入备份
+              import_files = [];
+              var _iteratorNormalCompletion6 = true;
+              var _didIteratorError6 = false;
+              var _iteratorError6 = undefined;
+
+              try {
+                for (var _iterator6 = json[_name][Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                  var _f = _step6.value;
+
+                  var exist = false;
+                  var _iteratorNormalCompletion7 = true;
+                  var _didIteratorError7 = false;
+                  var _iteratorError7 = undefined;
+
+                  try {
+                    for (var _iterator7 = import_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                      var _ipf = _step7.value;
+
+                      if (_ipf.split("/").pop() === _f.split("/").pop()) {
+                        exist = true;
+                        backup_files.push(_f);
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError7 = true;
+                    _iteratorError7 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
+                      }
+                    } finally {
+                      if (_didIteratorError7) {
+                        throw _iteratorError7;
+                      }
+                    }
+                  }
+
+                  exist || import_files.push(_f);
+                }
+              } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                    _iterator6.return();
+                  }
+                } finally {
+                  if (_didIteratorError6) {
+                    throw _iteratorError6;
+                  }
+                }
+              }
+
+              batches.push(import_files);
+            }
+          } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                _iterator5.return();
+              }
+            } finally {
+              if (_didIteratorError5) {
+                throw _iteratorError5;
+              }
+            }
+          }
+
+          em.emit("batches::ready");
+        });
+        return em;
+      }
+
+      /**
+       * 依赖载入
+       * @param  {array} batches [前置资源,...],[后置,...]
+       * @return {promise}
+       */
+
+    }, {
+      key: 'batchDepend',
+      value: function batchDepend() {
+        var _this3 = this;
+
+        for (var _len4 = arguments.length, batches = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          batches[_key4] = arguments[_key4];
+        }
+
+        var next_times = 0,
+            loaded_files = [],
+            em = emitter(),
+            load_batch = function load_batch() {
+          _this3.batch(batches[next_times]).on("done", function (e, resource) {
+            next_times++;
+            em.emit("next", next_times, resource);
+          }).on("fail", function (e, file, name) {
+            em.emit("fail", file, name);
+          });
+        };
+
+        if (batches.length < 2) {
+          return this.batch(batches);
+        }
+
+        em.on("next", function (e, times, files) {
+          loaded_files = loaded_files.concat(files);
+          times === batches.length && em.emit("done", loaded_files) || load_batch();
+        });
+
+        load_batch();
+
+        return em;
+      }
+
+      /**
+       * 并行载入
+       * @param  {Array}  resource [资源,...]
+       * @return {promise}
+       */
+
+    }, {
+      key: 'batch',
+      value: function batch() {
+        var _this4 = this;
+
+        var resource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var em = emitter(),
+            res = resource;
+        var load = function load(i) {
+          var file = resource[i];
+          var ext = file.split(".").pop(),
+              attrs = {},
+              name = file.split("/").pop();
+          if (ext === "js") {
+            attrs.defer = true;
+          }
+
+          if (!_this4.types[ext]) return em.emit("fail", file, name);
+
+          loadFile(_this4.types[ext], file, {
+            attrs: attrs,
+            success: function success() {
+              i++;
+              if (i < res.length) {
+                return load(i);
+              }
+              em.emit("done", res);
+            },
+            error: function error() {
+              em.emit("fail", file, name);
+            }
+          });
+        };
+        load(0);
+        return em;
+      }
+    }, {
+      key: 'types',
+
+
+      /**
+       * 支持加载的文件类型
+       * @return {object}
+       */
+      get: function get() {
+        return {
+          js: "script", css: "link"
+        };
+      }
+    }]);
+
+    return Loader;
+  }();
+
   /**
    * 模拟标准Promise类
    */
+
+
   var Promise = void 0;
   var EmitterPromise = function () {
     function EmitterPromise() {
-      var _this2 = this;
+      var _this5 = this;
 
       var rr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
 
@@ -556,15 +820,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
       emitter(this);
       this._resolve = function (value) {
-        _this2.emit("resolve", value);
-        _this2.off("reject");
+        _this5.emit("resolve", value);
+        _this5.off("reject");
       };
       if (rr.length === 1) {
         rr.call(this, this._resolve);
       } else {
         this._reject = function (reason) {
-          _this2.emit("reject", reason);
-          _this2.off("resolve");
+          _this5.emit("reject", reason);
+          _this5.off("resolve");
         };
         rr.call(this, this._resolve, this._reject);
       }
@@ -592,20 +856,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        * @return {EmitterPromise}
        */
       value: function then() {
-        var _this3 = this;
+        var _this6 = this;
 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
         var _catch = arguments[1];
 
         this.on("resolve", function (e, value) {
           try {
-            if (_this3.__chain_value instanceof Promise) {
-              _this3.__chain_value.then(cb);
+            if (_this6.__chain_value instanceof Promise) {
+              _this6.__chain_value.then(cb);
               return;
             }
-            _this3.__chain_value = cb.call(null, _this3.__chain_value || value);
+            _this6.__chain_value = cb.call(null, _this6.__chain_value || value);
           } catch (e) {
-            _this3.emit("reject", e);
+            _this6.emit("reject", e);
           }
         });
         if (typeof _catch === "function") {
@@ -623,20 +887,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'catch',
       value: function _catch() {
-        var _this4 = this;
+        var _this7 = this;
 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
 
         this.once("reject", function (e, reason) {
           var result = void 0;
           try {
-            if (_this4.__no_throw) return;
+            if (_this7.__no_throw) return;
             result = cb.call(null, reason);
-            _this4.__no_throw = true;
-            if (result) _this4.emit("resolve", result);
+            _this7.__no_throw = true;
+            if (result) _this7.emit("resolve", result);
           } catch (e) {
-            _this4.emit("reject", e);
-            if (!_this4.__no_throw && _this4.__emited.reject[1] === e) {
+            _this7.emit("reject", e);
+            if (!_this7.__no_throw && _this7.__emited.reject[1] === e) {
               throw e;
             }
           }
@@ -650,13 +914,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var values = [];
         return new EmitterPromise(function (resolve, reject) {
-          var _iteratorNormalCompletion4 = true;
-          var _didIteratorError4 = false;
-          var _iteratorError4 = undefined;
+          var _iteratorNormalCompletion8 = true;
+          var _didIteratorError8 = false;
+          var _iteratorError8 = undefined;
 
           try {
-            for (var _iterator4 = iterable[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-              var _p = _step4.value;
+            for (var _iterator8 = iterable[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+              var _p = _step8.value;
 
               _p.then(function (value) {
                 values.push(value);
@@ -668,16 +932,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               });
             }
           } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
+            _didIteratorError8 = true;
+            _iteratorError8 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                _iterator4.return();
+              if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                _iterator8.return();
               }
             } finally {
-              if (_didIteratorError4) {
-                throw _iteratorError4;
+              if (_didIteratorError8) {
+                throw _iteratorError8;
               }
             }
           }
@@ -726,274 +990,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
-
-  // import {emitter} from "./emitter.es6.js";
-
-  var Loader = function () {
-    function Loader() {
-      _classCallCheck(this, Loader);
-    }
-
-    _createClass(Loader, null, [{
-      key: 'jsonDepend',
-
-
-      /**
-       * 别名加载资源
-       * @param  {string}    url   有资源信息的json文件地址
-       * @param  {array} alias 别名组合
-       * @return {promise}
-       */
-      value: function jsonDepend(url) {
-        var _this5 = this;
-
-        var alias = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-        var batches = [],
-            backup_files = [];
-        var replace_res = function replace_res(file) {
-          // 查找备份资源
-          var backup_file = false;
-          var _iteratorNormalCompletion5 = true;
-          var _didIteratorError5 = false;
-          var _iteratorError5 = undefined;
-
-          try {
-            for (var _iterator5 = backup_files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-              var _f = _step5.value;
-
-              if (_f.split("/").pop() === file.name) {
-                backup_file = _f;
-              }
-            }
-          } catch (err) {
-            _didIteratorError5 = true;
-            _iteratorError5 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                _iterator5.return();
-              }
-            } finally {
-              if (_didIteratorError5) {
-                throw _iteratorError5;
-              }
-            }
-          }
-
-          if (!backup_file) return false;
-          // 替换资源
-          for (var _i in batches) {
-            for (var _j in batches[_i]) {
-              if (batches[_i][_j] === file.res) {
-                batches[_i][_j] = backup_file;
-                backup_files.splice(backup_files.indexOf(backup_file), 1);
-              }
-            }
-          }
-          return batches;
-        };
-
-        cacheJSON(url, function (json) {
-          var import_files = void 0;
-          var _iteratorNormalCompletion6 = true;
-          var _didIteratorError6 = false;
-          var _iteratorError6 = undefined;
-
-          try {
-            for (var _iterator6 = alias[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-              var _name = _step6.value;
-
-              if (!json[_name]) return;
-              // 过滤重复的文件，将其放入备份
-              import_files = [];
-              var _iteratorNormalCompletion7 = true;
-              var _didIteratorError7 = false;
-              var _iteratorError7 = undefined;
-
-              try {
-                for (var _iterator7 = json[_name][Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                  var _f = _step7.value;
-
-                  var exist = false;
-                  var _iteratorNormalCompletion8 = true;
-                  var _didIteratorError8 = false;
-                  var _iteratorError8 = undefined;
-
-                  try {
-                    for (var _iterator8 = import_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                      var _ipf = _step8.value;
-
-                      if (_ipf.split("/").pop() === _f.split("/").pop()) {
-                        exist = true;
-                        backup_files.push(_f);
-                      }
-                    }
-                  } catch (err) {
-                    _didIteratorError8 = true;
-                    _iteratorError8 = err;
-                  } finally {
-                    try {
-                      if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                        _iterator8.return();
-                      }
-                    } finally {
-                      if (_didIteratorError8) {
-                        throw _iteratorError8;
-                      }
-                    }
-                  }
-
-                  exist || import_files.push(_f);
-                }
-              } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                    _iterator7.return();
-                  }
-                } finally {
-                  if (_didIteratorError7) {
-                    throw _iteratorError7;
-                  }
-                }
-              }
-
-              batches.push(import_files);
-            }
-          } catch (err) {
-            _didIteratorError6 = true;
-            _iteratorError6 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                _iterator6.return();
-              }
-            } finally {
-              if (_didIteratorError6) {
-                throw _iteratorError6;
-              }
-            }
-          }
-
-          return _this5.batchDepend.apply(_this5, batches).catch(function (file) {
-            replace_res(file);
-            return batches;
-          }).then(function (batches) {
-            return _this5.batchDepend.apply(_this5, batches);
-          });
-        });
-      }
-
-      /**
-       * 依赖载入
-       * @param  {array} batches [前置资源,...],[后置,...]
-       * @return {promise}
-       */
-
-    }, {
-      key: 'batchDepend',
-      value: function batchDepend() {
-        var promise_list = [];
-
-        for (var _len4 = arguments.length, batches = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-          batches[_key4] = arguments[_key4];
-        }
-
-        if (batches.length < 2) {
-          return this.batch(batches);
-        }
-        for (var _i in batches) {
-          promise_list.push(this.batch(batches[_i]));
-        }
-        return Promise.all(promise_list);
-      }
-
-      /**
-       * 并行载入
-       * @param  {Array}  resource [资源,...]
-       * @return {promise}
-       */
-
-    }, {
-      key: 'batch',
-      value: function batch() {
-        var _this6 = this;
-
-        var resource = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-        var promise_batch = [];
-        var _iteratorNormalCompletion9 = true;
-        var _didIteratorError9 = false;
-        var _iteratorError9 = undefined;
-
-        try {
-          var _loop = function _loop() {
-            var _res = _step9.value;
-
-            promise_batch.push(new Promise(function (resolve, reject) {
-              var ext = _res.split(".").pop(),
-                  attrs = {},
-                  file = _res.split("/").pop();
-              if (ext === "js") {
-                attrs.defer = true;
-              }
-              if (!_this6.types[ext]) reject(_res, "文件格式不支持");else {
-                loadFile(_this6.types[ext], _res, {
-                  attrs: attrs,
-                  success: function success() {
-                    resolve(file);
-                  },
-                  error: function error() {
-                    reject({
-                      res: _res,
-                      name: file
-                    });
-                  }
-                });
-              }
-            }));
-          };
-
-          for (var _iterator9 = resource[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-            _loop();
-          }
-        } catch (err) {
-          _didIteratorError9 = true;
-          _iteratorError9 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion9 && _iterator9.return) {
-              _iterator9.return();
-            }
-          } finally {
-            if (_didIteratorError9) {
-              throw _iteratorError9;
-            }
-          }
-        }
-
-        return Promise.all(promise_batch);
-      }
-    }, {
-      key: 'types',
-
-
-      /**
-       * 支持加载的文件类型
-       * @return {object}
-       */
-      get: function get() {
-        return {
-          js: "script", css: "link"
-        };
-      }
-    }]);
-
-    return Loader;
-  }();
+  if ("Promise" in window) {
+    Promise = window.Promise;
+  }
 
   var HC = function () {
     function HC() {
@@ -1056,7 +1055,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'log',
       value: function log() {
-        var _this7 = this;
+        var _this8 = this;
 
         var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -1072,20 +1071,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           if (e.message !== "Script error.") {
             var _msg = e.filename + ' (' + e.message + '[' + e.lineno + ':' + e.colno + '])';
             errors.push(_msg);
-            _this7.console("error", _msg);
+            _this8.console("error", _msg);
           }
           msg = errors.join("\n");
           logger.emit("error", msg);
           // 有跳转页面
-          if (!_this7.config.debug && _this7.config.errorPageUrl) {
-            location.href = _this7.config.errorPageUrl + '?from=' + location.href + '&msg=' + msg;
+          if (!_this8.config.debug && _this8.config.errorPageUrl) {
+            location.href = _this8.config.errorPageUrl + '?from=' + location.href + '&msg=' + msg;
           }
           // 抽样提交
-          if (_this7.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this7.config.reportChance)) {
-            utils.xhr(_this7.config.reportUrl, {
+          if (_this8.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this8.config.reportChance)) {
+            utils.xhr(_this8.config.reportUrl, {
               method: "POST", data: { message: msg }
             });
-            _this7.console("info", "Error message reported.");
+            _this8.console("info", "Error message reported.");
           }
           return true;
         }, false);

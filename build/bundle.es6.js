@@ -261,13 +261,13 @@ const loadFile = (type = "script", url, options) => {
   }
   el.addEventListener("load", opts.success, false);
   el.addEventListener("error", opts.error, false);
-  el.addEventListener("error", () => {
-    // 删除标签
-    let i = 0, tags = document[opts.position].getElementsByTagName(type);
-    for(; i < tags.length; i++){
-      if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
-    }
-  }, {once: true});
+  // el.addEventListener("error", () => {
+  //   // 删除标签
+  //   let i = 0, tags = document[opts.position].getElementsByTagName(type);
+  //   for(; i < tags.length; i++){
+  //     if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
+  //   }
+  // }, {once: true});
   document[opts.position].appendChild(el);
 };
 
@@ -420,6 +420,147 @@ const emitter = (el = {}) => {
 
 };
 
+class Loader {
+
+  /**
+   * 支持加载的文件类型
+   * @return {object}
+   */
+  static get types(){
+    return {
+      js: "script", css: "link"
+    };
+  }
+
+  /**
+   * 别名加载资源
+   * @param  {string}    url   有资源信息的json文件地址
+   * @param  {array} alias 别名组合
+   * @return {promise}
+   */
+  static jsonDepend(url, alias=[]){
+    let batches = [], backup_files = [], em = emitter();
+    let replace_res = (file) => {
+      // 查找备份资源
+      let backup_file = false;
+      for(const _f of backup_files){
+        if(_f.split("/").pop() === file.name){
+          backup_file = _f;
+        }
+      }
+      if(!backup_file) return false;
+      // 替换资源
+      for(const _i in batches){
+        for(const _j in batches[_i]){
+          if(batches[_i][_j] === file.res){
+            batches[_i][_j] = backup_file;
+            backup_files.splice(backup_files.indexOf(backup_file), 1);
+          }
+        }
+      }
+      return batches;
+    };
+
+    em.on("batches::ready", () => {
+      this.batchDepend.apply(this, batches)
+      .once("fail", (e, file, name) => {
+        replace_res({res: file, name: name}) && em.emit("batches::ready");
+      });
+    });
+
+    cacheJSON(url, json => {
+      let import_files;
+      for(const _name of alias){
+        if(!json[_name]) return;
+        // 过滤重复的文件，将其放入备份
+        import_files = [];
+        for(const _f of json[_name]){
+          let exist = false;
+          for(const _ipf of import_files){
+            if(_ipf.split("/").pop() === _f.split("/").pop()){
+              exist = true;
+              backup_files.push(_f);
+            }
+          }
+          exist ||  import_files.push(_f);
+        }
+        batches.push(import_files);
+      }
+      em.emit("batches::ready");
+    });
+    return em;
+  }
+
+  /**
+   * 依赖载入
+   * @param  {array} batches [前置资源,...],[后置,...]
+   * @return {promise}
+   */
+  static batchDepend(...batches){
+    let next_times = 0, loaded_files = [], em = emitter(),
+    load_batch = () => {
+      this.batch(batches[next_times])
+      .on("done", (e, resource) => {
+        next_times++;
+        em.emit("next", next_times, resource);
+      })
+      .on("fail", (e, file, name) => {
+        em.emit("fail", file, name);
+      });
+    };
+
+    if(batches.length < 2){
+      return this.batch(batches);
+    }
+
+    em.on("next", (e, times, files) => {
+      loaded_files = loaded_files.concat(files);
+      times === batches.length && 
+      em.emit("done", loaded_files) || load_batch();
+    });
+
+    load_batch();
+    
+    return em;
+  }
+
+  /**
+   * 并行载入
+   * @param  {Array}  resource [资源,...]
+   * @return {promise}
+   */
+  static batch(resource = []) {
+    let em = emitter(), res = resource;
+    let load = (i) => {
+      const file = resource[i];
+      let ext = file.split(".").pop(), attrs = {}, 
+        name = file.split("/").pop();
+      if (ext === "js") {
+        attrs.defer = true;
+      }
+      
+      if (!this.types[ext]) 
+        return em.emit("fail", file, name);
+
+      loadFile(this.types[ext], file, {
+        attrs: attrs,
+        success() {
+          i++;
+          if(i < res.length){
+            return load(i);
+          }
+          em.emit("done", res);
+        },
+        error() { em.emit("fail", file, name); }
+      });
+
+    };
+    load(0);
+    return em;
+  }
+
+}
+
 /**
  * 模拟标准Promise类
  */
@@ -552,129 +693,8 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-
-// import {emitter} from "./emitter.es6.js";
-
-class Loader {
-
-  /**
-   * 支持加载的文件类型
-   * @return {object}
-   */
-  static get types(){
-    return {
-      js: "script", css: "link"
-    };
-  }
-
-  /**
-   * 别名加载资源
-   * @param  {string}    url   有资源信息的json文件地址
-   * @param  {array} alias 别名组合
-   * @return {promise}
-   */
-  static jsonDepend(url, alias=[]){
-    let batches = [], backup_files = [];
-    let replace_res = (file) => {
-      // 查找备份资源
-      let backup_file = false;
-      for(const _f of backup_files){
-        if(_f.split("/").pop() === file.name){
-          backup_file = _f;
-        }
-      }
-      if(!backup_file) return false;
-      // 替换资源
-      for(const _i in batches){
-        for(const _j in batches[_i]){
-          if(batches[_i][_j] === file.res){
-            batches[_i][_j] = backup_file;
-            backup_files.splice(backup_files.indexOf(backup_file), 1);
-          }
-        }
-      }
-      return batches;
-    };
-
-    cacheJSON(url, json => {
-      let import_files;
-      for(const _name of alias){
-        if(!json[_name]) return;
-        // 过滤重复的文件，将其放入备份
-        import_files = [];
-        for(const _f of json[_name]){
-          let exist = false;
-          for(const _ipf of import_files){
-            if(_ipf.split("/").pop() === _f.split("/").pop()){
-              exist = true;
-              backup_files.push(_f);
-            }
-          }
-          exist ||  import_files.push(_f);
-        }
-        batches.push(import_files);
-      }
-      return this.batchDepend.apply(this, batches)
-      .catch(file => {
-        replace_res(file);
-        return batches;
-      })
-      .then(batches => {
-        return this.batchDepend.apply(this, batches);
-      });
-    });
-  }
-
-  /**
-   * 依赖载入
-   * @param  {array} batches [前置资源,...],[后置,...]
-   * @return {promise}
-   */
-  static batchDepend(...batches){
-    let promise_list = [];
-    if(batches.length < 2){
-      return this.batch(batches);
-    }
-    for(const _i in batches){
-      promise_list.push(this.batch(batches[_i]));
-    }
-    return Promise.all(promise_list);
-  }
-
-  /**
-   * 并行载入
-   * @param  {Array}  resource [资源,...]
-   * @return {promise}
-   */
-  static batch(resource = []) {
-    let promise_batch = [];
-    for (const _res of resource) {
-      promise_batch.push(new Promise((resolve, reject) => {
-        let ext = _res.split(".").pop(),
-          attrs = {}, file = _res.split("/").pop();
-        if (ext === "js") {
-          attrs.defer = true;
-        }
-        if (!this.types[ext]) reject(_res, "文件格式不支持");
-        else {
-          loadFile(this.types[ext], _res, {
-            attrs: attrs,
-            success() {
-              resolve(file);
-            },
-            error() {
-              reject({
-                res: _res,
-                name: file
-              });
-            }
-          });
-        }
-      }));
-    }
-    return Promise.all(promise_batch);
-  }
-
+if("Promise" in window){
+  Promise = window.Promise;
 }
 
 const HC = class {

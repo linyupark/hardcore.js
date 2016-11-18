@@ -1,8 +1,7 @@
 import {
   loadFile, cacheJSON
 } from "./utils.es6.js";
-import {Promise} from "./promise.es6.js";
-// import {emitter} from "./emitter.es6.js";
+import {emitter} from "./emitter.es6.js";
 
 export class Loader {
 
@@ -23,7 +22,7 @@ export class Loader {
    * @return {promise}
    */
   static jsonDepend(url, alias=[]){
-    let batches = [], backup_files = [];
+    let batches = [], backup_files = [], em = emitter();
     let replace_res = (file) => {
       // 查找备份资源
       let backup_file = false;
@@ -45,6 +44,13 @@ export class Loader {
       return batches;
     };
 
+    em.on("batches::ready", () => {
+      this.batchDepend.apply(this, batches)
+      .once("fail", (e, file, name) => {
+        replace_res({res: file, name: name}) && em.emit("batches::ready");
+      });
+    });
+
     cacheJSON(url, json => {
       let import_files;
       for(const _name of alias){
@@ -63,15 +69,9 @@ export class Loader {
         }
         batches.push(import_files);
       }
-      return this.batchDepend.apply(this, batches)
-      .catch(file => {
-        replace_res(file);
-        return batches;
-      })
-      .then(batches => {
-        return this.batchDepend.apply(this, batches);
-      });
+      em.emit("batches::ready");
     });
+    return em;
   }
 
   /**
@@ -80,14 +80,31 @@ export class Loader {
    * @return {promise}
    */
   static batchDepend(...batches){
-    let promise_list = [];
+    let next_times = 0, loaded_files = [], em = emitter(),
+    load_batch = () => {
+      this.batch(batches[next_times])
+      .on("done", (e, resource) => {
+        next_times++;
+        em.emit("next", next_times, resource);
+      })
+      .on("fail", (e, file, name) => {
+        em.emit("fail", file, name);
+      });
+    };
+
     if(batches.length < 2){
       return this.batch(batches);
     }
-    for(const _i in batches){
-      promise_list.push(this.batch(batches[_i]));
-    }
-    return Promise.all(promise_list);
+
+    em.on("next", (e, times, files) => {
+      loaded_files = loaded_files.concat(files);
+      times === batches.length && 
+      em.emit("done", loaded_files) || load_batch();
+    });
+
+    load_batch();
+    
+    return em;
   }
 
   /**
@@ -96,32 +113,33 @@ export class Loader {
    * @return {promise}
    */
   static batch(resource = []) {
-    let promise_batch = [];
-    for (const _res of resource) {
-      promise_batch.push(new Promise((resolve, reject) => {
-        let ext = _res.split(".").pop(),
-          attrs = {}, file = _res.split("/").pop();
-        if (ext === "js") {
-          attrs.defer = true;
-        }
-        if (!this.types[ext]) reject(_res, "文件格式不支持");
-        else {
-          loadFile(this.types[ext], _res, {
-            attrs: attrs,
-            success() {
-              resolve(file);
-            },
-            error() {
-              reject({
-                res: _res,
-                name: file
-              });
-            }
-          });
-        }
-      }));
-    }
-    return Promise.all(promise_batch);
+    let em = emitter(), res = resource;
+    let load = (i) => {
+      const file = resource[i];
+      let ext = file.split(".").pop(), attrs = {}, 
+        name = file.split("/").pop();
+      if (ext === "js") {
+        attrs.defer = true;
+      }
+      
+      if (!this.types[ext]) 
+        return em.emit("fail", file, name);
+
+      loadFile(this.types[ext], file, {
+        attrs: attrs,
+        success() {
+          i++;
+          if(i < res.length){
+            return load(i);
+          }
+          em.emit("done", res);
+        },
+        error() { em.emit("fail", file, name); }
+      });
+
+    };
+    load(0);
+    return em;
   }
 
 }
