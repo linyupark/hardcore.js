@@ -217,7 +217,7 @@ const cookie = {
  * @param  {String} type   加载远程文件类型 [script,link,img]
  * @param  {String} url    地址
  * @param  {Object} opts   附加配置
- * @return null
+ * @return {Element}
  */
 const loadFile = (type = "script", url, options) => {
   let el = document.createElement(type),
@@ -231,8 +231,7 @@ const loadFile = (type = "script", url, options) => {
       attrs: {},
       success() {},
       error() {}
-    }, options),
-    tags = document[opts.position].getElementsByTagName(type);
+    }, options);
 
   if (!src.hasOwnProperty(type)) {
     throw new Error(`File type:${type} is not support dynamic load.`);
@@ -247,25 +246,28 @@ const loadFile = (type = "script", url, options) => {
     }
   }
   el[src[type]] = url;
-  if (tags.length > 0) {
-    // 一些老版本的安卓babel编译的of会报错，尽量少用of
-    for (let _tag in tags) {
-      if (tags[_tag][src[type]] === url) return;
-    }
-  }
   if (type === "link") {
     el.rel = "stylesheet";
   }
   el.addEventListener("load", opts.success, false);
   el.addEventListener("error", opts.error, false);
-  // el.addEventListener("error", () => {
-  //   // 删除标签
-  //   let i = 0, tags = document[opts.position].getElementsByTagName(type);
-  //   for(; i < tags.length; i++){
-  //     if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
-  //   }
-  // }, {once: true});
   document[opts.position].appendChild(el);
+  return el;
+};
+
+/**
+ * 私有函数，删除动态载入的文件标签，loadFile失败后可用
+ * @param  {String} type [description]
+ * @param  {String} url  [description]
+ * @return {null}      [description]
+ */
+const removeFile = (type="script", position="head", url) => {
+  let i = 0, 
+      tags = document[position].getElementsByTagName(type);
+  for(; i < tags.length; i++){
+    if(tags[i].src === url || tags[i].href === url) 
+      tags[i].parentNode.removeChild(tags[i]);
+  }
 };
 
 /**
@@ -310,12 +312,13 @@ export default {
   cookie,
   search2obj,
   typeOf,
-  hashCode
+  hashCode,
+  cacheJSON
 };
 
 export {
   loadFile,
-  cacheJSON,
   tagContent,
-  tagRemove
+  tagRemove,
+  removeFile
 };

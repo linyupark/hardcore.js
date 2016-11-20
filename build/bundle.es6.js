@@ -220,7 +220,7 @@ const cookie = {
  * @param  {String} type   加载远程文件类型 [script,link,img]
  * @param  {String} url    地址
  * @param  {Object} opts   附加配置
- * @return null
+ * @return {Element}
  */
 const loadFile = (type = "script", url, options) => {
   let el = document.createElement(type),
@@ -234,8 +234,7 @@ const loadFile = (type = "script", url, options) => {
       attrs: {},
       success() {},
       error() {}
-    }, options),
-    tags = document[opts.position].getElementsByTagName(type);
+    }, options);
 
   if (!src.hasOwnProperty(type)) {
     throw new Error(`File type:${type} is not support dynamic load.`);
@@ -250,25 +249,28 @@ const loadFile = (type = "script", url, options) => {
     }
   }
   el[src[type]] = url;
-  if (tags.length > 0) {
-    // 一些老版本的安卓babel编译的of会报错，尽量少用of
-    for (let _tag in tags) {
-      if (tags[_tag][src[type]] === url) return;
-    }
-  }
   if (type === "link") {
     el.rel = "stylesheet";
   }
   el.addEventListener("load", opts.success, false);
   el.addEventListener("error", opts.error, false);
-  // el.addEventListener("error", () => {
-  //   // 删除标签
-  //   let i = 0, tags = document[opts.position].getElementsByTagName(type);
-  //   for(; i < tags.length; i++){
-  //     if(tags[i] == el) tags[i].parentNode.removeChild(tags[i]);
-  //   }
-  // }, {once: true});
   document[opts.position].appendChild(el);
+  return el;
+};
+
+/**
+ * 私有函数，删除动态载入的文件标签，loadFile失败后可用
+ * @param  {String} type [description]
+ * @param  {String} url  [description]
+ * @return {null}      [description]
+ */
+const removeFile = (type="script", position="head", url) => {
+  let i = 0, 
+      tags = document[position].getElementsByTagName(type);
+  for(; i < tags.length; i++){
+    if(tags[i].src === url || tags[i].href === url) 
+      tags[i].parentNode.removeChild(tags[i]);
+  }
 };
 
 /**
@@ -313,7 +315,8 @@ var utils = {
   cookie,
   search2obj,
   typeOf,
-  hashCode
+  hashCode,
+  cacheJSON
 };
 
 const emitter = (el = {}) => {
@@ -419,147 +422,6 @@ const emitter = (el = {}) => {
   return el;
 
 };
-
-class Loader {
-
-  /**
-   * 支持加载的文件类型
-   * @return {object}
-   */
-  static get types(){
-    return {
-      js: "script", css: "link"
-    };
-  }
-
-  /**
-   * 别名加载资源
-   * @param  {string}    url   有资源信息的json文件地址
-   * @param  {array} alias 别名组合
-   * @return {promise}
-   */
-  static jsonDepend(url, alias=[]){
-    let batches = [], backup_files = [], em = emitter();
-    let replace_res = (file) => {
-      // 查找备份资源
-      let backup_file = false;
-      for(const _f of backup_files){
-        if(_f.split("/").pop() === file.name){
-          backup_file = _f;
-        }
-      }
-      if(!backup_file) return false;
-      // 替换资源
-      for(const _i in batches){
-        for(const _j in batches[_i]){
-          if(batches[_i][_j] === file.res){
-            batches[_i][_j] = backup_file;
-            backup_files.splice(backup_files.indexOf(backup_file), 1);
-          }
-        }
-      }
-      return batches;
-    };
-
-    em.on("batches::ready", () => {
-      this.batchDepend.apply(this, batches)
-      .once("fail", (e, file, name) => {
-        replace_res({res: file, name: name}) && em.emit("batches::ready");
-      });
-    });
-
-    cacheJSON(url, json => {
-      let import_files;
-      for(const _name of alias){
-        if(!json[_name]) return;
-        // 过滤重复的文件，将其放入备份
-        import_files = [];
-        for(const _f of json[_name]){
-          let exist = false;
-          for(const _ipf of import_files){
-            if(_ipf.split("/").pop() === _f.split("/").pop()){
-              exist = true;
-              backup_files.push(_f);
-            }
-          }
-          exist ||  import_files.push(_f);
-        }
-        batches.push(import_files);
-      }
-      em.emit("batches::ready");
-    });
-    return em;
-  }
-
-  /**
-   * 依赖载入
-   * @param  {array} batches [前置资源,...],[后置,...]
-   * @return {promise}
-   */
-  static batchDepend(...batches){
-    let next_times = 0, loaded_files = [], em = emitter(),
-    load_batch = () => {
-      this.batch(batches[next_times])
-      .on("done", (e, resource) => {
-        next_times++;
-        em.emit("next", next_times, resource);
-      })
-      .on("fail", (e, file, name) => {
-        em.emit("fail", file, name);
-      });
-    };
-
-    if(batches.length < 2){
-      return this.batch(batches);
-    }
-
-    em.on("next", (e, times, files) => {
-      loaded_files = loaded_files.concat(files);
-      times === batches.length && 
-      em.emit("done", loaded_files) || load_batch();
-    });
-
-    load_batch();
-    
-    return em;
-  }
-
-  /**
-   * 并行载入
-   * @param  {Array}  resource [资源,...]
-   * @return {promise}
-   */
-  static batch(resource = []) {
-    let em = emitter(), res = resource;
-    let load = (i) => {
-      const file = resource[i];
-      let ext = file.split(".").pop(), attrs = {}, 
-        name = file.split("/").pop();
-      if (ext === "js") {
-        attrs.defer = true;
-      }
-      
-      if (!this.types[ext]) 
-        return em.emit("fail", file, name);
-
-      loadFile(this.types[ext], file, {
-        attrs: attrs,
-        success() {
-          i++;
-          if(i < res.length){
-            return load(i);
-          }
-          em.emit("done", res);
-        },
-        error() { em.emit("fail", file, name); }
-      });
-
-    };
-    load(0);
-    return em;
-  }
-
-}
 
 /**
  * 模拟标准Promise类
@@ -695,6 +557,138 @@ let EmitterPromise = class {
 Promise = EmitterPromise;
 if("Promise" in window){
   Promise = window.Promise;
+}
+
+class Loader {
+
+  /**
+   * 支持加载的文件类型
+   * @return {object}
+   */
+  static get types(){
+    return {
+      js: "script", css: "link"
+    };
+  }
+
+  /**
+   * 资源别名载入（依赖模式）
+   * @param {object} json json格式的资源
+   * @param  {...[type]} alias_names [description]
+   * @return {[type]}                [description]
+   */
+  static alias(json, alias_names=[]){
+    let batch_list = [];
+    for(const name of alias_names){
+      if(!json[name]) return;
+      batch_list.push(json[name]);
+    }
+    return this.depend.apply(this, batch_list);
+  }
+
+  /**
+   * 依赖载入
+   * @param  {array} batch_list [前置资源,...],[后置,...]
+   * @return {promise}
+   */
+  static depend(...batch_list){
+    let i = 0, fail = [], done = [],
+    next = (resolve, reject) => {
+      if(i === batch_list.length){
+        if(fail.length > 0){
+          reject(fail);
+        }
+        else resolve(done);
+      }
+      this.batch.apply(this, batch_list[i])
+      .then(files => {
+        done = done.concat(files);
+        i++;
+        next(resolve, reject);
+      })
+      .catch(files => {
+        fail = fail.concat(files);
+        i++;
+        next(resolve, reject);
+      });
+    };
+    return new Promise(next);
+  }
+
+  /**
+   * 并行载入
+   * @param  {arguments}  files 资源,...
+   * @return {promise}
+   */
+  static batch(...files) {
+    let load_files = [], backup_files = [], 
+        fail = [], done = [];
+    // 收集重复文件，放入备份文件
+    for(const f of files){
+      let exist = false;
+      for(const lf of load_files){
+        if(f.split("/").pop() === lf.split("/").pop()){
+          exist = true;
+          backup_files = backup_files.concat(f);
+        }
+      }
+      if(!exist) load_files = load_files.concat(f);
+    }
+    return new Promise((resolve, reject) => {
+      let load = () => {
+        for(const file of load_files){
+          let name = file.split("/").pop(),
+              ext = name.split(".").pop(),
+              attrs = {};
+          if(ext === "js") attrs.async = true;
+          loadFile(this.types[ext], file, {
+            attrs: attrs,
+            success() {
+              check(done.push(file));
+            },
+            error() {
+              check(fail.push(file));
+            }
+          });
+        }
+      },
+      check = () => {
+        if(done.length === load_files.length){
+          resolve(done);
+        }
+        if(done.length+fail.length === load_files.length){
+          // 检查是否有备份，有则再尝试
+          let exist = false;
+          for(const fi in fail){
+            for(const bi in backup_files){
+              if(backup_files[bi].split("/").pop() === 
+                fail[fi].split("/").pop()){
+                exist = true;
+                done = done.concat(backup_files[bi]);
+              }
+            }
+          }
+          if(exist && done.length === load_files.length){
+            // 移除已经加载的文件
+            for(const lf of load_files){
+              removeFile(
+                this.types[lf.split(".").pop()],
+                "head", lf
+              );
+            }
+            // 替换成备份文件后能填补空缺就再执行一次
+            load_files = done; done = []; fail = [];
+            load();
+          }
+          else{
+            reject(fail);
+          }
+        }
+      };
+      load();
+    });
+  }
+
 }
 
 const HC = class {
