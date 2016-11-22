@@ -1009,6 +1009,94 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return Loader;
   }();
 
+  var riotjs = function () {
+    function riotjs() {
+      _classCallCheck(this, riotjs);
+    }
+
+    _createClass(riotjs, null, [{
+      key: 'complie',
+
+
+      // 浏览器编译
+      value: function complie() {
+        var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var promise_list = [];
+        if (url.length === 0 || typeof window.riot === "undefined") throw new Error("url未设置或riot未加载");
+        var _iteratorNormalCompletion10 = true;
+        var _didIteratorError10 = false;
+        var _iteratorError10 = undefined;
+
+        try {
+          var _loop2 = function _loop2() {
+            var _url = _step10.value;
+
+            promise_list.push(new Promise(function (resolve) {
+              try {
+                window.riot.compile(_url, function () {
+                  return resolve(_url);
+                });
+              } catch (e) {
+                throw e;
+              }
+            }));
+          };
+
+          for (var _iterator10 = url[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+            _loop2();
+          }
+        } catch (err) {
+          _didIteratorError10 = true;
+          _iteratorError10 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion10 && _iterator10.return) {
+              _iterator10.return();
+            }
+          } finally {
+            if (_didIteratorError10) {
+              throw _iteratorError10;
+            }
+          }
+        }
+
+        return Promise.all(promise_list);
+      }
+
+      // 全局route
+
+    }, {
+      key: 'defaultRoute',
+      value: function defaultRoute() {
+        var base = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#!";
+
+        var em = void 0;
+        if (window.riot === "undefined") throw new Error("riot未加载");
+        em = emitter();
+        window.riot.route.base(base);
+        window.riot.route.parser(function (path) {
+          var raw = path.split("?"),
+              uri = raw[0].split("/"),
+              qs = raw[1];
+          if (qs) uri.push(utils.search2obj(qs));
+          return uri;
+        });
+        window.riot.route(function () {
+          for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
+          }
+
+          em.emit("change", args);
+        });
+        window.riot.route.start(true);
+        return em;
+      }
+    }]);
+
+    return riotjs;
+  }();
+
   var HC = function () {
     function HC() {
       _classCallCheck(this, HC);
@@ -1053,8 +1141,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (this.config.debug === true && typeof window.console !== "undefined") {
           var _window$console;
 
-          for (var _len6 = arguments.length, msg = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
-            msg[_key6 - 1] = arguments[_key6];
+          for (var _len7 = arguments.length, msg = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+            msg[_key7 - 1] = arguments[_key7];
           }
 
           window.console[type] && (_window$console = window.console)[type].apply(_window$console, msg);
@@ -1114,6 +1202,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   HC.Loader = Loader;
   HC.emitter = emitter;
   HC.Promise = Promise;
+  HC.adapter = {
+    riotjs: riotjs
+  };
 
   exports.HC = HC;
 })(this.window = this.window || {});

@@ -1,0 +1,37 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body>
+  
+  <div id="main"></div>
+
+  <a href="#!/user/id/12">user12</a><br>
+  <a href="#!/post/id/13">post13</a><br>
+
+
+  <script src="../build/bundle.js"></script>
+  <script>
+
+  HC.Loader.batch(
+    "https://cdnjs.cloudflare.com/ajax/libs/riot/2.6.7/riot+compiler.min.js", 
+    "https://cdn.jsdelivr.net/riot/2.6.7/riot+compiler.min.js"
+  )
+  .then(function(){
+    HC.adapter.riotjs.defaultRoute()
+    .on("change", function(e, args){
+      HC.adapter.riotjs.complie(["./riot-tags/"+args[0]+".tag.html"])
+      .then(function(){
+        if(args[1] === "id"){
+          return riot.mount("#main", args[0], {
+            "_id": args[2]
+          });
+        }
+        riot.mount("#main", args[0]);
+      });
+    });
+  });
+  </script>
+</body>
+</html>
