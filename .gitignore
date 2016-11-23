@@ -2,6 +2,7 @@
 *~
 *.log
 Thumbs.db
+.tern-project
 node_modules
 
 #node

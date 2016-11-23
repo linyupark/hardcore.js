@@ -30,7 +30,7 @@ let EmitterPromise = class {
   }
 
   /**
-   * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => { 
+   * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
       console.log(values);
     }, reason => {
       console.log(reason)
@@ -90,7 +90,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   then(cb=()=>{}, _catch){
-    this.on("resolve", (e, value) => {
+    this.on("resolve", value => {
       try{
         if(this.__chain_value instanceof Promise){
           this.__chain_value.then(cb);
@@ -113,7 +113,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   catch(cb=()=>{}){
-    this.once("reject", (e, reason) => {
+    this.once("reject", reason => {
       let result;
       try{
         if(this.__no_throw) return;

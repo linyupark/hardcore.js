@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 </head>
 <body>
-  
+
   <div id="main"></div>
 
   <a href="#!/user/id/12">user12</a><br>
@@ -14,13 +14,21 @@
   <script src="../build/bundle.js"></script>
   <script>
 
+  // 2.x
+  // HC.Loader.batch(
+  //   "https://cdnjs.cloudflare.com/ajax/libs/riot/2.6.7/riot+compiler.min.js",
+  //   "https://cdn.jsdelivr.net/riot/2.6.7/riot+compiler.min.js"
+  // )
+  // 3.x
   HC.Loader.batch(
-    "https://cdnjs.cloudflare.com/ajax/libs/riot/2.6.7/riot+compiler.min.js", 
-    "https://cdn.jsdelivr.net/riot/2.6.7/riot+compiler.min.js"
+    "https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.0/riot+compiler.min.js",
+    "https://cdn.jsdelivr.net/riot/3.0/riot+compiler.min.js",
+    "./route.min.js"
   )
   .then(function(){
-    HC.adapter.riotjs.defaultRoute()
-    .on("change", function(e, args){
+    HC.adapter.riotjs.route()
+    .on("change", function(args){
+      if(args[0] === "") args[0] = "home";
       HC.adapter.riotjs.complie(["./riot-tags/"+args[0]+".tag.html"])
       .then(function(){
         if(args[1] === "id"){
@@ -30,6 +38,7 @@
         }
         riot.mount("#main", args[0]);
       });
+      // riot.route("/notfound");
     });
   });
   </script>

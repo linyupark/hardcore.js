@@ -254,10 +254,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
           var _cookie$split = _cookie.split("="),
               _cookie$split2 = _slicedToArray(_cookie$split, 2),
-              name = _cookie$split2[0],
+              _name = _cookie$split2[0],
               value = _cookie$split2[1];
 
-          if (key !== "" && key === name) {
+          if (key !== "" && key === _name) {
             return decodeURIComponent(value);
           }
         }
@@ -399,41 +399,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      * 所有监听中的回调函数
      * @type {Object}
      */
-    var _callbacks = {},
-
-
-    /**
-     * 将空格分隔的事件名连同索引传递到fn
-     * @param  {string}   events [description]
-     * @param  {Function} fn     [description]
-     */
-    scanEvents = function scanEvents(events, fn) {
-      var events_array = events.split(" ");
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = events_array[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _e = _step2.value;
-
-          fn(_e);
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-    };
+    var _callbacks = {};
 
     /**
      * 寄存器
@@ -442,39 +408,31 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     el.__emited = el.__emited || {};
 
     /**
-     * object defineProperty 默认 
+     * object defineProperty 默认
      * writable : false, configurable : false, enumerable : false
      * 避免被复写
      * 自定义事件
      */
     Object.defineProperty(el, "on", {
-      value: function value(events, fn) {
+      value: function value(event, fn) {
         if (typeof fn !== "function") return el;
-        scanEvents(events, function (name) {
-          _callbacks[name] = _callbacks[name] || [];
-          if (_callbacks[name].indexOf(fn) === -1) {
-            _callbacks[name].push(fn);
-          }
-          if (el.__emited[name]) {
-            fn.apply(el, el.__emited[name]);
-          }
-        });
-        // 支持chain写法
+        (_callbacks[event] = _callbacks[event] || []).push(fn);
+        el.__emited[event] && fn.apply(el, el.__emited[event]);
         return el;
       }
     });
 
     Object.defineProperty(el, "once", {
-      value: function value(events, fn) {
+      value: function value(event, fn) {
         var on = function on() {
           for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             args[_key2] = arguments[_key2];
           }
 
-          el.off(events, on);
+          el.off(event, on);
           fn.apply(el, args);
         };
-        return el.on(events, on);
+        return el.on(event, on);
       }
     });
 
@@ -482,16 +440,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      * 解除某自定义事件
      */
     Object.defineProperty(el, "off", {
-      value: function value(events, fn) {
-        if (events === "*" && !fn) _callbacks = {};else {
-          scanEvents(events, function (name) {
-            if (typeof fn === "function") {
-              for (var _i in _callbacks[name]) {
-                if (_callbacks[name][_i] == fn) _callbacks[name].splice(_i, 1);
-              }
-            } else delete _callbacks[name];
-            delete el.__emited[name];
-          });
+      value: function value(event, fn) {
+        if (event === "*" && !fn) _callbacks = {};else {
+          if (fn) {
+            for (var _i in _callbacks[event]) {
+              if (_callbacks[event][_i] == fn) _callbacks[event].splice(_i, 1);
+            }
+          } else delete _callbacks[event];
+          delete el.__emited[event];
         }
         return el;
       }
@@ -501,42 +457,40 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      * 触发某自定义事件
      */
     Object.defineProperty(el, "emit", {
-      value: function value(events) {
+      value: function value(event) {
+        var fns = _callbacks[event] || [];
+
         for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
           args[_key3 - 1] = arguments[_key3];
         }
 
-        scanEvents(events, function (name) {
-          var fns = _callbacks[name] || [];
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
 
+        try {
+          for (var _iterator2 = fns[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var _fn = _step2.value;
+
+            _fn.apply(el, args);
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
           try {
-            for (var _iterator3 = fns[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var _fn = _step3.value;
-
-              _fn.apply(el, [name].concat(args));
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
             }
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
           } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
+            if (_didIteratorError2) {
+              throw _iteratorError2;
             }
           }
+        }
 
-          el.__emited[name] = [name].concat(args);
-          // callback记录中有*，则任意name都要触发*所持fn
-          if (_callbacks["*"] && name !== "*") el.emit.apply(el, ["*", name].concat(args));
-        });
+        el.__emited[name] = [name].concat(args);
+        if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
         return el;
       }
     });
@@ -577,7 +531,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }
 
     /**
-     * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => { 
+     * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
         console.log(values);
       }, reason => {
         console.log(reason)
@@ -602,7 +556,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
         var _catch = arguments[1];
 
-        this.on("resolve", function (e, value) {
+        this.on("resolve", function (value) {
           try {
             if (_this3.__chain_value instanceof Promise) {
               _this3.__chain_value.then(cb);
@@ -632,7 +586,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
 
-        this.once("reject", function (e, reason) {
+        this.once("reject", function (reason) {
           var result = void 0;
           try {
             if (_this4.__no_throw) return;
@@ -655,13 +609,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var values = [];
         return new EmitterPromise(function (resolve, reject) {
-          var _iteratorNormalCompletion4 = true;
-          var _didIteratorError4 = false;
-          var _iteratorError4 = undefined;
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
 
           try {
-            for (var _iterator4 = iterable[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-              var _p = _step4.value;
+            for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var _p = _step3.value;
 
               _p.then(function (value) {
                 values.push(value);
@@ -673,16 +627,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               });
             }
           } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                _iterator4.return();
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
               }
             } finally {
-              if (_didIteratorError4) {
-                throw _iteratorError4;
+              if (_didIteratorError3) {
+                throw _iteratorError3;
               }
             }
           }
@@ -754,28 +708,28 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var alias_names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
         var batch_list = [];
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
 
         try {
-          for (var _iterator5 = alias_names[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var name = _step5.value;
+          for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var _name2 = _step4.value;
 
-            if (!json[name]) return;
-            batch_list.push(json[name]);
+            if (!json[_name2]) return;
+            batch_list.push(json[_name2]);
           }
         } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-              _iterator5.return();
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
             }
           } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
+            if (_didIteratorError4) {
+              throw _iteratorError4;
             }
           }
         }
@@ -841,22 +795,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           files[_key5] = arguments[_key5];
         }
 
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
 
         try {
-          for (var _iterator6 = files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var f = _step6.value;
+          for (var _iterator5 = files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var f = _step5.value;
 
             var exist = false;
-            var _iteratorNormalCompletion9 = true;
-            var _didIteratorError9 = false;
-            var _iteratorError9 = undefined;
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
 
             try {
-              for (var _iterator9 = load_files[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                var lf = _step9.value;
+              for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                var lf = _step8.value;
 
                 if (f.split("/").pop() === lf.split("/").pop()) {
                   exist = true;
@@ -864,16 +818,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
               }
             } catch (err) {
-              _didIteratorError9 = true;
-              _iteratorError9 = err;
+              _didIteratorError8 = true;
+              _iteratorError8 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                  _iterator9.return();
+                if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                  _iterator8.return();
                 }
               } finally {
-                if (_didIteratorError9) {
-                  throw _iteratorError9;
+                if (_didIteratorError8) {
+                  throw _iteratorError8;
                 }
               }
             }
@@ -881,29 +835,29 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             if (!exist) load_files = load_files.concat(f);
           }
         } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-              _iterator6.return();
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+              _iterator5.return();
             }
           } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
+            if (_didIteratorError5) {
+              throw _iteratorError5;
             }
           }
         }
 
         return new Promise(function (resolve, reject) {
           var load = function load() {
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
 
             try {
               var _loop = function _loop() {
-                var file = _step7.value;
+                var file = _step6.value;
 
                 var name = file.split("/").pop(),
                     ext = name.split(".").pop(),
@@ -920,20 +874,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
               };
 
-              for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+              for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                 _loop();
               }
             } catch (err) {
-              _didIteratorError7 = true;
-              _iteratorError7 = err;
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                  _iterator7.return();
+                if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                  _iterator6.return();
                 }
               } finally {
-                if (_didIteratorError7) {
-                  throw _iteratorError7;
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
                 }
               }
             }
@@ -955,28 +909,28 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               }
               if (exist && done.length === load_files.length) {
                 // 移除已经加载的文件
-                var _iteratorNormalCompletion8 = true;
-                var _didIteratorError8 = false;
-                var _iteratorError8 = undefined;
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
 
                 try {
-                  for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                    var lf = _step8.value;
+                  for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var lf = _step7.value;
 
                     removeFile(_this6.types[lf.split(".").pop()], "head", lf);
                   }
                   // 替换成备份文件后能填补空缺就再执行一次
                 } catch (err) {
-                  _didIteratorError8 = true;
-                  _iteratorError8 = err;
+                  _didIteratorError7 = true;
+                  _iteratorError7 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                      _iterator8.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                      _iterator7.return();
                     }
                   } finally {
-                    if (_didIteratorError8) {
-                      throw _iteratorError8;
+                    if (_didIteratorError7) {
+                      throw _iteratorError7;
                     }
                   }
                 }
@@ -1024,39 +978,35 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var promise_list = [];
         if (url.length === 0 || typeof window.riot === "undefined") throw new Error("url未设置或riot未加载");
-        var _iteratorNormalCompletion10 = true;
-        var _didIteratorError10 = false;
-        var _iteratorError10 = undefined;
+        var _iteratorNormalCompletion9 = true;
+        var _didIteratorError9 = false;
+        var _iteratorError9 = undefined;
 
         try {
           var _loop2 = function _loop2() {
-            var _url = _step10.value;
+            var _url = _step9.value;
 
             promise_list.push(new Promise(function (resolve) {
-              try {
-                window.riot.compile(_url, function () {
-                  return resolve(_url);
-                });
-              } catch (e) {
-                throw e;
-              }
+              window.riot.compile(_url, function () {
+                return resolve(_url);
+              });
             }));
           };
 
-          for (var _iterator10 = url[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+          for (var _iterator9 = url[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
             _loop2();
           }
         } catch (err) {
-          _didIteratorError10 = true;
-          _iteratorError10 = err;
+          _didIteratorError9 = true;
+          _iteratorError9 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion10 && _iterator10.return) {
-              _iterator10.return();
+            if (!_iteratorNormalCompletion9 && _iterator9.return) {
+              _iterator9.return();
             }
           } finally {
-            if (_didIteratorError10) {
-              throw _iteratorError10;
+            if (_didIteratorError9) {
+              throw _iteratorError9;
             }
           }
         }
@@ -1064,32 +1014,35 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         return Promise.all(promise_list);
       }
 
-      // 全局route
+      // route
 
     }, {
-      key: 'defaultRoute',
-      value: function defaultRoute() {
+      key: 'route',
+      value: function route() {
         var base = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#!";
 
-        var em = void 0;
-        if (window.riot === "undefined") throw new Error("riot未加载");
+        var em = void 0,
+            route = void 0;
+        // 针对 riot3.0 route分离
+        if (typeof window.riot === "undefined" && typeof window.route === "undefined") throw new Error("riot未加载");
         em = emitter();
-        window.riot.route.base(base);
-        window.riot.route.parser(function (path) {
+        route = window.riot.route || window.route;
+        route.base(base);
+        route.parser(function (path) {
           var raw = path.split("?"),
               uri = raw[0].split("/"),
               qs = raw[1];
           if (qs) uri.push(utils.search2obj(qs));
           return uri;
         });
-        window.riot.route(function () {
+        route(function () {
           for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
             args[_key6] = arguments[_key6];
           }
 
           em.emit("change", args);
         });
-        window.riot.route.start(true);
+        route.start(true);
         return em;
       }
     }]);

@@ -5,19 +5,7 @@ export const emitter = (el = {}) => {
    * 所有监听中的回调函数
    * @type {Object}
    */
-  let _callbacks = {},
-
-  /**
-   * 将空格分隔的事件名连同索引传递到fn
-   * @param  {string}   events [description]
-   * @param  {Function} fn     [description]
-   */
-  scanEvents = (events, fn) => {
-    const events_array = events.split(" ");
-    for(const _e of events_array){
-      fn(_e);
-    }
-  };
+  let _callbacks = {};
 
   /**
    * 寄存器
@@ -26,35 +14,27 @@ export const emitter = (el = {}) => {
   el.__emited = el.__emited || {};
 
   /**
-   * object defineProperty 默认 
+   * object defineProperty 默认
    * writable : false, configurable : false, enumerable : false
    * 避免被复写
    * 自定义事件
    */
   Object.defineProperty(el, "on", {
-    value(events, fn){
+    value(event, fn){
       if(typeof fn !== "function")  return el;
-      scanEvents(events, (name) => {
-        _callbacks[name] = _callbacks[name] || [];
-        if(_callbacks[name].indexOf(fn) === -1){
-          _callbacks[name].push(fn);
-        }
-        if(el.__emited[name]){
-          fn.apply(el, el.__emited[name]);
-        }
-      });
-      // 支持chain写法
+      (_callbacks[event] = _callbacks[event] || []).push(fn);
+      el.__emited[event] && fn.apply(el, el.__emited[event]);
       return el;
     }
   });
 
   Object.defineProperty(el, "once", {
-    value(events, fn){
+    value(event, fn){
       let on = (...args) => {
-        el.off(events, on);
+        el.off(event, on);
         fn.apply(el, args);
       };
-      return el.on(events, on);
+      return el.on(event, on);
     }
   });
 
@@ -62,19 +42,17 @@ export const emitter = (el = {}) => {
    * 解除某自定义事件
    */
   Object.defineProperty(el, "off", {
-    value(events, fn){
-      if(events === "*" && !fn) _callbacks = {};
+    value(event, fn){
+      if(event === "*" && !fn) _callbacks = {};
       else{
-        scanEvents(events, (name) => {
-          if(typeof fn === "function"){
-            for(const _i in _callbacks[name]){
-              if(_callbacks[name][_i] == fn) 
-                _callbacks[name].splice(_i, 1);
-            }
+        if(fn){
+          for(const _i in _callbacks[event]){
+            if(_callbacks[event][_i] == fn)
+              _callbacks[event].splice(_i, 1);
           }
-          else delete _callbacks[name];
-          delete el.__emited[name];
-        });
+        }
+        else delete _callbacks[event];
+        delete el.__emited[event];
       }
       return el;
     }
@@ -84,17 +62,14 @@ export const emitter = (el = {}) => {
    * 触发某自定义事件
    */
   Object.defineProperty(el, "emit", {
-    value(events, ...args){
-      scanEvents(events, (name) => {
-        const fns = _callbacks[name] || [];
-        for(let _fn of fns){
-          _fn.apply(el, [name].concat(args));
-        }
-        el.__emited[name] = [name].concat(args);
-        // callback记录中有*，则任意name都要触发*所持fn
-        if(_callbacks["*"] && name !== "*")
-          el.emit.apply(el, ["*", name].concat(args));
-      });
+    value(event, ...args){
+      const fns = _callbacks[event] || [];
+      for(let _fn of fns){
+        _fn.apply(el, args);
+      }
+      el.__emited[name] = [name].concat(args);
+      if(_callbacks["*"] && event !== "*")
+        el.emit.apply(el, ["*", event].concat(args));
       return el;
     }
   });
