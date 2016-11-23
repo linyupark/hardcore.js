@@ -666,7 +666,19 @@ class Loader {
 
 }
 
+let __riot_subRoute;
+
 const riotjs = class {
+
+  static get router(){
+    return (window.riot && window.riot.route) || window.route;
+  }
+
+  static subRoute(...args){
+    if(!__riot_subRoute)
+      __riot_subRoute = this.router.create();
+    return __riot_subRoute.apply(this, args);
+  }
 
   // 浏览器编译
   static complie(url=[]){
@@ -683,13 +695,11 @@ const riotjs = class {
 
   // route
   static route(base="#!"){
-    let em, route;
+    let em, route = this.router;
     // 针对 riot3.0 route分离
-    if(typeof window.riot === "undefined"
-      && typeof window.route === "undefined")
+    if(typeof route === "undefined")
       throw new Error("riot未加载");
     em = emitter();
-    route = window.riot.route || window.route;
     route.base(base);
     route.parser(function(path) {
       const raw = path.split("?"),
@@ -705,17 +715,19 @@ const riotjs = class {
     return em;
   }
 
+  //
+
 };
 
 const HC = class {
 
   /**
    * 设置
-   * @param  {Object} config 
-   * @return {null}        
+   * @param  {Object} config
+   * @return {null}
    */
   static config(config = {}) {
-    
+
     this.config = utils.assign({
       log: true,
       debug: true,
@@ -733,11 +745,11 @@ const HC = class {
   /**
    * 视情况调用console
    * @param  {string}    type 消息类型
-   * @param  {arguments} msg  
-   * @return {null}         
+   * @param  {arguments} msg
+   * @return {null}
    */
   static console(type, ...msg){
-    if(this.config.debug === true 
+    if(this.config.debug === true
       && typeof window.console !== "undefined"){
       window.console[type] && window.console[type](...msg);
     }
@@ -766,7 +778,7 @@ const HC = class {
         location.href = `${this.config.errorPageUrl}?from=${location.href}&msg=${msg}`;
       }
       // 抽样提交
-      if(this.config.reportUrl && 
+      if(this.config.reportUrl &&
         Math.random()*100 >= (100-parseFloat(this.config.reportChance))){
         utils.xhr(this.config.reportUrl, {
           method: "POST", data: { message: msg }
@@ -784,9 +796,7 @@ HC.utils = utils;
 HC.Loader = Loader;
 HC.emitter = emitter;
 HC.Promise = Promise;
-HC.adapter = {
-  riotjs: riotjs
-};
+HC.riot = riotjs;
 
 exports.HC = HC;
 

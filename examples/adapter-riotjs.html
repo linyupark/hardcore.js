@@ -26,10 +26,11 @@
     "./route.min.js"
   )
   .then(function(){
-    HC.adapter.riotjs.route()
+    HC.riot.route()
     .on("change", function(args){
+      console.log("change");
       if(args[0] === "") args[0] = "home";
-      HC.adapter.riotjs.complie(["./riot-tags/"+args[0]+".tag.html"])
+      HC.riot.complie(["./riot-tags/"+args[0]+".tag.html"])
       .then(function(){
         if(args[1] === "id"){
           return riot.mount("#main", args[0], {
@@ -38,7 +39,10 @@
         }
         riot.mount("#main", args[0]);
       });
-      // riot.route("/notfound");
+    });
+
+    HC.riot.subRoute("*", function(url){
+      HC.riot.router("/notfound");
     });
   });
   </script>

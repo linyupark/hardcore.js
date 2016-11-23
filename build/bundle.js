@@ -963,16 +963,29 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return Loader;
   }();
 
+  var __riot_subRoute = void 0;
+
   var riotjs = function () {
     function riotjs() {
       _classCallCheck(this, riotjs);
     }
 
     _createClass(riotjs, null, [{
-      key: 'complie',
+      key: 'subRoute',
+      value: function subRoute() {
+        if (!__riot_subRoute) __riot_subRoute = this.router.create();
 
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+          args[_key6] = arguments[_key6];
+        }
+
+        return __riot_subRoute.apply(this, args);
+      }
 
       // 浏览器编译
+
+    }, {
+      key: 'complie',
       value: function complie() {
         var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
@@ -1022,11 +1035,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var base = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#!";
 
         var em = void 0,
-            route = void 0;
+            route = this.router;
         // 针对 riot3.0 route分离
-        if (typeof window.riot === "undefined" && typeof window.route === "undefined") throw new Error("riot未加载");
+        if (typeof route === "undefined") throw new Error("riot未加载");
         em = emitter();
-        route = window.riot.route || window.route;
         route.base(base);
         route.parser(function (path) {
           var raw = path.split("?"),
@@ -1036,14 +1048,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           return uri;
         });
         route(function () {
-          for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-            args[_key6] = arguments[_key6];
+          for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+            args[_key7] = arguments[_key7];
           }
 
           em.emit("change", args);
         });
         route.start(true);
         return em;
+      }
+
+      //
+
+    }, {
+      key: 'router',
+      get: function get() {
+        return window.riot && window.riot.route || window.route;
       }
     }]);
 
@@ -1061,8 +1081,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       /**
        * 设置
-       * @param  {Object} config 
-       * @return {null}        
+       * @param  {Object} config
+       * @return {null}
        */
       value: function config() {
         var _config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1084,8 +1104,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       /**
        * 视情况调用console
        * @param  {string}    type 消息类型
-       * @param  {arguments} msg  
-       * @return {null}         
+       * @param  {arguments} msg
+       * @return {null}
        */
 
     }, {
@@ -1094,8 +1114,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         if (this.config.debug === true && typeof window.console !== "undefined") {
           var _window$console;
 
-          for (var _len7 = arguments.length, msg = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
-            msg[_key7 - 1] = arguments[_key7];
+          for (var _len8 = arguments.length, msg = Array(_len8 > 1 ? _len8 - 1 : 0), _key8 = 1; _key8 < _len8; _key8++) {
+            msg[_key8 - 1] = arguments[_key8];
           }
 
           window.console[type] && (_window$console = window.console)[type].apply(_window$console, msg);
@@ -1155,9 +1175,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   HC.Loader = Loader;
   HC.emitter = emitter;
   HC.Promise = Promise;
-  HC.adapter = {
-    riotjs: riotjs
-  };
+  HC.riot = riotjs;
 
   exports.HC = HC;
 })(this.window = this.window || {});

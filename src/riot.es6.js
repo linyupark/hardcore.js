@@ -2,7 +2,19 @@ import utils from "./utils.es6.js";
 import {emitter} from "./emitter.es6.js";
 import {Promise} from "./promise.es6.js";
 
+let __riot_subRoute;
+
 const riotjs = class {
+
+  static get router(){
+    return (window.riot && window.riot.route) || window.route;
+  }
+
+  static subRoute(...args){
+    if(!__riot_subRoute)
+      __riot_subRoute = this.router.create();
+    return __riot_subRoute.apply(this, args);
+  }
 
   // 浏览器编译
   static complie(url=[]){
@@ -19,13 +31,11 @@ const riotjs = class {
 
   // route
   static route(base="#!"){
-    let em, route;
+    let em, route = this.router;
     // 针对 riot3.0 route分离
-    if(typeof window.riot === "undefined"
-      && typeof window.route === "undefined")
+    if(typeof route === "undefined")
       throw new Error("riot未加载");
     em = emitter();
-    route = window.riot.route || window.route;
     route.base(base);
     route.parser(function(path) {
       const raw = path.split("?"),
@@ -40,6 +50,8 @@ const riotjs = class {
     route.start(true);
     return em;
   }
+
+  //
 
 };
 
