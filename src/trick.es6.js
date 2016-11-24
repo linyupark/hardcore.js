@@ -15,5 +15,3 @@ export const createSingleton = Fn => {
   };
   return Singleton;
 };
-
-

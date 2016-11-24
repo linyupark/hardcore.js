@@ -1,9 +1,9 @@
 import * as trick from "./trick.es6.js";
 import utils from "./utils.es6.js";
-import {Loader} from "./loader.es6.js";
-import {emitter} from "./emitter.es6.js";
-import {Promise} from "./promise.es6.js";
-import {riotjs} from "./riot.es6.js";
+import { Loader } from "./loader.es6.js";
+import { emitter } from "./emitter.es6.js";
+import { Promise } from "./promise.es6.js";
+import { riotjs } from "./riot.es6.js";
 
 const HC = class {
 
@@ -34,9 +34,9 @@ const HC = class {
    * @param  {arguments} msg
    * @return {null}
    */
-  static console(type, ...msg){
-    if(this.config.debug === true
-      && typeof window.console !== "undefined"){
+  static console(type, ...msg) {
+    if (this.config.debug === true &&
+      typeof window.console !== "undefined") {
       window.console[type] && window.console[type](...msg);
     }
   }
@@ -46,13 +46,14 @@ const HC = class {
    * @param  {Boolean} start
    * @return {null}
    */
-  static log(start=true){
-    let errors = [], msg, logger = emitter();
+  static log(start = true) {
+    let errors = [],
+      msg, logger = emitter();
     window.onerror = () => { return true; };
-    if(!start) return;
+    if (!start) return;
     window.addEventListener("error", (e) => {
       // 忽略跨域脚本错误
-      if(e.message !== "Script error."){
+      if (e.message !== "Script error.") {
         let _msg = `${e.filename} (${e.message}[${e.lineno}:${e.colno}])`;
         errors.push(_msg);
         this.console("error", _msg);
@@ -60,14 +61,15 @@ const HC = class {
       msg = errors.join("\n");
       logger.emit("error", msg);
       // 有跳转页面
-      if(!this.config.debug && this.config.errorPageUrl){
+      if (!this.config.debug && this.config.errorPageUrl) {
         location.href = `${this.config.errorPageUrl}?from=${location.href}&msg=${msg}`;
       }
       // 抽样提交
-      if(this.config.reportUrl &&
-        Math.random()*100 >= (100-parseFloat(this.config.reportChance))){
+      if (this.config.reportUrl &&
+        Math.random() * 100 >= (100 - parseFloat(this.config.reportChance))) {
         utils.xhr(this.config.reportUrl, {
-          method: "POST", data: { message: msg }
+          method: "POST",
+          data: { message: msg }
         });
         this.console("info", "Error message reported.");
       }

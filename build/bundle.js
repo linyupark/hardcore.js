@@ -62,7 +62,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
    * 对象数据扩充
    * @param  {Object} obj 目标对象
    * @param  {object} ext 扩充对象
-   * @return {object} 
+   * @return {object}
    */
   var assign = function assign() {
     var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -116,7 +116,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
    * xmlhttp 请求
    * @param  {string} url     请求地址
    * @param  {object} options 设置
-   * @return {callback}         
+   * @return {callback}
    */
   var xhr = function xhr(url) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -195,7 +195,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      * @param  {string} name  项
      * @param  {String} value 值
      * @param  {Object} opts  扩展配置
-     * @return {null}       
+     * @return {null}
      */
     set: function set(name) {
       var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
@@ -345,7 +345,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   /**
    * 生成 hash
-   * @param  {string} s 
+   * @param  {string} s
    * @return {hash}
    */
   var hashCode = function hashCode(s) {
@@ -935,7 +935,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   }
                 }
 
-                load_files = done;done = [];fail = [];
+                load_files = done;
+                done = [];
+                fail = [];
                 load();
               } else {
                 reject(fail);
@@ -955,7 +957,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
       get: function get() {
         return {
-          js: "script", css: "link"
+          js: "script",
+          css: "link"
         };
       }
     }]);
@@ -1057,9 +1060,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         route.start(true);
         return em;
       }
-
-      //
-
     }, {
       key: 'router',
       get: function get() {
@@ -1158,7 +1158,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           // 抽样提交
           if (_this7.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this7.config.reportChance)) {
             utils.xhr(_this7.config.reportUrl, {
-              method: "POST", data: { message: msg }
+              method: "POST",
+              data: { message: msg }
             });
             _this7.console("info", "Error message reported.");
           }

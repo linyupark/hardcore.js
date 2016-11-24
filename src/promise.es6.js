@@ -1,5 +1,4 @@
-
-import {emitter} from "./emitter.es6.js";
+import { emitter } from "./emitter.es6.js";
 
 /**
  * 模拟标准Promise类
@@ -7,8 +6,8 @@ import {emitter} from "./emitter.es6.js";
 let Promise;
 let EmitterPromise = class {
 
-  constructor(rr=()=>{}){
-    if(rr.length === 0){
+  constructor(rr = () => {}) {
+    if (rr.length === 0) {
       throw new Error("Promise needs (resolve, reject) at least one function name.");
     }
     emitter(this);
@@ -16,10 +15,9 @@ let EmitterPromise = class {
       this.emit("resolve", value);
       this.off("reject");
     };
-    if(rr.length === 1){
+    if (rr.length === 1) {
       rr.call(this, this._resolve);
-    }
-    else{
+    } else {
       this._reject = (reason) => {
         this.emit("reject", reason);
         this.off("resolve");
@@ -38,13 +36,13 @@ let EmitterPromise = class {
    * @param  {Array}  iterable [p1,p2,p3..]
    * @return {EmitterPromise}
    */
-  static all(iterable=[]){
+  static all(iterable = []) {
     let values = [];
     return new EmitterPromise((resolve, reject) => {
-      for(let _p of iterable){
+      for (let _p of iterable) {
         _p.then(value => {
           values.push(value);
-          if(values.length === iterable.length){
+          if (values.length === iterable.length) {
             resolve(values);
           }
         }).catch(reason => {
@@ -59,12 +57,12 @@ let EmitterPromise = class {
    * @param  {mixed} value
    * @return {EmitterPromise}
    */
-  static resolve(value){
-    if(value instanceof Promise){
+  static resolve(value) {
+    if (value instanceof Promise) {
       return value;
     }
     return new EmitterPromise((resolve) => {
-      setTimeout(function(){
+      setTimeout(function() {
         resolve(value);
       }, 0);
     });
@@ -75,9 +73,9 @@ let EmitterPromise = class {
    * @param  {mixed} reason
    * @return {EmitterPromise}
    */
-  static reject(reason){
+  static reject(reason) {
     return new EmitterPromise((resolve, reject) => {
-      setTimeout(function(){
+      setTimeout(function() {
         reject(reason);
       }, 0);
       resolve;
@@ -89,19 +87,19 @@ let EmitterPromise = class {
    * @param  {Function} cb 执行回调
    * @return {EmitterPromise}
    */
-  then(cb=()=>{}, _catch){
+  then(cb = () => {}, _catch) {
     this.on("resolve", value => {
-      try{
-        if(this.__chain_value instanceof Promise){
+      try {
+        if (this.__chain_value instanceof Promise) {
           this.__chain_value.then(cb);
           return;
         }
         this.__chain_value = cb.call(null, this.__chain_value || value);
-      } catch(e) {
+      } catch (e) {
         this.emit("reject", e);
       }
     });
-    if(typeof _catch === "function"){
+    if (typeof _catch === "function") {
       return this.catch(_catch);
     }
     return this;
@@ -112,17 +110,17 @@ let EmitterPromise = class {
    * @param  {Function} cb 执行回调
    * @return {EmitterPromise}
    */
-  catch(cb=()=>{}){
+  catch (cb = () => {}) {
     this.once("reject", reason => {
       let result;
-      try{
-        if(this.__no_throw) return;
+      try {
+        if (this.__no_throw) return;
         result = cb.call(null, reason);
         this.__no_throw = true;
-        if(result) this.emit("resolve", result);
-      } catch(e) {
+        if (result) this.emit("resolve", result);
+      } catch (e) {
         this.emit("reject", e);
-        if(!this.__no_throw && this.__emited.reject[1] === e){
+        if (!this.__no_throw && this.__emited.reject[1] === e) {
           throw e;
         }
       }
@@ -133,8 +131,8 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if("Promise" in window){
+if ("Promise" in window) {
   Promise = window.Promise;
 }
 
-export {Promise};
+export { Promise };

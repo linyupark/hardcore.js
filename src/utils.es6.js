@@ -10,7 +10,7 @@ const typeOf = mixed =>
  * 对象数据扩充
  * @param  {Object} obj 目标对象
  * @param  {object} ext 扩充对象
- * @return {object} 
+ * @return {object}
  */
 const assign = (obj = {}, ext = {}) => {
   for (let k in ext) {
@@ -57,7 +57,7 @@ const search2obj = (hash = "") => {
  * xmlhttp 请求
  * @param  {string} url     请求地址
  * @param  {object} options 设置
- * @return {callback}         
+ * @return {callback}
  */
 const xhr = (url, options = {}) => {
   let opts = assign({
@@ -158,7 +158,7 @@ const cookie = {
    * @param  {string} name  项
    * @param  {String} value 值
    * @param  {Object} opts  扩展配置
-   * @return {null}       
+   * @return {null}
    */
   set(name, value = "", options) {
     let data = {},
@@ -261,18 +261,18 @@ const loadFile = (type = "script", url, options) => {
  * @param  {String} url  [description]
  * @return {null}      [description]
  */
-const removeFile = (type="script", position="head", url) => {
-  let i = 0, 
-      tags = document[position].getElementsByTagName(type);
-  for(; i < tags.length; i++){
-    if(tags[i].src === url || tags[i].href === url) 
+const removeFile = (type = "script", position = "head", url) => {
+  let i = 0,
+    tags = document[position].getElementsByTagName(type);
+  for (; i < tags.length; i++) {
+    if (tags[i].src === url || tags[i].href === url)
       tags[i].parentNode.removeChild(tags[i]);
   }
 };
 
 /**
  * 生成 hash
- * @param  {string} s 
+ * @param  {string} s
  * @return {hash}
  */
 const hashCode = s => {
@@ -288,19 +288,19 @@ const hashCode = s => {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-const cacheJSON = (url, callback=()=>{}) => {
-  const name = "_cache_"+hashCode(url.replace(/^http[s]?:\/\//, ""));
-  if("localStorage" in window && cookie.get(`${name}`)){
+const cacheJSON = (url, callback = () => {}) => {
+  const name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
+  if ("localStorage" in window && cookie.get(`${name}`)) {
     return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
   }
-  try{
+  try {
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
       cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.call(null, res);
     });
-  } catch(e){
+  } catch (e) {
     throw e;
   }
 };

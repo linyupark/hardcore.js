@@ -20,8 +20,6 @@ const createSingleton = Fn => {
 };
 
 
-
-
 var trick = Object.freeze({
 	createSingleton: createSingleton
 });
@@ -38,7 +36,7 @@ const typeOf = mixed =>
  * 对象数据扩充
  * @param  {Object} obj 目标对象
  * @param  {object} ext 扩充对象
- * @return {object} 
+ * @return {object}
  */
 const assign = (obj = {}, ext = {}) => {
   for (let k in ext) {
@@ -85,7 +83,7 @@ const search2obj = (hash = "") => {
  * xmlhttp 请求
  * @param  {string} url     请求地址
  * @param  {object} options 设置
- * @return {callback}         
+ * @return {callback}
  */
 const xhr = (url, options = {}) => {
   let opts = assign({
@@ -161,7 +159,7 @@ const cookie = {
    * @param  {string} name  项
    * @param  {String} value 值
    * @param  {Object} opts  扩展配置
-   * @return {null}       
+   * @return {null}
    */
   set(name, value = "", options) {
     let data = {},
@@ -264,18 +262,18 @@ const loadFile = (type = "script", url, options) => {
  * @param  {String} url  [description]
  * @return {null}      [description]
  */
-const removeFile = (type="script", position="head", url) => {
-  let i = 0, 
-      tags = document[position].getElementsByTagName(type);
-  for(; i < tags.length; i++){
-    if(tags[i].src === url || tags[i].href === url) 
+const removeFile = (type = "script", position = "head", url) => {
+  let i = 0,
+    tags = document[position].getElementsByTagName(type);
+  for (; i < tags.length; i++) {
+    if (tags[i].src === url || tags[i].href === url)
       tags[i].parentNode.removeChild(tags[i]);
   }
 };
 
 /**
  * 生成 hash
- * @param  {string} s 
+ * @param  {string} s
  * @return {hash}
  */
 const hashCode = s => {
@@ -291,19 +289,19 @@ const hashCode = s => {
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-const cacheJSON = (url, callback=()=>{}) => {
-  const name = "_cache_"+hashCode(url.replace(/^http[s]?:\/\//, ""));
-  if("localStorage" in window && cookie.get(`${name}`)){
+const cacheJSON = (url, callback = () => {}) => {
+  const name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
+  if ("localStorage" in window && cookie.get(`${name}`)) {
     return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
   }
-  try{
+  try {
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
       cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.call(null, res);
     });
-  } catch(e){
+  } catch (e) {
     throw e;
   }
 };
@@ -340,8 +338,8 @@ const emitter = (el = {}) => {
    * 自定义事件
    */
   Object.defineProperty(el, "on", {
-    value(event, fn){
-      if(typeof fn !== "function")  return el;
+    value(event, fn) {
+      if (typeof fn !== "function") return el;
       (_callbacks[event] = _callbacks[event] || []).push(fn);
       el.__emited[event] && fn.apply(el, el.__emited[event]);
       return el;
@@ -349,7 +347,7 @@ const emitter = (el = {}) => {
   });
 
   Object.defineProperty(el, "once", {
-    value(event, fn){
+    value(event, fn) {
       let on = (...args) => {
         el.off(event, on);
         fn.apply(el, args);
@@ -362,16 +360,15 @@ const emitter = (el = {}) => {
    * 解除某自定义事件
    */
   Object.defineProperty(el, "off", {
-    value(event, fn){
-      if(event === "*" && !fn) _callbacks = {};
-      else{
-        if(fn){
-          for(const _i in _callbacks[event]){
-            if(_callbacks[event][_i] == fn)
+    value(event, fn) {
+      if (event === "*" && !fn) _callbacks = {};
+      else {
+        if (fn) {
+          for (const _i in _callbacks[event]) {
+            if (_callbacks[event][_i] == fn)
               _callbacks[event].splice(_i, 1);
           }
-        }
-        else delete _callbacks[event];
+        } else delete _callbacks[event];
         delete el.__emited[event];
       }
       return el;
@@ -382,13 +379,13 @@ const emitter = (el = {}) => {
    * 触发某自定义事件
    */
   Object.defineProperty(el, "emit", {
-    value(event, ...args){
+    value(event, ...args) {
       const fns = _callbacks[event] || [];
-      for(let _fn of fns){
+      for (let _fn of fns) {
         _fn.apply(el, args);
       }
       el.__emited[name] = [name].concat(args);
-      if(_callbacks["*"] && event !== "*")
+      if (_callbacks["*"] && event !== "*")
         el.emit.apply(el, ["*", event].concat(args));
       return el;
     }
@@ -404,8 +401,8 @@ const emitter = (el = {}) => {
 let Promise;
 let EmitterPromise = class {
 
-  constructor(rr=()=>{}){
-    if(rr.length === 0){
+  constructor(rr = () => {}) {
+    if (rr.length === 0) {
       throw new Error("Promise needs (resolve, reject) at least one function name.");
     }
     emitter(this);
@@ -413,10 +410,9 @@ let EmitterPromise = class {
       this.emit("resolve", value);
       this.off("reject");
     };
-    if(rr.length === 1){
+    if (rr.length === 1) {
       rr.call(this, this._resolve);
-    }
-    else{
+    } else {
       this._reject = (reason) => {
         this.emit("reject", reason);
         this.off("resolve");
@@ -435,13 +431,13 @@ let EmitterPromise = class {
    * @param  {Array}  iterable [p1,p2,p3..]
    * @return {EmitterPromise}
    */
-  static all(iterable=[]){
+  static all(iterable = []) {
     let values = [];
     return new EmitterPromise((resolve, reject) => {
-      for(let _p of iterable){
+      for (let _p of iterable) {
         _p.then(value => {
           values.push(value);
-          if(values.length === iterable.length){
+          if (values.length === iterable.length) {
             resolve(values);
           }
         }).catch(reason => {
@@ -456,12 +452,12 @@ let EmitterPromise = class {
    * @param  {mixed} value
    * @return {EmitterPromise}
    */
-  static resolve(value){
-    if(value instanceof Promise){
+  static resolve(value) {
+    if (value instanceof Promise) {
       return value;
     }
     return new EmitterPromise((resolve) => {
-      setTimeout(function(){
+      setTimeout(function() {
         resolve(value);
       }, 0);
     });
@@ -472,9 +468,9 @@ let EmitterPromise = class {
    * @param  {mixed} reason
    * @return {EmitterPromise}
    */
-  static reject(reason){
+  static reject(reason) {
     return new EmitterPromise((resolve, reject) => {
-      setTimeout(function(){
+      setTimeout(function() {
         reject(reason);
       }, 0);
       resolve;
@@ -486,19 +482,19 @@ let EmitterPromise = class {
    * @param  {Function} cb 执行回调
    * @return {EmitterPromise}
    */
-  then(cb=()=>{}, _catch){
+  then(cb = () => {}, _catch) {
     this.on("resolve", value => {
-      try{
-        if(this.__chain_value instanceof Promise){
+      try {
+        if (this.__chain_value instanceof Promise) {
           this.__chain_value.then(cb);
           return;
         }
         this.__chain_value = cb.call(null, this.__chain_value || value);
-      } catch(e) {
+      } catch (e) {
         this.emit("reject", e);
       }
     });
-    if(typeof _catch === "function"){
+    if (typeof _catch === "function") {
       return this.catch(_catch);
     }
     return this;
@@ -509,17 +505,17 @@ let EmitterPromise = class {
    * @param  {Function} cb 执行回调
    * @return {EmitterPromise}
    */
-  catch(cb=()=>{}){
+  catch (cb = () => {}) {
     this.once("reject", reason => {
       let result;
-      try{
-        if(this.__no_throw) return;
+      try {
+        if (this.__no_throw) return;
         result = cb.call(null, reason);
         this.__no_throw = true;
-        if(result) this.emit("resolve", result);
-      } catch(e) {
+        if (result) this.emit("resolve", result);
+      } catch (e) {
         this.emit("reject", e);
-        if(!this.__no_throw && this.__emited.reject[1] === e){
+        if (!this.__no_throw && this.__emited.reject[1] === e) {
           throw e;
         }
       }
@@ -530,7 +526,7 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if("Promise" in window){
+if ("Promise" in window) {
   Promise = window.Promise;
 }
 
@@ -540,9 +536,10 @@ class Loader {
    * 支持加载的文件类型
    * @return {object}
    */
-  static get types(){
+  static get types() {
     return {
-      js: "script", css: "link"
+      js: "script",
+      css: "link"
     };
   }
 
@@ -552,10 +549,10 @@ class Loader {
    * @param  {...[type]} alias_names [description]
    * @return {[type]}                [description]
    */
-  static alias(json, alias_names=[]){
+  static alias(json, alias_names = []) {
     let batch_list = [];
-    for(const name of alias_names){
-      if(!json[name]) return;
+    for (const name of alias_names) {
+      if (!json[name]) return;
       batch_list.push(json[name]);
     }
     return this.depend.apply(this, batch_list);
@@ -566,27 +563,28 @@ class Loader {
    * @param  {array} batch_list [前置资源,...],[后置,...]
    * @return {promise}
    */
-  static depend(...batch_list){
-    let i = 0, fail = [], done = [],
-    next = (resolve, reject) => {
-      if(i === batch_list.length){
-        if(fail.length > 0){
-          reject(fail);
+  static depend(...batch_list) {
+    let i = 0,
+      fail = [],
+      done = [],
+      next = (resolve, reject) => {
+        if (i === batch_list.length) {
+          if (fail.length > 0) {
+            reject(fail);
+          } else resolve(done);
         }
-        else resolve(done);
-      }
-      this.batch.apply(this, batch_list[i])
-      .then(files => {
-        done = done.concat(files);
-        i++;
-        next(resolve, reject);
-      })
-      .catch(files => {
-        fail = fail.concat(files);
-        i++;
-        next(resolve, reject);
-      });
-    };
+        this.batch.apply(this, batch_list[i])
+          .then(files => {
+            done = done.concat(files);
+            i++;
+            next(resolve, reject);
+          })
+          .catch(files => {
+            fail = fail.concat(files);
+            i++;
+            next(resolve, reject);
+          });
+      };
     return new Promise(next);
   }
 
@@ -596,70 +594,73 @@ class Loader {
    * @return {promise}
    */
   static batch(...files) {
-    let load_files = [], backup_files = [], 
-        fail = [], done = [];
+    let load_files = [],
+      backup_files = [],
+      fail = [],
+      done = [];
     // 收集重复文件，放入备份文件
-    for(const f of files){
+    for (const f of files) {
       let exist = false;
-      for(const lf of load_files){
-        if(f.split("/").pop() === lf.split("/").pop()){
+      for (const lf of load_files) {
+        if (f.split("/").pop() === lf.split("/").pop()) {
           exist = true;
           backup_files = backup_files.concat(f);
         }
       }
-      if(!exist) load_files = load_files.concat(f);
+      if (!exist) load_files = load_files.concat(f);
     }
     return new Promise((resolve, reject) => {
       let load = () => {
-        for(const file of load_files){
-          let name = file.split("/").pop(),
+          for (const file of load_files) {
+            let name = file.split("/").pop(),
               ext = name.split(".").pop(),
               attrs = {};
-          if(ext === "js") attrs.async = true;
-          loadFile(this.types[ext], file, {
-            attrs: attrs,
-            success() {
-              check(done.push(file));
-            },
-            error() {
-              check(fail.push(file));
-            }
-          });
-        }
-      },
-      check = () => {
-        if(done.length === load_files.length){
-          resolve(done);
-        }
-        if(done.length+fail.length === load_files.length){
-          // 检查是否有备份，有则再尝试
-          let exist = false;
-          for(const fi in fail){
-            for(const bi in backup_files){
-              if(backup_files[bi].split("/").pop() === 
-                fail[fi].split("/").pop()){
-                exist = true;
-                done = done.concat(backup_files[bi]);
+            if (ext === "js") attrs.async = true;
+            loadFile(this.types[ext], file, {
+              attrs: attrs,
+              success() {
+                check(done.push(file));
+              },
+              error() {
+                check(fail.push(file));
+              }
+            });
+          }
+        },
+        check = () => {
+          if (done.length === load_files.length) {
+            resolve(done);
+          }
+          if (done.length + fail.length === load_files.length) {
+            // 检查是否有备份，有则再尝试
+            let exist = false;
+            for (const fi in fail) {
+              for (const bi in backup_files) {
+                if (backup_files[bi].split("/").pop() ===
+                  fail[fi].split("/").pop()) {
+                  exist = true;
+                  done = done.concat(backup_files[bi]);
+                }
               }
             }
-          }
-          if(exist && done.length === load_files.length){
-            // 移除已经加载的文件
-            for(const lf of load_files){
-              removeFile(
-                this.types[lf.split(".").pop()],
-                "head", lf
-              );
+            if (exist && done.length === load_files.length) {
+              // 移除已经加载的文件
+              for (const lf of load_files) {
+                removeFile(
+                  this.types[lf.split(".").pop()],
+                  "head", lf
+                );
+              }
+              // 替换成备份文件后能填补空缺就再执行一次
+              load_files = done;
+              done = [];
+              fail = [];
+              load();
+            } else {
+              reject(fail);
             }
-            // 替换成备份文件后能填补空缺就再执行一次
-            load_files = done; done = []; fail = [];
-            load();
           }
-          else{
-            reject(fail);
-          }
-        }
-      };
+        };
       load();
     });
   }
@@ -670,22 +671,22 @@ let __riot_subRoute;
 
 const riotjs = class {
 
-  static get router(){
+  static get router() {
     return (window.riot && window.riot.route) || window.route;
   }
 
-  static subRoute(...args){
-    if(!__riot_subRoute)
+  static subRoute(...args) {
+    if (!__riot_subRoute)
       __riot_subRoute = this.router.create();
     return __riot_subRoute.apply(this, args);
   }
 
   // 浏览器编译
-  static complie(url=[]){
+  static complie(url = []) {
     let promise_list = [];
-    if(url.length === 0 || typeof window.riot === "undefined")
+    if (url.length === 0 || typeof window.riot === "undefined")
       throw new Error("url未设置或riot未加载");
-    for(const _url of url){
+    for (const _url of url) {
       promise_list.push(new Promise(resolve => {
         window.riot.compile(_url, () => resolve(_url));
       }));
@@ -694,18 +695,18 @@ const riotjs = class {
   }
 
   // route
-  static route(base="#!"){
+  static route(base = "#!") {
     let em, route = this.router;
     // 针对 riot3.0 route分离
-    if(typeof route === "undefined")
+    if (typeof route === "undefined")
       throw new Error("riot未加载");
     em = emitter();
     route.base(base);
     route.parser(function(path) {
       const raw = path.split("?"),
-          uri = raw[0].split("/"),
-          qs = raw[1];
-      if(qs) uri.push(utils.search2obj(qs));
+        uri = raw[0].split("/"),
+        qs = raw[1];
+      if (qs) uri.push(utils.search2obj(qs));
       return uri;
     });
     route((...args) => {
@@ -714,8 +715,6 @@ const riotjs = class {
     route.start(true);
     return em;
   }
-
-  //
 
 };
 
@@ -748,9 +747,9 @@ const HC = class {
    * @param  {arguments} msg
    * @return {null}
    */
-  static console(type, ...msg){
-    if(this.config.debug === true
-      && typeof window.console !== "undefined"){
+  static console(type, ...msg) {
+    if (this.config.debug === true &&
+      typeof window.console !== "undefined") {
       window.console[type] && window.console[type](...msg);
     }
   }
@@ -760,13 +759,14 @@ const HC = class {
    * @param  {Boolean} start
    * @return {null}
    */
-  static log(start=true){
-    let errors = [], msg, logger = emitter();
+  static log(start = true) {
+    let errors = [],
+      msg, logger = emitter();
     window.onerror = () => { return true; };
-    if(!start) return;
+    if (!start) return;
     window.addEventListener("error", (e) => {
       // 忽略跨域脚本错误
-      if(e.message !== "Script error."){
+      if (e.message !== "Script error.") {
         let _msg = `${e.filename} (${e.message}[${e.lineno}:${e.colno}])`;
         errors.push(_msg);
         this.console("error", _msg);
@@ -774,14 +774,15 @@ const HC = class {
       msg = errors.join("\n");
       logger.emit("error", msg);
       // 有跳转页面
-      if(!this.config.debug && this.config.errorPageUrl){
+      if (!this.config.debug && this.config.errorPageUrl) {
         location.href = `${this.config.errorPageUrl}?from=${location.href}&msg=${msg}`;
       }
       // 抽样提交
-      if(this.config.reportUrl &&
-        Math.random()*100 >= (100-parseFloat(this.config.reportChance))){
+      if (this.config.reportUrl &&
+        Math.random() * 100 >= (100 - parseFloat(this.config.reportChance))) {
         utils.xhr(this.config.reportUrl, {
-          method: "POST", data: { message: msg }
+          method: "POST",
+          data: { message: msg }
         });
         this.console("info", "Error message reported.");
       }

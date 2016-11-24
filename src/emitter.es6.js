@@ -1,4 +1,3 @@
-
 export const emitter = (el = {}) => {
 
   /**
@@ -20,8 +19,8 @@ export const emitter = (el = {}) => {
    * 自定义事件
    */
   Object.defineProperty(el, "on", {
-    value(event, fn){
-      if(typeof fn !== "function")  return el;
+    value(event, fn) {
+      if (typeof fn !== "function") return el;
       (_callbacks[event] = _callbacks[event] || []).push(fn);
       el.__emited[event] && fn.apply(el, el.__emited[event]);
       return el;
@@ -29,7 +28,7 @@ export const emitter = (el = {}) => {
   });
 
   Object.defineProperty(el, "once", {
-    value(event, fn){
+    value(event, fn) {
       let on = (...args) => {
         el.off(event, on);
         fn.apply(el, args);
@@ -42,16 +41,15 @@ export const emitter = (el = {}) => {
    * 解除某自定义事件
    */
   Object.defineProperty(el, "off", {
-    value(event, fn){
-      if(event === "*" && !fn) _callbacks = {};
-      else{
-        if(fn){
-          for(const _i in _callbacks[event]){
-            if(_callbacks[event][_i] == fn)
+    value(event, fn) {
+      if (event === "*" && !fn) _callbacks = {};
+      else {
+        if (fn) {
+          for (const _i in _callbacks[event]) {
+            if (_callbacks[event][_i] == fn)
               _callbacks[event].splice(_i, 1);
           }
-        }
-        else delete _callbacks[event];
+        } else delete _callbacks[event];
         delete el.__emited[event];
       }
       return el;
@@ -62,13 +60,13 @@ export const emitter = (el = {}) => {
    * 触发某自定义事件
    */
   Object.defineProperty(el, "emit", {
-    value(event, ...args){
+    value(event, ...args) {
       const fns = _callbacks[event] || [];
-      for(let _fn of fns){
+      for (let _fn of fns) {
         _fn.apply(el, args);
       }
       el.__emited[name] = [name].concat(args);
-      if(_callbacks["*"] && event !== "*")
+      if (_callbacks["*"] && event !== "*")
         el.emit.apply(el, ["*", event].concat(args));
       return el;
     }
