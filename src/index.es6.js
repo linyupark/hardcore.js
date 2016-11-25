@@ -3,7 +3,7 @@ import utils from "./utils.es6.js";
 import { Loader } from "./loader.es6.js";
 import { emitter } from "./emitter.es6.js";
 import { Promise } from "./promise.es6.js";
-import { riotjs } from "./riot.es6.js";
+import { riotjs } from "./riot.adapter.es6.js";
 
 const HC = class {
 

@@ -9,7 +9,8 @@
     "rollup": "rollup ./src/index.es6.js -o ./build/bundle.es6.js -f iife -n window",
     "babel": "babel -o ./build/bundle.js ./build/bundle.es6.js",
     "uglifyjs": "uglifyjs ./build/bundle.js -m -o ./dist/wylib.min.js --source-map ./dist/wylib.min.map",
-    "dist": "npm run rollup && npm run babel && npm run uglifyjs"
+    "dist": "npm run rollup && npm run babel && npm run uglifyjs",
+    "winserver": "browser-sync start --server --file \"build/bundle.js, examples/*.html\""
   },
   "license": "MIT",
   "dependencies": {},

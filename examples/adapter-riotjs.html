@@ -7,7 +7,7 @@
 
   <div id="main"></div>
 
-  <a href="#!/user/id/12">user12</a><br>
+  <a href="#!/user/id/121">user121</a><br>
   <a href="#!/post/id/13">post13</a><br>
 
 
@@ -22,8 +22,7 @@
   // 3.x
   HC.Loader.batch(
     "https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.0/riot+compiler.min.js",
-    "https://cdn.jsdelivr.net/riot/3.0/riot+compiler.min.js",
-    "./route.min.js"
+    "https://cdn.jsdelivr.net/riot/3.0/riot+compiler.min.js"
   )
   .then(function(){
     HC.riot.route()
@@ -42,6 +41,7 @@
     });
 
     HC.riot.subRoute("*", function(url){
+      console.log("*");
       HC.riot.router("/notfound");
     });
   });
