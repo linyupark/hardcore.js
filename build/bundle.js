@@ -861,11 +861,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var name = file.split("/").pop(),
                     ext = name.split(".").pop(),
-                    attrs = { rel: name },
+                    attrs = { rel: file },
                     type = _this6.types[ext];
                 if (ext === "js") attrs.defer = true;
                 // 之前加载过的相同文件删除
-                removeFile(type, "head", name);
+                removeFile(type, "head", file);
                 loadFile(type, file, {
                   attrs: attrs,
                   success: function success() {
@@ -873,7 +873,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   },
                   error: function error() {
                     // 不留下失败文件
-                    removeFile(type, "head", name);
+                    removeFile(type, "head", file);
                     check(fail.push(file));
                   }
                 });
@@ -922,7 +922,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                     var lf = _step7.value;
 
-                    removeFile(_this6.types[lf.split(".").pop()], "head", lf.split("/").pop());
+                    removeFile(_this6.types[lf.split(".").pop()], "head", lf);
                   }
                   // 替换成备份文件后能填补空缺就再执行一次
                 } catch (err) {

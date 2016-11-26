@@ -614,11 +614,11 @@ class Loader {
           for (const file of load_files) {
             let name = file.split("/").pop(),
               ext = name.split(".").pop(),
-              attrs = { rel: name },
+              attrs = { rel: file },
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;
             // 之前加载过的相同文件删除
-            removeFile(type, "head", name);
+            removeFile(type, "head", file);
             loadFile(type, file, {
               attrs: attrs,
               success() {
@@ -626,7 +626,7 @@ class Loader {
               },
               error() {
                 // 不留下失败文件
-                removeFile(type, "head", name);
+                removeFile(type, "head", file);
                 check(fail.push(file));
               }
             });
@@ -651,10 +651,7 @@ class Loader {
             if (exist && done.length === load_files.length) {
               // 移除已经加载的文件
               for (const lf of load_files) {
-                removeFile(
-                  this.types[lf.split(".").pop()],
-                  "head", lf.split("/").pop()
-                );
+                removeFile(this.types[lf.split(".").pop()], "head", lf);
               }
               // 替换成备份文件后能填补空缺就再执行一次
               load_files = done;
