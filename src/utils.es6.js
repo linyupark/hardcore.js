@@ -258,14 +258,14 @@ const loadFile = (type = "script", url, options) => {
 /**
  * 私有函数，删除动态载入的文件标签，loadFile失败后可用
  * @param  {String} type [description]
- * @param  {String} url  [description]
+ * @param  {String} rel  [description]
  * @return {null}      [description]
  */
-const removeFile = (type = "script", position = "head", url) => {
+const removeFile = (type = "script", position = "head", rel) => {
   let i = 0,
     tags = document[position].getElementsByTagName(type);
   for (; i < tags.length; i++) {
-    if (tags[i].src === url || tags[i].href === url)
+    if (tags[i].rel === rel)
       tags[i].parentNode.removeChild(tags[i]);
   }
 };

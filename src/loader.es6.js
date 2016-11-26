@@ -85,14 +85,19 @@ export class Loader {
           for (const file of load_files) {
             let name = file.split("/").pop(),
               ext = name.split(".").pop(),
-              attrs = {};
-            if (ext === "js") attrs.async = true;
-            loadFile(this.types[ext], file, {
+              attrs = { rel: name },
+              type = this.types[ext];
+            if (ext === "js") attrs.defer = true;
+            // 之前加载过的相同文件删除
+            removeFile(type, "head", name);
+            loadFile(type, file, {
               attrs: attrs,
               success() {
                 check(done.push(file));
               },
               error() {
+                // 不留下失败文件
+                removeFile(type, "head", name);
                 check(fail.push(file));
               }
             });
@@ -119,7 +124,7 @@ export class Loader {
               for (const lf of load_files) {
                 removeFile(
                   this.types[lf.split(".").pop()],
-                  "head", lf
+                  "head", lf.split("/").pop()
                 );
               }
               // 替换成备份文件后能填补空缺就再执行一次

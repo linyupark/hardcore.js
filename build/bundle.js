@@ -328,18 +328,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   /**
    * 私有函数，删除动态载入的文件标签，loadFile失败后可用
    * @param  {String} type [description]
-   * @param  {String} url  [description]
+   * @param  {String} rel  [description]
    * @return {null}      [description]
    */
   var removeFile = function removeFile() {
     var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "script";
     var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "head";
-    var url = arguments[2];
+    var rel = arguments[2];
 
     var i = 0,
         tags = document[position].getElementsByTagName(type);
     for (; i < tags.length; i++) {
-      if (tags[i].src === url || tags[i].href === url) tags[i].parentNode.removeChild(tags[i]);
+      if (tags[i].rel === rel) tags[i].parentNode.removeChild(tags[i]);
     }
   };
 
@@ -861,14 +861,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var name = file.split("/").pop(),
                     ext = name.split(".").pop(),
-                    attrs = {};
-                if (ext === "js") attrs.async = true;
-                loadFile(_this6.types[ext], file, {
+                    attrs = { rel: name },
+                    type = _this6.types[ext];
+                if (ext === "js") attrs.defer = true;
+                // 之前加载过的相同文件删除
+                removeFile(type, "head", name);
+                loadFile(type, file, {
                   attrs: attrs,
                   success: function success() {
                     check(done.push(file));
                   },
                   error: function error() {
+                    // 不留下失败文件
+                    removeFile(type, "head", name);
                     check(fail.push(file));
                   }
                 });
@@ -917,7 +922,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                     var lf = _step7.value;
 
-                    removeFile(_this6.types[lf.split(".").pop()], "head", lf);
+                    removeFile(_this6.types[lf.split(".").pop()], "head", lf.split("/").pop());
                   }
                   // 替换成备份文件后能填补空缺就再执行一次
                 } catch (err) {
@@ -1105,7 +1110,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             first();
             loop();
           }
-        };loop();
+        };
+        loop();
         emitStackLevel = 0;
       })();
     }

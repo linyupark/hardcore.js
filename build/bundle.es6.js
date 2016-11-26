@@ -259,14 +259,14 @@ const loadFile = (type = "script", url, options) => {
 /**
  * 私有函数，删除动态载入的文件标签，loadFile失败后可用
  * @param  {String} type [description]
- * @param  {String} url  [description]
+ * @param  {String} rel  [description]
  * @return {null}      [description]
  */
-const removeFile = (type = "script", position = "head", url) => {
+const removeFile = (type = "script", position = "head", rel) => {
   let i = 0,
     tags = document[position].getElementsByTagName(type);
   for (; i < tags.length; i++) {
-    if (tags[i].src === url || tags[i].href === url)
+    if (tags[i].rel === rel)
       tags[i].parentNode.removeChild(tags[i]);
   }
 };
@@ -614,14 +614,19 @@ class Loader {
           for (const file of load_files) {
             let name = file.split("/").pop(),
               ext = name.split(".").pop(),
-              attrs = {};
-            if (ext === "js") attrs.async = true;
-            loadFile(this.types[ext], file, {
+              attrs = { rel: name },
+              type = this.types[ext];
+            if (ext === "js") attrs.defer = true;
+            // 之前加载过的相同文件删除
+            removeFile(type, "head", name);
+            loadFile(type, file, {
               attrs: attrs,
               success() {
                 check(done.push(file));
               },
               error() {
+                // 不留下失败文件
+                removeFile(type, "head", name);
                 check(fail.push(file));
               }
             });
@@ -648,7 +653,7 @@ class Loader {
               for (const lf of load_files) {
                 removeFile(
                   this.types[lf.split(".").pop()],
-                  "head", lf
+                  "head", lf.split("/").pop()
                 );
               }
               // 替换成备份文件后能填补空缺就再执行一次
@@ -800,13 +805,14 @@ function emit(force) {
     }
   });
   if (isRoot) {
-    let first, loop = function(){
+    let first, loop = function() {
       first = emitStack.shift();
-      if(first) {
+      if (first) {
         first();
         loop();
       }
-    }; loop();
+    };
+    loop();
     emitStackLevel = 0;
   }
 }
@@ -861,12 +867,12 @@ function go(path, title, shouldReplace) {
 
   path = base + normalize(path);
   title = title || doc.title;
-    // browsers ignores the second parameter `title`
+  // browsers ignores the second parameter `title`
   shouldReplace
     ?
     hist.replaceState(null, title, path) :
     hist.pushState(null, title, path);
-    // so we need to set it manually
+  // so we need to set it manually
   doc.title = title;
   routeFound = false;
   emit();
@@ -934,9 +940,9 @@ const route = mainRouter.m.bind(mainRouter);
  */
 route.create = function() {
   const newSubRouter = new Router();
-    // assign sub-router's main method
+  // assign sub-router's main method
   const router = newSubRouter.m.bind(newSubRouter);
-    // stop only this sub-router
+  // stop only this sub-router
   router.stop = newSubRouter.s.bind(newSubRouter);
   return router;
 };
@@ -1002,8 +1008,8 @@ route.start = function(autoExec) {
   if (!started) {
     if (win) {
       if (document.readyState === 'complete') start(autoExec);
-        // the timeout is needed to solve
-        // a weird safari bug https://github.com/riot/route/issues/33
+      // the timeout is needed to solve
+      // a weird safari bug https://github.com/riot/route/issues/33
       else win[ADD_EVENT_LISTENER]('load', function() {
         setTimeout(function() { start(autoExec); }, 1);
       });
