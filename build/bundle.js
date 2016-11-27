@@ -899,7 +899,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           },
               check = function check() {
             if (done.length === load_files.length) {
-              resolve(done);
+              return resolve(done);
             }
             if (done.length + fail.length === load_files.length) {
               // 检查是否有备份，有则再尝试
@@ -909,6 +909,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   if (backup_files[bi].split("/").pop() === fail[fi].split("/").pop()) {
                     exist = true;
                     done = done.concat(backup_files[bi]);
+                    backup_files.splice(bi, 1);
                   }
                 }
               }

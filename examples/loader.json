@@ -1,4 +1,9 @@
 {
-  "jquery1.8": ["http://res.winbaoxian.com/3rdparty/jquery/1.8/jquery.min.js"],
+  "jquery1.8": ["//res.winbaoxian.com/3rdparty/jquery/1.82/jquery.min.js", "//res.winbaoxian.com/3rdparty/jquery/1.8/jquery.min.js"],
+  "riot3.0.1": [
+    "//cdn.bootcss.com/riot/3.0.1/riot.min.js",
+    "//cdnjs.cloudflare.com/ajax/libs/riot/3.0.2/riot.min.js",
+    "//cdn.jsdelivr.net/riot/3.0/riot.min.js"
+  ],
   "jBox": ["http://res.winbaoxian.com/3rdparty/jBox/0.32/js/jBox.min.js", "http://res.winbaoxian.com/3rdparty/jBox/0.3/js/jBox.min.js", "http://res.winbaoxian.com/3rdparty/jBox/0.3/css/jBox.min.css"]
 }

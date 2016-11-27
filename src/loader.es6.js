@@ -105,7 +105,7 @@ export class Loader {
         },
         check = () => {
           if (done.length === load_files.length) {
-            resolve(done);
+            return resolve(done);
           }
           if (done.length + fail.length === load_files.length) {
             // 检查是否有备份，有则再尝试
@@ -116,6 +116,7 @@ export class Loader {
                   fail[fi].split("/").pop()) {
                   exist = true;
                   done = done.concat(backup_files[bi]);
+                  backup_files.splice(bi, 1);
                 }
               }
             }

@@ -15,7 +15,7 @@
     HC.config();
     HC.utils.cacheJSON("./loader.json", function(json){
       console.log(json);
-      HC.Loader.alias(json, ["jquery1.8", "jBox"])
+      HC.Loader.alias(json, ["jquery1.8", "jBox", "riot3.0.1"])
       .then(function(files){
         console.log("then: ", files);
         $(".tooltip").jBox("Tooltip");
@@ -30,7 +30,7 @@
     // }).catch(function(files){
     //   console.log("catch: ", files);
     // });
-    // 
+    //
     // HC.Loader.batch("http://res.winbaoxian.com/3rdparty/jquery/1.8/jquery.min.js", "http://res.winbaoxian.com/3rdparty/jquery/1.83/jquery.min.js").then(function(files){
     //   console.log("then: ", files);
     // }).catch(function(files){
