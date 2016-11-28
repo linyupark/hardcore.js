@@ -73,58 +73,62 @@ const xhr = (url, options = {}) => {
     xhr, progress = 0,
     send_data = [],
     has_q = url.split("/").pop().search(/\?/) !== -1;
-  try {
-    // 是否有缓存
-    if (!opts.cache) {
-      url += (has_q ? "&" : "?") + "_=" + Math.random();
-      has_q = true;
-    }
-    // 整理发送数据
-    send_data.push(serialize(opts.data));
-    // 如果是put /post 则用formdata
-    if (/^put$|^post$/i.test(opts.method)) {
-      opts.headers["Content-type"] = "application/x-www-form-urlencoded";
-    } else {
-      url += (has_q ? "&" : "?") + send_data;
-    }
-    xhr = new XMLHttpRequest();
-    xhr.open(opts.method, url, true);
-    for (let k in opts.headers) {
-      xhr.setRequestHeader(k, opts.headers[k]);
-    }
-    // 如果支持进度条
-    xhr.upload.onprogress = xhr.onprogress = (e) => {
-      if (e.lengthComputable) {
-        progress = Math.round(e.loaded * 100 / e.total);
-        opts.progress(progress);
-      }
-    };
-    xhr.onload = (e) => {
-      let res;
-      if (e.target.status === 200) {
-        res = e.target.responseText;
-        if (opts.type === "json") {
-          res = JSON.parse(res);
-        }
-        opts.done.call(e.target, res);
-      }
-    };
-    xhr.send(send_data);
-    // 支持 xhr(...).done(fn).fail(fn);
-    return {
-      done(fn) {
-        opts.done = fn;
-      },
-      fail(fn) {
-        opts.fail = fn;
-      },
-      progress(fn) {
-        opts.progress = fn;
-      }
-    };
-  } catch (e) {
-    throw e;
+  // 是否有缓存
+  if (!opts.cache) {
+    url += (has_q ? "&" : "?") + "_=" + Math.random();
+    has_q = true;
   }
+  // 整理发送数据
+  if(serialize(opts.data) !== ""){
+    send_data.push(serialize(opts.data));
+  }
+  // 如果是put /post 则用formdata
+  if (/^put$|^post$/i.test(opts.method)) {
+    opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+  } else if(send_data.length > 0) {
+    url += (has_q ? "&" : "?") + send_data;
+  }
+  xhr = new XMLHttpRequest();
+  xhr.open(opts.method, url, true);
+  for (let k in opts.headers) {
+    xhr.setRequestHeader(k, opts.headers[k]);
+  }
+  // 如果支持进度条
+  xhr.upload.onprogress = xhr.onprogress = (e) => {
+    if (e.lengthComputable) {
+      progress = Math.round(e.loaded * 100 / e.total);
+      opts.progress.call(e.target, progress);
+    }
+  };
+  xhr.onload = (e) => {
+    let res;
+    if (e.target.status === 200 || e.target.status === 304) {
+      res = e.target.responseText;
+      if (opts.type === "json") {
+        res = JSON.parse(res);
+      }
+      opts.done.call(e.target, res);
+    }
+    else{
+      opts.fail.call(e.target, e.target.status);
+    }
+  };
+  xhr.onerror = opts.fail;
+  // done().fail().progress()
+  xhr.done = fn => {
+    opts.done = fn;
+    return xhr;
+  }
+  xhr.fail = fn => {
+    opts.fail = fn;
+    return xhr;
+  }
+  xhr.progress = fn => {
+    opts.progress = fn;
+    return xhr;
+  }
+  xhr.send(send_data);
+  return xhr;
 };
 
 /**
@@ -284,25 +288,41 @@ const hashCode = s => {
 
 /**
  * 在浏览器关闭之前缓存ajax获取的json数据
- * @param  {[type]}   url      [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
+ * @param  {String} url           [description]
+ * @param  {Object} [callback={}] [description]
+ * @return {Object}               [description]
  */
-const cacheJSON = (url, callback = () => {}) => {
-  const name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
+const cacheJSON = (url, _callback={}) => {
+  const name = "_hc_cache_json_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
+  let callback = assign({
+    done(){}, fail(){}
+  }, _callback);
   if ("localStorage" in window && cookie.get(`${name}`)) {
-    return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
+    setTimeout(() => {
+      callback.done.call(null, JSON.parse(window.localStorage.getItem(name)));
+    }, 0);
   }
-  try {
+  else{
     xhr(url).done(res => {
-      // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+      // 关闭浏览器失效，保证下次浏览获取新的资源列表
       cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
-      callback.call(null, res);
+      callback.done.call(null, res);
+    })
+    .fail(status => {
+      callback.fail.call(null, status);
     });
-  } catch (e) {
-    throw e;
   }
+  // 支持 done().fail()
+  callback.done = fn => {
+    callback.done = fn;
+    return callback;
+  };
+  callback.fail = fn => {
+    callback.fail = fn;
+    return callback;
+  };
+  return callback;
 };
 
 export default {
