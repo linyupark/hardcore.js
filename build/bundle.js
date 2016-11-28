@@ -135,58 +135,86 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         progress = 0,
         send_data = [],
         has_q = url.split("/").pop().search(/\?/) !== -1;
-    try {
-      // 是否有缓存
-      if (!opts.cache) {
-        url += (has_q ? "&" : "?") + "_=" + Math.random();
-        has_q = true;
-      }
-      // 整理发送数据
-      send_data.push(serialize(opts.data));
-      // 如果是put /post 则用formdata
-      if (/^put$|^post$/i.test(opts.method)) {
-        opts.headers["Content-type"] = "application/x-www-form-urlencoded";
-      } else {
-        url += (has_q ? "&" : "?") + send_data;
-      }
-      xhr = new XMLHttpRequest();
-      xhr.open(opts.method, url, true);
-      for (var k in opts.headers) {
-        xhr.setRequestHeader(k, opts.headers[k]);
-      }
-      // 如果支持进度条
-      xhr.upload.onprogress = xhr.onprogress = function (e) {
-        if (e.lengthComputable) {
-          progress = Math.round(e.loaded * 100 / e.total);
-          opts.progress(progress);
-        }
-      };
-      xhr.onload = function (e) {
-        var res = void 0;
-        if (e.target.status === 200) {
-          res = e.target.responseText;
-          if (opts.type === "json") {
-            res = JSON.parse(res);
-          }
-          opts.done.call(e.target, res);
-        }
-      };
-      xhr.send(send_data);
-      // 支持 xhr(...).done(fn).fail(fn);
-      return {
-        done: function done(fn) {
-          opts.done = fn;
-        },
-        fail: function fail(fn) {
-          opts.fail = fn;
-        },
-        progress: function progress(fn) {
-          opts.progress = fn;
-        }
-      };
-    } catch (e) {
-      throw e;
+    // 是否有缓存
+    if (!opts.cache) {
+      url += (has_q ? "&" : "?") + "_=" + Math.random();
+      has_q = true;
     }
+    // 整理发送数据
+    if (serialize(opts.data) !== "") {
+      send_data.push(serialize(opts.data));
+    }
+    // 如果是put /post 则用formdata
+    if (/^put$|^post$/i.test(opts.method)) {
+      opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+    } else if (send_data.length > 0) {
+      url += (has_q ? "&" : "?") + send_data;
+    }
+    xhr = new XMLHttpRequest();
+    xhr.open(opts.method, url, true);
+    for (var k in opts.headers) {
+      xhr.setRequestHeader(k, opts.headers[k]);
+    }
+    // 如果支持进度条
+    xhr.upload.onprogress = xhr.onprogress = function (e) {
+      if (e.lengthComputable) {
+        progress = Math.round(e.loaded * 100 / e.total);
+        opts.progress.call(e.target, progress);
+      }
+    };
+    xhr.onload = function (e) {
+      var res = void 0;
+      if (e.target.status === 200 || e.target.status === 304) {
+        res = e.target.responseText;
+        if (opts.type === "json") {
+          res = JSON.parse(res);
+        }
+        opts.done.call(e.target, res);
+      } else {
+        opts.fail.call(e.target, e.target.status);
+      }
+    };
+    xhr.onerror = opts.fail;
+    // done().fail().progress()
+    xhr.done = function (fn) {
+      opts.done = fn;
+      return xhr;
+    };
+    xhr.fail = function (fn) {
+      opts.fail = fn;
+      return xhr;
+    };
+    xhr.progress = function (fn) {
+      opts.progress = fn;
+      return xhr;
+    };
+    xhr.send(send_data);
+    return xhr;
+  };
+
+  /**
+   * 清除字符串中指定的标签
+   * @param  {string} tag 标签名称
+   * @param  {string} str 字符串
+   * @return {string}
+   */
+  var tagRemove = function tagRemove(tag, str) {
+    return str.replace(new RegExp('<' + tag + '(.|\\s)*?\\/' + tag + '>', "g"), "");
+  };
+
+  /**
+   * 解析字符串中的标签内容
+   * @param  {string} tag 标签名称
+   * @param  {string} 解析字符串
+   * @return {string}
+   */
+  var tagContent = function tagContent(tag, str) {
+    var re = new RegExp('<' + tag + '\\b[^>]*>([\\s\\S]*?)<\\/' + tag + '>', "gm"),
+        text = "";
+    for (var match = re.exec(str); match; match = re.exec(str)) {
+      text += match[1];
+    }
+    return text;
   };
 
   var cookie = {
@@ -279,7 +307,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   };
 
   /**
-   * 私有函数，动态加载文件
+   * 动态加载文件,建议私有化
    * @param  {String} type   加载远程文件类型 [script,link,img]
    * @param  {String} url    地址
    * @param  {Object} opts   附加配置
@@ -326,7 +354,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   };
 
   /**
-   * 私有函数，删除动态载入的文件标签，loadFile失败后可用
+   * 删除动态载入的文件标签，loadFile失败后可用，建议私有化
    * @param  {String} type [description]
    * @param  {String} rel  [description]
    * @return {null}      [description]
@@ -357,39 +385,59 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   /**
    * 在浏览器关闭之前缓存ajax获取的json数据
-   * @param  {[type]}   url      [description]
-   * @param  {Function} callback [description]
-   * @return {[type]}            [description]
+   * @param  {String} url           [description]
+   * @param  {Object} options [description]
+   * @return {Object}               [description]
    */
   var cacheJSON = function cacheJSON(url) {
-    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
-    if ("localStorage" in window && cookie.get('' + name)) {
-      return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
-    }
-    try {
+    var name = '_hc_cache_json_' + hashCode(url.replace(/^http[s]?:\/\//, ""));
+    var callback = assign({
+      force: false, // true的时候强制ajax获取
+      done: function done() {},
+      fail: function fail() {}
+    }, options);
+    if ("localStorage" in window && cookie.get('' + name) && !callback.force) {
+      setTimeout(function () {
+        callback.done.call(null, JSON.parse(window.localStorage.getItem(name)));
+      }, 0);
+    } else {
       xhr(url).done(function (res) {
-        // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+        // 关闭浏览器失效，保证下次浏览获取新的资源列表
         cookie.set(name, "y");
         window.localStorage.setItem(name, JSON.stringify(res));
-        callback.call(null, res);
+        callback.done.call(null, res);
+      }).fail(function (status) {
+        callback.fail.call(null, status);
       });
-    } catch (e) {
-      throw e;
     }
+    // 支持 done().fail()
+    callback.done = function (fn) {
+      callback.done = fn;
+      return callback;
+    };
+    callback.fail = function (fn) {
+      callback.fail = fn;
+      return callback;
+    };
+    return callback;
   };
 
-  var utils = {
+  var utils = Object.freeze({
+    typeOf: typeOf,
     assign: assign,
     serialize: serialize,
-    xhr: xhr,
-    cookie: cookie,
     search2obj: search2obj,
-    typeOf: typeOf,
+    xhr: xhr,
+    tagRemove: tagRemove,
+    tagContent: tagContent,
+    cookie: cookie,
+    loadFile: loadFile,
+    removeFile: removeFile,
     hashCode: hashCode,
     cacheJSON: cacheJSON
-  };
+  });
 
   var emitter = function emitter() {
     var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1386,7 +1434,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           var raw = path.split("?"),
               uri = raw[0].split("/"),
               qs = raw[1];
-          if (qs) uri.push(utils.search2obj(qs));
+          if (qs) uri.push(search2obj(qs));
           return uri;
         });
         this.router(function () {
@@ -1426,7 +1474,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function config() {
         var _config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        this.config = utils.assign({
+        this.config = assign({
           log: true,
           debug: true,
           // 非debug情况下出现js错误跳转页面地址
@@ -1496,7 +1544,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           }
           // 抽样提交
           if (_this7.config.reportUrl && Math.random() * 100 >= 100 - parseFloat(_this7.config.reportChance)) {
-            utils.xhr(_this7.config.reportUrl, {
+            xhr(_this7.config.reportUrl, {
               method: "POST",
               data: { message: msg }
             });

@@ -1,5 +1,5 @@
 import * as trick from "./trick.es6.js";
-import utils from "./utils.es6.js";
+import * as utils from "./utils.es6.js";
 import { Loader } from "./loader.es6.js";
 import { emitter } from "./emitter.es6.js";
 import { Promise } from "./promise.es6.js";

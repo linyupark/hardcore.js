@@ -1,4 +1,4 @@
-import utils from "./utils.es6.js";
+import { search2obj } from "./utils.es6.js";
 import { emitter } from "./emitter.es6.js";
 import { Promise } from "./promise.es6.js";
 import route from "./riot.route.es6.js";
@@ -37,7 +37,7 @@ const riotjs = class {
       const raw = path.split("?"),
         uri = raw[0].split("/"),
         qs = raw[1];
-      if (qs) uri.push(utils.search2obj(qs));
+      if (qs) uri.push(search2obj(qs));
       return uri;
     });
     this.router((...args) => {

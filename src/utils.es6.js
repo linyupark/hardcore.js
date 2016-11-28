@@ -3,8 +3,10 @@
  * @param  {mixed} mixed
  * @return {string}       Number|String|Object|Array|Function
  */
-const typeOf = mixed =>
+export const typeOf = mixed =>
   Object.prototype.toString.apply(mixed).match(/\[object (\w+)\]/)[1];
+
+
 
 /**
  * 对象数据扩充
@@ -12,7 +14,7 @@ const typeOf = mixed =>
  * @param  {object} ext 扩充对象
  * @return {object}
  */
-const assign = (obj = {}, ext = {}) => {
+export const assign = (obj = {}, ext = {}) => {
   for (let k in ext) {
     if (ext.hasOwnProperty(k)) {
       obj[k] = ext[k];
@@ -21,15 +23,19 @@ const assign = (obj = {}, ext = {}) => {
   return obj;
 };
 
+
+
 /**
  * object => serialize
  * @param  {Object} obj [description]
  * @return {[type]}     [description]
  */
-const serialize = (obj = {}) =>
+export const serialize = (obj = {}) =>
   Object.keys(obj).map(k =>
     `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`
   ).join('&');
+
+
 
 /**
  * hash search 转对象
@@ -37,7 +43,7 @@ const serialize = (obj = {}) =>
  * @param  {string} hash
  * @return {obj}
  */
-const search2obj = (hash = "") => {
+export const search2obj = (hash = "") => {
   let ret = {},
     seg = decodeURIComponent(hash).replace(/^\?/, '').split('&'),
     len = seg.length,
@@ -53,13 +59,15 @@ const search2obj = (hash = "") => {
   return ret;
 };
 
+
+
 /**
  * xmlhttp 请求
  * @param  {string} url     请求地址
  * @param  {object} options 设置
  * @return {callback}
  */
-const xhr = (url, options = {}) => {
+export const xhr = (url, options = {}) => {
   let opts = assign({
       method: "GET",
       data: {},
@@ -73,59 +81,65 @@ const xhr = (url, options = {}) => {
     xhr, progress = 0,
     send_data = [],
     has_q = url.split("/").pop().search(/\?/) !== -1;
-  try {
-    // 是否有缓存
-    if (!opts.cache) {
-      url += (has_q ? "&" : "?") + "_=" + Math.random();
-      has_q = true;
-    }
-    // 整理发送数据
-    send_data.push(serialize(opts.data));
-    // 如果是put /post 则用formdata
-    if (/^put$|^post$/i.test(opts.method)) {
-      opts.headers["Content-type"] = "application/x-www-form-urlencoded";
-    } else {
-      url += (has_q ? "&" : "?") + send_data;
-    }
-    xhr = new XMLHttpRequest();
-    xhr.open(opts.method, url, true);
-    for (let k in opts.headers) {
-      xhr.setRequestHeader(k, opts.headers[k]);
-    }
-    // 如果支持进度条
-    xhr.upload.onprogress = xhr.onprogress = (e) => {
-      if (e.lengthComputable) {
-        progress = Math.round(e.loaded * 100 / e.total);
-        opts.progress(progress);
-      }
-    };
-    xhr.onload = (e) => {
-      let res;
-      if (e.target.status === 200) {
-        res = e.target.responseText;
-        if (opts.type === "json") {
-          res = JSON.parse(res);
-        }
-        opts.done.call(e.target, res);
-      }
-    };
-    xhr.send(send_data);
-    // 支持 xhr(...).done(fn).fail(fn);
-    return {
-      done(fn) {
-        opts.done = fn;
-      },
-      fail(fn) {
-        opts.fail = fn;
-      },
-      progress(fn) {
-        opts.progress = fn;
-      }
-    };
-  } catch (e) {
-    throw e;
+  // 是否有缓存
+  if (!opts.cache) {
+    url += (has_q ? "&" : "?") + "_=" + Math.random();
+    has_q = true;
   }
+  // 整理发送数据
+  if(serialize(opts.data) !== ""){
+    send_data.push(serialize(opts.data));
+  }
+  // 如果是put /post 则用formdata
+  if (/^put$|^post$/i.test(opts.method)) {
+    opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+  } else if(send_data.length > 0) {
+    url += (has_q ? "&" : "?") + send_data;
+  }
+  xhr = new XMLHttpRequest();
+  xhr.open(opts.method, url, true);
+  for (let k in opts.headers) {
+    xhr.setRequestHeader(k, opts.headers[k]);
+  }
+  // 如果支持进度条
+  xhr.upload.onprogress = xhr.onprogress = (e) => {
+    if (e.lengthComputable) {
+      progress = Math.round(e.loaded * 100 / e.total);
+      opts.progress.call(e.target, progress);
+    }
+  };
+  xhr.onload = (e) => {
+    let res;
+    if (e.target.status === 200 || e.target.status === 304) {
+      res = e.target.responseText;
+      if (opts.type === "json") {
+        res = JSON.parse(res);
+      }
+      opts.done.call(e.target, res);
+    }
+    else{
+      opts.fail.call(e.target, e.target.status);
+    }
+  };
+  xhr.onerror = opts.fail;
+  // done().fail().progress()
+  xhr.done = fn => {
+    opts.done = fn;
+    return xhr;
+  }
+  xhr.fail = fn => {
+    opts.fail = fn;
+    return xhr;
+  }
+  xhr.progress = fn => {
+    opts.progress = fn;
+    return xhr;
+  }
+  xhr.send(send_data);
+  return xhr;
 };
+
+
 
 /**
  * 清除字符串中指定的标签
@@ -133,9 +147,11 @@ const xhr = (url, options = {}) => {
  * @param  {string} str 字符串
  * @return {string}
  */
-const tagRemove = (tag, str) => {
+export const tagRemove = (tag, str) => {
   return str.replace(new RegExp(`<${tag}(.|\\s)*?\\/${tag}>`, "g"), "");
 };
+
+
 
 /**
  * 解析字符串中的标签内容
@@ -143,7 +159,7 @@ const tagRemove = (tag, str) => {
  * @param  {string} 解析字符串
  * @return {string}
  */
-const tagContent = function(tag, str) {
+export const tagContent = function(tag, str) {
   let re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gm"),
     text = "";
   for (let match = re.exec(str); match; match = re.exec(str)) {
@@ -152,7 +168,9 @@ const tagContent = function(tag, str) {
   return text;
 };
 
-const cookie = {
+
+
+export const cookie = {
   /**
    * 设置 cookie
    * @param  {string} name  项
@@ -212,14 +230,16 @@ const cookie = {
 
 };
 
+
+
 /**
- * 私有函数，动态加载文件
+ * 动态加载文件,建议私有化
  * @param  {String} type   加载远程文件类型 [script,link,img]
  * @param  {String} url    地址
  * @param  {Object} opts   附加配置
  * @return {Element}
  */
-const loadFile = (type = "script", url, options) => {
+export const loadFile = (type = "script", url, options) => {
   let el = document.createElement(type),
     src = {
       script: "src",
@@ -255,13 +275,15 @@ const loadFile = (type = "script", url, options) => {
   return el;
 };
 
+
+
 /**
- * 私有函数，删除动态载入的文件标签，loadFile失败后可用
+ * 删除动态载入的文件标签，loadFile失败后可用，建议私有化
  * @param  {String} type [description]
  * @param  {String} rel  [description]
  * @return {null}      [description]
  */
-const removeFile = (type = "script", position = "head", rel) => {
+export const removeFile = (type = "script", position = "head", rel) => {
   let i = 0,
     tags = document[position].getElementsByTagName(type);
   for (; i < tags.length; i++) {
@@ -270,55 +292,58 @@ const removeFile = (type = "script", position = "head", rel) => {
   }
 };
 
+
+
 /**
  * 生成 hash
  * @param  {string} s
  * @return {hash}
  */
-const hashCode = s => {
+export const hashCode = s => {
   return s.split("").reduce((a, b) => {
     a = ((a << 5) - a) + b.charCodeAt(0);
     return a & a;
   }, 0);
 };
 
+
+
 /**
  * 在浏览器关闭之前缓存ajax获取的json数据
- * @param  {[type]}   url      [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
+ * @param  {String} url           [description]
+ * @param  {Object} options [description]
+ * @return {Object}               [description]
  */
-const cacheJSON = (url, callback = () => {}) => {
-  const name = "_cache_" + hashCode(url.replace(/^http[s]?:\/\//, ""));
-  if ("localStorage" in window && cookie.get(`${name}`)) {
-    return callback.call(null, JSON.parse(window.localStorage.getItem(name)));
+export const cacheJSON = (url, options={}) => {
+  const name = `_hc_cache_json_${hashCode(url.replace(/^http[s]?:\/\//, ""))}`;
+  let callback = assign({
+    force: false, // true的时候强制ajax获取
+    done(){}, fail(){}
+  }, options);
+  if ("localStorage" in window && cookie.get(`${name}`) && !callback.force) {
+    setTimeout(() => {
+      callback.done.call(null, JSON.parse(window.localStorage.getItem(name)));
+    }, 0);
   }
-  try {
+  else{
     xhr(url).done(res => {
-      // 关闭浏览器失效，保证下次浏览获取新的oss资源列表
+      // 关闭浏览器失效，保证下次浏览获取新的资源列表
       cookie.set(name, "y");
       window.localStorage.setItem(name, JSON.stringify(res));
-      callback.call(null, res);
+      callback.done.call(null, res);
+    })
+    .fail(status => {
+      callback.fail.call(null, status);
     });
-  } catch (e) {
-    throw e;
   }
-};
-
-export default {
-  assign,
-  serialize,
-  xhr,
-  cookie,
-  search2obj,
-  typeOf,
-  hashCode,
-  cacheJSON
-};
-
-export {
-  loadFile,
-  tagContent,
-  tagRemove,
-  removeFile
+  // 支持 done().fail()
+  callback.done = fn => {
+    callback.done = fn;
+    return callback;
+  };
+  callback.fail = fn => {
+    callback.fail = fn;
+    return callback;
+  };
+  return callback;
 };
