@@ -76,7 +76,8 @@ export const xhr = (url, options = {}) => {
       type: "json",
       done() {},
       fail() {},
-      progress() {}
+      progress() {},
+      complete() {}
     }, options),
     xhr, progress = 0,
     send_data = [],
@@ -108,7 +109,7 @@ export const xhr = (url, options = {}) => {
       opts.progress.call(e.target, progress);
     }
   };
-  xhr.onload = (e) => {
+  xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
       res = e.target.responseText;
@@ -120,8 +121,13 @@ export const xhr = (url, options = {}) => {
     else{
       opts.fail.call(e.target, e.target.status);
     }
-  };
-  xhr.onerror = opts.fail;
+  }, false);
+  xhr.addEventListener('error', () => {
+    opts.fail();
+  }, false);
+  xhr.addEventListener('loadend', () => {
+    opts.complete();
+  }, false);
   // done().fail().progress()
   xhr.done = fn => {
     opts.done = fn;
@@ -133,6 +139,10 @@ export const xhr = (url, options = {}) => {
   }
   xhr.progress = fn => {
     opts.progress = fn;
+    return xhr;
+  }
+  xhr.complete = fn => {
+    opts.complete = fn;
     return xhr;
   }
   xhr.send(send_data);
