@@ -325,7 +325,7 @@ export const hashCode = s => {
  * @return {Object}               [description]
  */
 export const cacheJSON = (url, options={}) => {
-  const name = `_hc_cache_json_${hashCode(url.replace(/^http[s]?:\/\//, ""))}`;
+  const name = `_hc_json_${url.split("/").pop().split(".")[0]}`;
   let callback = assign({
     force: false, // true的时候强制ajax获取
     done(){}, fail(){}
@@ -339,6 +339,7 @@ export const cacheJSON = (url, options={}) => {
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的资源列表
       cookie.set(name, "y");
+      window.localStorage &&
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.done.call(null, res);
     })
