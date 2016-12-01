@@ -1,0 +1,5 @@
+logs
+*.log
+.tern-project
+node_modules
+web/static/riot/

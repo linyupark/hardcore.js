@@ -1,0 +1,28 @@
+{
+  "name": "fp.front.sosho.cn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "web": "browser-sync start -s \"web\" -f \"./web/**/*\"",
+    "riot": "riot -w --type es6 ./src/riot/ ./web/static/riot/",
+    "rollup:index": "onchange ./src/index.es6.js -- rollup -o ./web/static/index.rollup.js -f umd -n App",
+    "babel:index": "onchange ./web/static/index.rollup.js -- babel -o ./web/static/index.js",
+    "sass:index": "node-sass -w -r ./src/sass/index.sass -o ./web/static/index.css",
+    "windev": "start npm run riot && start npm run rollup:index && start npm run babel:index && start npm run sass:index",
+    "macdev": "npm run riot & npm run rollup:index & npm run babel:index & npm run sass:index",
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.coding.net/usho/fp.front.sosho.cn.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "babel-preset-es2015-riot": "^1.1.0",
+    "babel-preset-es2015-script": "^1.1.0",
+    "gulp": "^3.9.1",
+    "gulp-uglifyjs": "^0.6.2",
+    "onchange": "^3.0.2"
+  }
+}

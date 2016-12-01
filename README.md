@@ -3,7 +3,7 @@
 安装开发环境
 
 ```
-  $ npm i -g riot babel-core babel-cli uglify-js gulp browser-sync --registry http://registry.cnpmjs.org
+  $ npm i -g riot node-sass babel-core babel-cli uglify-js gulp browser-sync --registry http://registry.cnpmjs.org
   $ npm i -D --registry http://registry.cnpmjs.org
 ```
 
