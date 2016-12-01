@@ -69,6 +69,8 @@ export class Loader {
       backup_files = [],
       fail = [],
       done = [];
+    // 已经通过loader加载过的文件
+    this._loaded_files = this._loaded_files || [];
     // 收集重复文件，放入备份文件
     for (const f of files) {
       let exist = false;
@@ -89,13 +91,18 @@ export class Loader {
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;
             // 之前加载过的相同文件删除
-            removeFile(type, "head", file);
+            // removeFile(type, "head", file);
+            if(this._loaded_files.indexOf(file) !== -1){
+              check(done.push(file));
+              continue;
+            }
             loadFile(type, file, {
               attrs: attrs,
-              success() {
+              success: () => {
+                this._loaded_files.push(file);
                 check(done.push(file));
               },
-              error() {
+              error: () => {
                 // 不留下失败文件
                 removeFile(type, "head", file);
                 check(fail.push(file));

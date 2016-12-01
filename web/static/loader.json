@@ -1,0 +1,13 @@
+{
+  "fp": {
+    "riot": [
+      "//cdn.bootcss.com/riot/3.0.1/riot.min.js",
+      "//unpkg.com/riot@3.0.1/riot.min.js"
+    ],
+    "dev": [
+      "./static/index."
+      "./static/riot/component.js",
+      "./static/riot/common.js"
+    ]
+  }
+}

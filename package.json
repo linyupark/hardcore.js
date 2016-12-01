@@ -2,16 +2,15 @@
   "name": "fp.front.sosho.cn",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "web": "browser-sync start -s \"web\" -f \"./web/**/*\"",
     "riot": "riot -w --type es6 ./src/riot/ ./web/static/riot/",
-    "rollup:index": "onchange ./src/index.es6.js -- rollup -o ./web/static/index.rollup.js -f umd -n App",
-    "babel:index": "onchange ./web/static/index.rollup.js -- babel -o ./web/static/index.js",
-    "sass:index": "node-sass -w -r ./src/sass/index.sass -o ./web/static/",
-    "windev": "start npm run riot && start npm run rollup:index && start npm run babel:index && start npm run sass:index",
-    "macdev": "npm run riot & npm run rollup:index & npm run babel:index & npm run sass:index",
-    "build": "gulp build"
+    "rollup:fp": "onchange ./src/*/*.es6.js ./src/fp.es6.js -- rollup ./src/fp.es6.js -o ./web/static/fp.rollup.js -f umd -n App",
+    "babel:fp": "onchange ./web/static/fp.rollup.js -- babel -o ./web/static/fp.js",
+    "sass:fp": "node-sass -w -r ./src/sass/fp.sass -o ./web/static/",
+    "windev:fp": "start npm run riot && start npm run rollup:fp && start npm run babel:fp && start npm run sass:fp",
+    "macdev:fp": "npm run riot & npm run rollup:fp & npm run babel:fp & npm run sass:fp",
+    "build:fp": "gulp build:fp"
   },
   "repository": {
     "type": "git",
