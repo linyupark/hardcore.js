@@ -8,7 +8,7 @@
     "riot": "riot -w --type es6 ./src/riot/ ./web/static/riot/",
     "rollup:index": "onchange ./src/index.es6.js -- rollup -o ./web/static/index.rollup.js -f umd -n App",
     "babel:index": "onchange ./web/static/index.rollup.js -- babel -o ./web/static/index.js",
-    "sass:index": "node-sass -w -r ./src/sass/index.sass -o ./web/static/index.css",
+    "sass:index": "node-sass -w -r ./src/sass/index.sass -o ./web/static/",
     "windev": "start npm run riot && start npm run rollup:index && start npm run babel:index && start npm run sass:index",
     "macdev": "npm run riot & npm run rollup:index & npm run babel:index & npm run sass:index",
     "build": "gulp build"
