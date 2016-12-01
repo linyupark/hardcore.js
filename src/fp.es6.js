@@ -16,13 +16,15 @@ export class FP {
         env: 'dev', // 环境
         staticBase: './static/',
         routeBase: '#!', // route解析分隔符
-        mountPage: '#page', // 页面逻辑挂载点
+        mountPage: '#main', // 页面逻辑挂载点
         loginPage: 'login',
         indexPage: 'index',
         errorPage: '500',
-        notFoundPage: '400',
-        resource: ['riot']
+        notFoundPage: '404',
+        resource: ['riot', 'jquery']
       }, options);
+      // 记录已经加载的tag
+      this.tagMounted = {};
       // 合并组件
       this.route = route;
       this.utils = {
@@ -39,7 +41,9 @@ export class FP {
 
     // 初始化必要资源
     this.config.resource.push(this.config.env);
-    cacheJSON(this.config.staticBase('loader.json'))
+    cacheJSON(`${this.config.staticBase}loader.json`, {
+      force: this.config.env !== 'pro'
+    })
     .done(resp => {
       // 记录方便不刷新情况下获取
       this.loaderJSON = resp[this.config.id];
@@ -59,18 +63,25 @@ export class FP {
         this.on('route::change', params => {
           let
             page = params[0] || this.config.indexPage,
-            pageFile = this.config.staticBase(
-              `riot/${this.config.id}/${page}.js`),
+            pageFile = `${this.config.staticBase}riot/${this.config.id}/${page}.js`,
             tagName = `${this.config.id}-${page}`;
           this.route.params = params;
           Loader.batch(pageFile).then(() => {
             try{
-              window.riot.mount(this.config.mountPage, tagName);
+              let tag = window.riot.mount(this.config.mountPage, tagName)[0],
+                ctags = (tag) => {
+                  for(let childTagName in tag.tags){
+                    this.tagMounted[childTagName] = tag.tags[childTagName];
+                    ctags(tag.tags[childTagName]);
+                  }
+                };
+              this.tagMounted[tagName] = tag;
+              ctags(tag);
             } catch(e) {
               route(`/${this.config.errorPage}?message=${e.message}`);
             }
           }).catch(() => {
-            route('/${this.config.notFoundPage}');
+            route('/' + this.config.notFoundPage);
           });
         });
         // 开始监听路由变化
@@ -79,8 +90,10 @@ export class FP {
         });
         // 启动路由
         route.start(true);
+
         // 将项目实例导入riot全局app对象
         window.riot.mixin({ app: this });
+
         this.emit('init::done', files);
       })
       .catch(files => {

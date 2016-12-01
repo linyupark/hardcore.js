@@ -23,7 +23,8 @@ export class Loader {
   static alias(json, alias_names = []) {
     let batch_list = [];
     for (const name of alias_names) {
-      if (!json[name]) return;
+      if (!json[name] || json[name].length === 0)
+        continue;
       batch_list.push(json[name]);
     }
     return this.depend.apply(this, batch_list);
