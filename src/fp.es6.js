@@ -5,9 +5,9 @@ import route from './hardcore/riot.route.es6.js';
 
 export class FP {
 
-  constructor(options={}){
+  constructor(options = {}) {
     // 单例化
-    if(!FP.instance){
+    if (!FP.instance) {
       // 可监听化
       emitter(this);
       // 配置信息
@@ -21,7 +21,7 @@ export class FP {
         indexPage: 'index',
         errorPage: '500',
         notFoundPage: '404',
-        resource: ['riot', 'jquery']
+        resource: ['riot', 'jquery', 'materialize']
       }, options);
       // 记录已经加载的tag
       this.tagMounted = {};
@@ -37,69 +37,69 @@ export class FP {
     return FP.instance;
   }
 
-  init(){
-
+  init() {
+    const cf = this.config;
     // 初始化必要资源
-    this.config.resource.push(this.config.env);
-    cacheJSON(`${this.config.staticBase}loader.json`, {
-      force: this.config.env !== 'pro'
-    })
-    .done(resp => {
-      // 记录方便不刷新情况下获取
-      this.loaderJSON = resp[this.config.id];
-      Loader.alias(this.loaderJSON, this.config.resource)
-      .then(files => {
-        // 开始初始化路由
-        route.base(this.config.routeBase);
-        // 路由解析方式
-        route.parser(path => {
-          const raw = path.split('?'),
-            uri = raw[0].split('/'),
-            qs = raw[1];
-          if (qs) uri.push(search2obj(qs));
-          return uri;
-        });
-        // 设置路由控制
-        this.on('route::change', params => {
-          let
-            page = params[0] || this.config.indexPage,
-            pageFile = `${this.config.staticBase}riot/${this.config.id}/${page}.js`,
-            tagName = `${this.config.id}-${page}`;
-          this.route.params = params;
-          Loader.batch(pageFile).then(() => {
-            try{
-              let tag = window.riot.mount(this.config.mountPage, tagName)[0],
-                ctags = (tag) => {
-                  for(let childTagName in tag.tags){
-                    this.tagMounted[childTagName] = tag.tags[childTagName];
-                    ctags(tag.tags[childTagName]);
-                  }
-                };
-              this.tagMounted[tagName] = tag;
-              ctags(tag);
-            } catch(e) {
-              route(`/${this.config.errorPage}?message=${e.message}`);
-            }
-          }).catch(() => {
-            route('/' + this.config.notFoundPage);
-          });
-        });
-        // 开始监听路由变化
-        route((...args) => {
-          this.emit('route::change', args);
-        });
-        // 启动路由
-        route.start(true);
-
-        // 将项目实例导入riot全局app对象
-        window.riot.mixin({ app: this });
-
-        this.emit('init::done', files);
+    cf.resource.push(this.config.env);
+    cacheJSON(`${cf.staticBase}loader.json`, {
+        force: cf.env !== 'pro'
       })
-      .catch(files => {
-        this.emit('init::fail', files);
+      .done(resp => {
+        // 记录方便不刷新情况下获取
+        this.loaderJSON = resp[cf.id];
+        Loader.alias(this.loaderJSON, cf.resource)
+          .then(files => {
+            // 开始初始化路由
+            route.base(cf.routeBase);
+            // 路由解析方式
+            route.parser(path => {
+              const raw = path.split('?'),
+                uri = raw[0].split('/'),
+                qs = raw[1];
+              if (qs) uri.push(search2obj(qs));
+              return uri;
+            });
+            // 设置路由控制
+            this.on('route::change', params => {
+              let
+                page = params[0] || cf.indexPage,
+                pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js`,
+                tagName = `${cf.id}-${page}`;
+              this.route.params = params;
+              Loader.batch(pageFile).then(() => {
+                try {
+                  let tag = window.riot.mount(cf.mountPage, tagName)[0],
+                    ctags = (tag) => {
+                      for (let childTagName in tag.tags) {
+                        this.tagMounted[childTagName] = tag.tags[childTagName];
+                        ctags(tag.tags[childTagName]);
+                      }
+                    };
+                  this.tagMounted[tagName] = tag;
+                  ctags(tag);
+                } catch (e) {
+                  route(`/${cf.errorPage}?message=${e.message}`);
+                }
+              }).catch(() => {
+                route('/' + cf.notFoundPage);
+              });
+            });
+            // 开始监听路由变化
+            route((...args) => {
+              this.emit('route::change', args);
+            });
+            // 启动路由
+            route.start(true);
+
+            // 将项目实例导入riot全局app对象
+            window.riot.mixin({ app: this });
+
+            this.emit('init::done', files);
+          })
+          .catch(files => {
+            this.emit('init::fail', files);
+          });
       });
-    });
 
   }
 
@@ -107,8 +107,8 @@ export class FP {
    * 适配项目接口
    * @return {[type]} [description]
    */
-  api(method, url, data){
-    const prefix = {dev: 'dev.', test: 'test.', pro: ''}[this.config.env];
+  api(method, url, data) {
+    const prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
     return xhr(`//${prefix}h5.sosho.cn/server/${url}`, {
       method: method,
       data: data,
@@ -119,13 +119,13 @@ export class FP {
   /**
    * 追加资源载入
    */
-  addResource(resName){
+  addResource(resName) {
     let existRes;
-    if(!this.loaderJSON)
+    if (!this.loaderJSON)
       return Promise.reject();
-    if(this.loaderJSON[resName])
+    if (this.loaderJSON[resName])
       existRes = resName;
-    else if(this.loaderJSON[`${resName}.${this.config.env}`])
+    else if (this.loaderJSON[`${resName}.${this.config.env}`])
       existRes = `${resName}.${this.config.env}`;
     return Loader.alias(this.loaderJSON, [existRes]);
   }

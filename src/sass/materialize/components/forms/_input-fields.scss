@@ -37,8 +37,9 @@ textarea.materialize-textarea {
 
   // General Styles
   background-color: transparent;
-  border: none;
-  border-bottom: $input-border;
+  // border: none;
+  // border-bottom: $input-border;
+  border: $input-border;
   border-radius: 0;
   outline: none;
   height: $input-height;

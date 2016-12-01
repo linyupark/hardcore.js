@@ -4,6 +4,12 @@
       "//cdn.bootcss.com/riot/3.0.1/riot.min.js",
       "//unpkg.com/riot@3.0.1/riot.min.js"
     ],
+    "jquery": [
+      "//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"
+    ],
+    "materialize": [
+      "//cdn.bootcss.com/materialize/0.97.8/js/materialize.min.js"
+    ],
     "dev": [
       "./static/riot/component.js",
       "./static/riot/common.js"

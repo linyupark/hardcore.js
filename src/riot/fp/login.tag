@@ -10,7 +10,8 @@
         <input placeholder="密码" type="password">
       </p>
       <p>
-        <button class="btn">提交</button>
+        <button class="btn waves-effect waves-light" type="submit" name="action">提&nbsp;交
+        </button>
       </p>
     </div>
   </div>
@@ -21,6 +22,7 @@
   this.on('mount', () => {
     console.log('login mounted');
   });
+  Waves.displayEffect();
   </script>
 
 </fp-login>

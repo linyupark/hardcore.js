@@ -1328,7 +1328,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           indexPage: 'index',
           errorPage: '500',
           notFoundPage: '404',
-          resource: ['riot', 'jquery']
+          resource: ['riot', 'jquery', 'materialize']
         }, options);
         // 记录已经加载的tag
         this.tagMounted = {};
@@ -1349,16 +1349,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function init() {
         var _this6 = this;
 
+        var cf = this.config;
         // 初始化必要资源
-        this.config.resource.push(this.config.env);
-        cacheJSON(this.config.staticBase + 'loader.json', {
-          force: this.config.env !== 'pro'
+        cf.resource.push(this.config.env);
+        cacheJSON(cf.staticBase + 'loader.json', {
+          force: cf.env !== 'pro'
         }).done(function (resp) {
           // 记录方便不刷新情况下获取
-          _this6.loaderJSON = resp[_this6.config.id];
-          Loader.alias(_this6.loaderJSON, _this6.config.resource).then(function (files) {
+          _this6.loaderJSON = resp[cf.id];
+          Loader.alias(_this6.loaderJSON, cf.resource).then(function (files) {
             // 开始初始化路由
-            route.base(_this6.config.routeBase);
+            route.base(cf.routeBase);
             // 路由解析方式
             route.parser(function (path) {
               var raw = path.split('?'),
@@ -1369,14 +1370,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             // 设置路由控制
             _this6.on('route::change', function (params) {
-              var page = params[0] || _this6.config.indexPage,
-                  pageFile = _this6.config.staticBase + 'riot/' + _this6.config.id + '/' + page + '.js',
-                  tagName = _this6.config.id + '-' + page;
+              var page = params[0] || cf.indexPage,
+                  pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js',
+                  tagName = cf.id + '-' + page;
               _this6.route.params = params;
               Loader.batch(pageFile).then(function () {
                 try {
                   (function () {
-                    var tag = window.riot.mount(_this6.config.mountPage, tagName)[0],
+                    var tag = window.riot.mount(cf.mountPage, tagName)[0],
                         ctags = function ctags(tag) {
                       for (var childTagName in tag.tags) {
                         _this6.tagMounted[childTagName] = tag.tags[childTagName];
@@ -1387,10 +1388,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     ctags(tag);
                   })();
                 } catch (e) {
-                  route('/' + _this6.config.errorPage + '?message=' + e.message);
+                  route('/' + cf.errorPage + '?message=' + e.message);
                 }
               }).catch(function () {
-                route('/' + _this6.config.notFoundPage);
+                route('/' + cf.notFoundPage);
               });
             });
             // 开始监听路由变化
