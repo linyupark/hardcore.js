@@ -13,6 +13,7 @@ let EmitterPromise = class {
     emitter(this);
     this._resolve = (value) => {
       this.emit("resolve", value);
+      this._emited_value = value;
       this.off("reject");
     };
     if (rr.length === 1) {
@@ -88,7 +89,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   then(cb = () => {}, _catch) {
-    this.on("resolve", value => {
+    this.once("resolve", value => {
       try {
         if (this.__chain_value instanceof Promise) {
           this.__chain_value.then(cb);
@@ -101,6 +102,9 @@ let EmitterPromise = class {
     });
     if (typeof _catch === "function") {
       return this.catch(_catch);
+    }
+    if(this._emited_value){
+      this.emit("resolve", this._emited_value);
     }
     return this;
   }
@@ -120,7 +124,7 @@ let EmitterPromise = class {
         if (result) this.emit("resolve", result);
       } catch (e) {
         this.emit("reject", e);
-        if (!this.__no_throw && this.__emited.reject[1] === e) {
+        if (!this.__no_throw) {
           throw e;
         }
       }

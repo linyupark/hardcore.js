@@ -5,12 +5,11 @@
   "scripts": {
     "macdev": "onchange ./src/* -- npm run rollup & onchange ./build/bundle.es6.js -- npm run babel",
     "windev": "start onchange ./src/* -- npm run rollup && start onchange ./build/bundle.es6.js -- npm run babel",
-    "prerollup": "eslint ./src/*",
     "rollup": "rollup ./src/index.es6.js -o ./build/bundle.es6.js -f iife -n window",
     "babel": "babel -o ./build/bundle.js ./build/bundle.es6.js",
     "uglifyjs": "uglifyjs ./build/bundle.js -m -o ./dist/hardcore.min.js --source-map ./dist/hardcore.min.map",
     "dist": "npm run rollup && npm run babel && npm run uglifyjs",
-    "winserver": "browser-sync start --server --file \"build/bundle.js, examples/*.html\""
+    "winserver": "browser-sync start -s -f \"build/bundle.js, examples/*.html\"  --directory"
   },
   "license": "MIT",
   "dependencies": {},

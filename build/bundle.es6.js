@@ -102,7 +102,8 @@ const xhr = (url, options = {}) => {
       type: "json",
       done() {},
       fail() {},
-      progress() {}
+      progress() {},
+      complete() {}
     }, options),
     xhr, progress = 0,
     send_data = [],
@@ -134,7 +135,7 @@ const xhr = (url, options = {}) => {
       opts.progress.call(e.target, progress);
     }
   };
-  xhr.onload = (e) => {
+  xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
       res = e.target.responseText;
@@ -146,8 +147,13 @@ const xhr = (url, options = {}) => {
     else{
       opts.fail.call(e.target, e.target.status);
     }
-  };
-  xhr.onerror = opts.fail;
+  }, false);
+  xhr.addEventListener('error', () => {
+    opts.fail();
+  }, false);
+  xhr.addEventListener('loadend', () => {
+    opts.complete();
+  }, false);
   // done().fail().progress()
   xhr.done = fn => {
     opts.done = fn;
@@ -159,6 +165,10 @@ const xhr = (url, options = {}) => {
   };
   xhr.progress = fn => {
     opts.progress = fn;
+    return xhr;
+  };
+  xhr.complete = fn => {
+    opts.complete = fn;
     return xhr;
   };
   xhr.send(send_data);
@@ -341,7 +351,7 @@ const hashCode = s => {
  * @return {Object}               [description]
  */
 const cacheJSON = (url, options={}) => {
-  const name = `_hc_cache_json_${hashCode(url.replace(/^http[s]?:\/\//, ""))}`;
+  const name = `_hc_json_${url.split("/").pop().split(".")[0]}`;
   let callback = assign({
     force: false, // true的时候强制ajax获取
     done(){}, fail(){}
@@ -355,6 +365,7 @@ const cacheJSON = (url, options={}) => {
     xhr(url).done(res => {
       // 关闭浏览器失效，保证下次浏览获取新的资源列表
       cookie.set(name, "y");
+      window.localStorage &&
       window.localStorage.setItem(name, JSON.stringify(res));
       callback.done.call(null, res);
     })
@@ -412,9 +423,10 @@ const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "on", {
     value(event, fn) {
-      if (typeof fn !== "function") return el;
-      (_callbacks[event] = _callbacks[event] || []).push(fn);
-      el.__emited[event] && fn.apply(el, el.__emited[event]);
+      if (typeof fn == "function"){
+        (_callbacks[event] = _callbacks[event] || []).push(fn);
+        el.__emited[event] && fn.apply(el, el.__emited[event]);
+      }
       return el;
     }
   });
@@ -441,7 +453,9 @@ const emitter = (el = {}) => {
             if (_callbacks[event][_i] == fn)
               _callbacks[event].splice(_i, 1);
           }
-        } else delete _callbacks[event];
+        } else {
+          delete _callbacks[event];
+        }
         delete el.__emited[event];
       }
       return el;
@@ -453,7 +467,7 @@ const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "emit", {
     value(event, ...args) {
-      const fns = _callbacks[event] || [];
+      const fns = (_callbacks[event] || []).slice(0);
       for (let _fn of fns) {
         _fn.apply(el, args);
       }
@@ -481,6 +495,7 @@ let EmitterPromise = class {
     emitter(this);
     this._resolve = (value) => {
       this.emit("resolve", value);
+      this._emited_value = value;
       this.off("reject");
     };
     if (rr.length === 1) {
@@ -556,7 +571,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   then(cb = () => {}, _catch) {
-    this.on("resolve", value => {
+    this.once("resolve", value => {
       try {
         if (this.__chain_value instanceof Promise) {
           this.__chain_value.then(cb);
@@ -569,6 +584,9 @@ let EmitterPromise = class {
     });
     if (typeof _catch === "function") {
       return this.catch(_catch);
+    }
+    if(this._emited_value){
+      this.emit("resolve", this._emited_value);
     }
     return this;
   }
@@ -588,7 +606,7 @@ let EmitterPromise = class {
         if (result) this.emit("resolve", result);
       } catch (e) {
         this.emit("reject", e);
-        if (!this.__no_throw && this.__emited.reject[1] === e) {
+        if (!this.__no_throw) {
           throw e;
         }
       }
@@ -625,7 +643,8 @@ class Loader {
   static alias(json, alias_names = []) {
     let batch_list = [];
     for (const name of alias_names) {
-      if (!json[name]) return;
+      if (!json[name] || json[name].length === 0)
+        continue;
       batch_list.push(json[name]);
     }
     return this.depend.apply(this, batch_list);
@@ -671,6 +690,8 @@ class Loader {
       backup_files = [],
       fail = [],
       done = [];
+    // 已经通过loader加载过的文件
+    this._loaded_files = this._loaded_files || [];
     // 收集重复文件，放入备份文件
     for (const f of files) {
       let exist = false;
@@ -691,13 +712,18 @@ class Loader {
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;
             // 之前加载过的相同文件删除
-            removeFile(type, "head", file);
+            // removeFile(type, "head", file);
+            if(this._loaded_files.indexOf(file) !== -1){
+              check(done.push(file));
+              continue;
+            }
             loadFile(type, file, {
               attrs: attrs,
-              success() {
+              success: () => {
+                this._loaded_files.push(file);
                 check(done.push(file));
               },
-              error() {
+              error: () => {
                 // 不留下失败文件
                 removeFile(type, "head", file);
                 check(fail.push(file));

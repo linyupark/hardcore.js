@@ -129,7 +129,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       type: "json",
       done: function done() {},
       fail: function fail() {},
-      progress: function progress() {}
+      progress: function progress() {},
+      complete: function complete() {}
     }, options),
         xhr = void 0,
         progress = 0,
@@ -162,7 +163,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         opts.progress.call(e.target, progress);
       }
     };
-    xhr.onload = function (e) {
+    xhr.addEventListener('load', function (e) {
       var res = void 0;
       if (e.target.status === 200 || e.target.status === 304) {
         res = e.target.responseText;
@@ -173,8 +174,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       } else {
         opts.fail.call(e.target, e.target.status);
       }
-    };
-    xhr.onerror = opts.fail;
+    }, false);
+    xhr.addEventListener('error', function () {
+      opts.fail();
+    }, false);
+    xhr.addEventListener('loadend', function () {
+      opts.complete();
+    }, false);
     // done().fail().progress()
     xhr.done = function (fn) {
       opts.done = fn;
@@ -186,6 +192,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     };
     xhr.progress = function (fn) {
       opts.progress = fn;
+      return xhr;
+    };
+    xhr.complete = function (fn) {
+      opts.complete = fn;
       return xhr;
     };
     xhr.send(send_data);
@@ -392,7 +402,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   var cacheJSON = function cacheJSON(url) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var name = '_hc_cache_json_' + hashCode(url.replace(/^http[s]?:\/\//, ""));
+    var name = '_hc_json_' + url.split("/").pop().split(".")[0];
     var callback = assign({
       force: false, // true的时候强制ajax获取
       done: function done() {},
@@ -406,7 +416,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       xhr(url).done(function (res) {
         // 关闭浏览器失效，保证下次浏览获取新的资源列表
         cookie.set(name, "y");
-        window.localStorage.setItem(name, JSON.stringify(res));
+        window.localStorage && window.localStorage.setItem(name, JSON.stringify(res));
         callback.done.call(null, res);
       }).fail(function (status) {
         callback.fail.call(null, status);
@@ -463,9 +473,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      */
     Object.defineProperty(el, "on", {
       value: function value(event, fn) {
-        if (typeof fn !== "function") return el;
-        (_callbacks[event] = _callbacks[event] || []).push(fn);
-        el.__emited[event] && fn.apply(el, el.__emited[event]);
+        if (typeof fn == "function") {
+          (_callbacks[event] = _callbacks[event] || []).push(fn);
+          el.__emited[event] && fn.apply(el, el.__emited[event]);
+        }
         return el;
       }
     });
@@ -494,7 +505,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             for (var _i in _callbacks[event]) {
               if (_callbacks[event][_i] == fn) _callbacks[event].splice(_i, 1);
             }
-          } else delete _callbacks[event];
+          } else {
+            delete _callbacks[event];
+          }
           delete el.__emited[event];
         }
         return el;
@@ -506,7 +519,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      */
     Object.defineProperty(el, "emit", {
       value: function value(event) {
-        var fns = _callbacks[event] || [];
+        var fns = (_callbacks[event] || []).slice(0);
 
         for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
           args[_key3 - 1] = arguments[_key3];
@@ -564,6 +577,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       emitter(this);
       this._resolve = function (value) {
         _this2.emit("resolve", value);
+        _this2._emited_value = value;
         _this2.off("reject");
       };
       if (rr.length === 1) {
@@ -604,7 +618,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
         var _catch = arguments[1];
 
-        this.on("resolve", function (value) {
+        this.once("resolve", function (value) {
           try {
             if (_this3.__chain_value instanceof Promise) {
               _this3.__chain_value.then(cb);
@@ -617,6 +631,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         });
         if (typeof _catch === "function") {
           return this.catch(_catch);
+        }
+        if (this._emited_value) {
+          this.emit("resolve", this._emited_value);
         }
         return this;
       }
@@ -643,7 +660,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             if (result) _this4.emit("resolve", result);
           } catch (e) {
             _this4.emit("reject", e);
-            if (!_this4.__no_throw && _this4.__emited.reject[1] === e) {
+            if (!_this4.__no_throw) {
               throw e;
             }
           }
@@ -764,7 +781,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
             var _name2 = _step4.value;
 
-            if (!json[_name2]) return;
+            if (!json[_name2] || json[_name2].length === 0) continue;
             batch_list.push(json[_name2]);
           }
         } catch (err) {
@@ -837,6 +854,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             backup_files = [],
             fail = [],
             done = [];
+        // 已经通过loader加载过的文件
+        this._loaded_files = this._loaded_files || [];
         // 收集重复文件，放入备份文件
 
         for (var _len5 = arguments.length, files = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
@@ -913,10 +932,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     type = _this6.types[ext];
                 if (ext === "js") attrs.defer = true;
                 // 之前加载过的相同文件删除
-                removeFile(type, "head", file);
+                // removeFile(type, "head", file);
+                if (_this6._loaded_files.indexOf(file) !== -1) {
+                  check(done.push(file));
+                  return 'continue';
+                }
                 loadFile(type, file, {
                   attrs: attrs,
                   success: function success() {
+                    _this6._loaded_files.push(file);
                     check(done.push(file));
                   },
                   error: function error() {
@@ -928,7 +952,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               };
 
               for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                _loop();
+                var _ret2 = _loop();
+
+                if (_ret2 === 'continue') continue;
               }
             } catch (err) {
               _didIteratorError6 = true;
