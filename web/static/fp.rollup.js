@@ -413,7 +413,7 @@ const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "emit", {
     value(event, ...args) {
-      const fns = _callbacks[event] || [];
+      const fns = (_callbacks[event] || []).slice(0);
       for (let _fn of fns) {
         _fn.apply(el, args);
       }
@@ -2615,6 +2615,7 @@ function Tag$$1(impl, conf, innerHTML) {
 
   // make this tag observable
   emitter(this);
+  window.console.log(this);
   // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) root._tag.unmount(true);
 
@@ -3554,6 +3555,8 @@ route.start = function(autoExec) {
 route.base();
 route.parser();
 
+window.riot = riot$1;
+
 class FP {
 
   constructor(options={}){
@@ -3577,7 +3580,6 @@ class FP {
       // 记录已经加载的tag
       this.tagMounted = {};
       // 合并组件
-      window.riot = riot$1;
       this.route = route;
       this.utils = {
         cookie: cookie

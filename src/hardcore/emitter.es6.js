@@ -20,9 +20,10 @@ export const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "on", {
     value(event, fn) {
-      if (typeof fn !== "function") return el;
-      (_callbacks[event] = _callbacks[event] || []).push(fn);
-      el.__emited[event] && fn.apply(el, el.__emited[event]);
+      if (typeof fn == "function"){
+        (_callbacks[event] = _callbacks[event] || []).push(fn);
+        el.__emited[event] && fn.apply(el, el.__emited[event]);
+      }
       return el;
     }
   });
@@ -49,7 +50,9 @@ export const emitter = (el = {}) => {
             if (_callbacks[event][_i] == fn)
               _callbacks[event].splice(_i, 1);
           }
-        } else delete _callbacks[event];
+        } else {
+          delete _callbacks[event];
+        }
         delete el.__emited[event];
       }
       return el;
@@ -61,7 +64,7 @@ export const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "emit", {
     value(event, ...args) {
-      const fns = _callbacks[event] || [];
+      const fns = (_callbacks[event] || []).slice(0);
       for (let _fn of fns) {
         _fn.apply(el, args);
       }

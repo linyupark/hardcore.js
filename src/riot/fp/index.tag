@@ -7,6 +7,8 @@
     <a href="#!/login">login</a>
   </p>
 
+  <pagination-select pages="10" page="1"><pagination-select>
+
   <footer></footer>
 
   <script>

@@ -4,6 +4,8 @@ import { emitter } from './hardcore/emitter.es6.js';
 import riot from './hardcore/riot.core.es6.js';
 import route from './hardcore/riot.route.es6.js';
 
+window.riot = riot;
+
 export class FP {
 
   constructor(options={}){
@@ -27,7 +29,6 @@ export class FP {
       // 记录已经加载的tag
       this.tagMounted = {};
       // 合并组件
-      window.riot = riot;
       this.route = route;
       this.utils = {
         cookie: cookie

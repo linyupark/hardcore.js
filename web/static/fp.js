@@ -89,7 +89,7 @@ callback.done=function(fn){callback.done=fn;return callback;};callback.fail=func
    * 解除某自定义事件
    */Object.defineProperty(el,"off",{value:function value(event,fn){if(event==="*"&&!fn)_callbacks={};else{if(fn){for(var _i in _callbacks[event]){if(_callbacks[event][_i]==fn)_callbacks[event].splice(_i,1);}}else delete _callbacks[event];delete el.__emited[event];}return el;}});/**
    * 触发某自定义事件
-   */Object.defineProperty(el,"emit",{value:function value(event){var fns=_callbacks[event]||[];for(var _len2=arguments.length,args=Array(_len2>1?_len2-1:0),_key2=1;_key2<_len2;_key2++){args[_key2-1]=arguments[_key2];}var _iteratorNormalCompletion2=true;var _didIteratorError2=false;var _iteratorError2=undefined;try{for(var _iterator2=fns[Symbol.iterator](),_step2;!(_iteratorNormalCompletion2=(_step2=_iterator2.next()).done);_iteratorNormalCompletion2=true){var _fn=_step2.value;_fn.apply(el,args);}}catch(err){_didIteratorError2=true;_iteratorError2=err;}finally{try{if(!_iteratorNormalCompletion2&&_iterator2.return){_iterator2.return();}}finally{if(_didIteratorError2){throw _iteratorError2;}}}el.__emited[name]=[name].concat(args);if(_callbacks["*"]&&event!=="*")el.emit.apply(el,["*",event].concat(args));return el;}});return el;};/**
+   */Object.defineProperty(el,"emit",{value:function value(event){var fns=(_callbacks[event]||[]).slice(0);for(var _len2=arguments.length,args=Array(_len2>1?_len2-1:0),_key2=1;_key2<_len2;_key2++){args[_key2-1]=arguments[_key2];}var _iteratorNormalCompletion2=true;var _didIteratorError2=false;var _iteratorError2=undefined;try{for(var _iterator2=fns[Symbol.iterator](),_step2;!(_iteratorNormalCompletion2=(_step2=_iterator2.next()).done);_iteratorNormalCompletion2=true){var _fn=_step2.value;_fn.apply(el,args);}}catch(err){_didIteratorError2=true;_iteratorError2=err;}finally{try{if(!_iteratorNormalCompletion2&&_iterator2.return){_iterator2.return();}}finally{if(_didIteratorError2){throw _iteratorError2;}}}el.__emited[name]=[name].concat(args);if(_callbacks["*"]&&event!=="*")el.emit.apply(el,["*",event].concat(args));return el;}});return el;};/**
  * 模拟标准Promise类
  */var Promise$1=void 0;var EmitterPromise=function(){function EmitterPromise(){var _this=this;var rr=arguments.length>0&&arguments[0]!==undefined?arguments[0]:function(){};_classCallCheck(this,EmitterPromise);if(rr.length===0){throw new Error("Promise needs (resolve, reject) at least one function name.");}emitter(this);this._resolve=function(value){_this.emit("resolve",value);_this.off("reject");};if(rr.length===1){rr.call(this,this._resolve);}else{this._reject=function(reason){_this.emit("reject",reason);_this.off("resolve");};rr.call(this,this._resolve,this._reject);}return this;}/**
    * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
@@ -585,7 +585,7 @@ if(isLoop&&isAnonymous)return;var ctx=!isAnonymous&&isLoop?this:parent||this;eac
  */function Tag$$1(impl,conf,innerHTML){var opts=extend({},conf.opts),parent=conf.parent,isLoop=conf.isLoop,isAnonymous=conf.isAnonymous,item=cleanUpData(conf.item),instAttrs=[],// All attributes on the Tag when it's first parsed
 implAttrs=[],// expressions on this type of Tag
 expressions=[],root=conf.root,tagName=conf.tagName||getTagName(root),isVirtual=tagName==='virtual',propsInSyncWithParent=[],dom;// make this tag observable
-emitter(this);// only call unmount if we have a valid __TAG_IMPL (has name property)
+emitter(this);window.console.log(this);// only call unmount if we have a valid __TAG_IMPL (has name property)
 if(impl.name&&root._tag)root._tag.unmount(true);// not yet mounted
 this.isMounted=false;root.isLoop=isLoop;defineProperty(this,'_internal',{isAnonymous:isAnonymous,instAttrs:instAttrs,innerHTML:innerHTML,// these vars will be needed only for the virtual tags
 virts:[],tail:null,head:null});// create a unique id to this tag
@@ -825,7 +825,7 @@ parser=DEFAULT_PARSER;secondParser=DEFAULT_SECOND_PARSER;}if(fn)parser=fn;if(fn2
  * @param {boolean} autoExec - automatically exec after starting if true
  */route.start=function(autoExec){if(!started){if(win){if(document.readyState==='complete')start(autoExec);// the timeout is needed to solve
 // a weird safari bug https://github.com/riot/route/issues/33
-else win[ADD_EVENT_LISTENER]('load',function(){setTimeout(function(){start(autoExec);},1);});}started=true;}};/** Prepare the router **/route.base();route.parser();var FP=function(){function FP(){var options=arguments.length>0&&arguments[0]!==undefined?arguments[0]:{};_classCallCheck(this,FP);// 单例化
+else win[ADD_EVENT_LISTENER]('load',function(){setTimeout(function(){start(autoExec);},1);});}started=true;}};/** Prepare the router **/route.base();route.parser();window.riot=riot$1;var FP=function(){function FP(){var options=arguments.length>0&&arguments[0]!==undefined?arguments[0]:{};_classCallCheck(this,FP);// 单例化
 if(!FP.instance){// 可监听化
 emitter(this);// 配置信息
 this.config=assign({id:'fp',// 项目id
@@ -835,7 +835,7 @@ mountPage:'#main',// 页面逻辑挂载点
 loginPage:'login',indexPage:'index',errorPage:'500',notFoundPage:'404',resource:[]// 需要预先加载的资源
 },options);// 记录已经加载的tag
 this.tagMounted={};// 合并组件
-window.riot=riot$1;this.route=route;this.utils={cookie:cookie};// 初始化操作
+this.route=route;this.utils={cookie:cookie};// 初始化操作
 this.init();FP.instance=this;}return FP.instance;}_createClass(FP,[{key:'init',value:function init(){var _this13=this;var cf=this.config;// 初始化必要资源
 cf.resource.push(this.config.env);cacheJSON(''+cf.staticBase+cf.id+'.json',{force:cf.env!=='pro'}).done(function(resp){// 记录方便不刷新情况下获取
 _this13.loaderJSON=resp;Loader.alias(_this13.loaderJSON,cf.resource).then(function(files){// 开始初始化路由
