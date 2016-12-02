@@ -828,19 +828,20 @@ parser=DEFAULT_PARSER;secondParser=DEFAULT_SECOND_PARSER;}if(fn)parser=fn;if(fn2
 else win[ADD_EVENT_LISTENER]('load',function(){setTimeout(function(){start(autoExec);},1);});}started=true;}};/** Prepare the router **/route.base();route.parser();var FP=function(){function FP(){var options=arguments.length>0&&arguments[0]!==undefined?arguments[0]:{};_classCallCheck(this,FP);// 单例化
 if(!FP.instance){// 可监听化
 emitter(this);// 配置信息
-this.config=assign({id:'fp',env:'dev',// 环境
+this.config=assign({id:'fp',// 项目id
+env:'dev',// 环境
 staticBase:'./static/',routeBase:'#!',// route解析分隔符
 mountPage:'#main',// 页面逻辑挂载点
 loginPage:'login',indexPage:'index',errorPage:'500',notFoundPage:'404',resource:[]// 需要预先加载的资源
 },options);// 记录已经加载的tag
 this.tagMounted={};// 合并组件
-this.riot=window.riot=riot$1;this.route=route;this.utils={cookie:cookie};// 初始化操作
-this.init();FP.instance=this;}return FP.instance;}_createClass(FP,[{key:'init',value:function init(){var _this13=this;// 初始化必要资源
-this.config.resource.push(this.config.env);cacheJSON(this.config.staticBase+'loader.json',{force:this.config.env!=='pro'}).done(function(resp){// 记录方便不刷新情况下获取
-_this13.loaderJSON=resp[_this13.config.id];Loader.alias(_this13.loaderJSON,_this13.config.resource).then(function(files){// 开始初始化路由
-route.base(_this13.config.routeBase);// 路由解析方式
+window.riot=riot$1;this.route=route;this.utils={cookie:cookie};// 初始化操作
+this.init();FP.instance=this;}return FP.instance;}_createClass(FP,[{key:'init',value:function init(){var _this13=this;var cf=this.config;// 初始化必要资源
+cf.resource.push(this.config.env);cacheJSON(''+cf.staticBase+cf.id+'.json',{force:cf.env!=='pro'}).done(function(resp){// 记录方便不刷新情况下获取
+_this13.loaderJSON=resp;Loader.alias(_this13.loaderJSON,cf.resource).then(function(files){// 开始初始化路由
+route.base(cf.routeBase);// 路由解析方式
 route.parser(function(path){var raw=path.split('?'),uri=raw[0].split('/'),qs=raw[1];if(qs)uri.push(search2obj(qs));return uri;});// 设置路由控制
-_this13.on('route::change',function(params){var page=params[0]||_this13.config.indexPage,pageFile=_this13.config.staticBase+'riot/'+_this13.config.id+'/'+page+'.js',tagName=_this13.config.id+'-'+page;_this13.route.params=params;Loader.batch(pageFile).then(function(){try{(function(){var tag$$1=riot$1.mount(_this13.config.mountPage,tagName)[0],ctags=function ctags(tag$$1){for(var childTagName in tag$$1.tags){_this13.tagMounted[childTagName]=tag$$1.tags[childTagName];ctags(tag$$1.tags[childTagName]);}};_this13.tagMounted[tagName]=tag$$1;ctags(tag$$1);})();}catch(e){route('/'+_this13.config.errorPage+'?message='+e.message);window.console.error(e);}}).catch(function(){route('/'+_this13.config.notFoundPage);});});// 开始监听路由变化
+_this13.on('route::change',function(params){var page=params[0]||cf.indexPage,pageFile=cf.staticBase+'riot/'+cf.id+'/'+page+'.js',tagName=cf.id+'-'+page;_this13.route.params=params;Loader.batch(pageFile).then(function(){try{(function(){var tag$$1=riot$1.mount(cf.mountPage,tagName)[0],ctags=function ctags(tag$$1){for(var childTagName in tag$$1.tags){_this13.tagMounted[childTagName]=tag$$1.tags[childTagName];ctags(tag$$1.tags[childTagName]);}};_this13.tagMounted[tagName]=tag$$1;ctags(tag$$1);})();}catch(e){route('/'+cf.errorPage+'?message='+e.message);window.console.error(e);}}).catch(function(){route('/'+cf.notFoundPage);});});// 开始监听路由变化
 route(function(){for(var _len5=arguments.length,args=Array(_len5),_key5=0;_key5<_len5;_key5++){args[_key5]=arguments[_key5];}_this13.emit('route::change',args);});// 启动路由
 route.start(true);// 将项目实例导入riot全局app对象
 riot$1.mixin({app:_this13});_this13.emit('init::done',files);}).catch(function(files){_this13.emit('init::fail',files);});});}/**

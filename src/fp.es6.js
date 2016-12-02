@@ -13,7 +13,7 @@ export class FP {
       emitter(this);
       // 配置信息
       this.config = assign({
-        id: 'fp',
+        id: 'fp', // 项目id
         env: 'dev', // 环境
         staticBase: './static/',
         routeBase: '#!', // route解析分隔符
@@ -27,7 +27,7 @@ export class FP {
       // 记录已经加载的tag
       this.tagMounted = {};
       // 合并组件
-      this.riot = window.riot = riot;
+      window.riot = riot;
       this.route = route;
       this.utils = {
         cookie: cookie
@@ -40,19 +40,19 @@ export class FP {
   }
 
   init(){
-
+    const cf = this.config;
     // 初始化必要资源
-    this.config.resource.push(this.config.env);
-    cacheJSON(`${this.config.staticBase}loader.json`, {
-      force: this.config.env !== 'pro'
+    cf.resource.push(this.config.env);
+    cacheJSON(`${cf.staticBase}${cf.id}.json`, {
+      force: cf.env !== 'pro'
     })
     .done(resp => {
       // 记录方便不刷新情况下获取
-      this.loaderJSON = resp[this.config.id];
-      Loader.alias(this.loaderJSON, this.config.resource)
+      this.loaderJSON = resp;
+      Loader.alias(this.loaderJSON, cf.resource)
       .then(files => {
         // 开始初始化路由
-        route.base(this.config.routeBase);
+        route.base(cf.routeBase);
         // 路由解析方式
         route.parser(path => {
           const raw = path.split('?'),
@@ -64,13 +64,13 @@ export class FP {
         // 设置路由控制
         this.on('route::change', params => {
           let
-            page = params[0] || this.config.indexPage,
-            pageFile = `${this.config.staticBase}riot/${this.config.id}/${page}.js`,
-            tagName = `${this.config.id}-${page}`;
+            page = params[0] || cf.indexPage,
+            pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js`,
+            tagName = `${cf.id}-${page}`;
           this.route.params = params;
           Loader.batch(pageFile).then(() => {
             try{
-              let tag = riot.mount(this.config.mountPage, tagName)[0],
+              let tag = riot.mount(cf.mountPage, tagName)[0],
                 ctags = (tag) => {
                   for(let childTagName in tag.tags){
                     this.tagMounted[childTagName] = tag.tags[childTagName];
@@ -80,11 +80,11 @@ export class FP {
               this.tagMounted[tagName] = tag;
               ctags(tag);
             } catch(e) {
-              route(`/${this.config.errorPage}?message=${e.message}`);
+              route(`/${cf.errorPage}?message=${e.message}`);
               window.console.error(e);
             }
           }).catch(() => {
-            route('/' + this.config.notFoundPage);
+            route('/' + cf.notFoundPage);
           });
         });
         // 开始监听路由变化

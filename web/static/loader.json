@@ -1,9 +1,0 @@
-{
-  "fp": {
-    "dev": [
-      "./static/fp.css",
-      "./static/riot/component.js",
-      "./static/riot/common.js"
-    ]
-  }
-}
