@@ -19,7 +19,6 @@
   "license": "MIT",
   "devDependencies": {
     "babel-preset-es2015-riot": "^1.1.0",
-    "babel-preset-es2015-script": "^1.1.0",
     "gulp": "^3.9.1",
     "gulp-uglifyjs": "^0.6.2",
     "onchange": "^3.0.2"

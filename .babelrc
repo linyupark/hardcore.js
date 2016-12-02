@@ -1,3 +1,4 @@
 {
-  "presets": ["es2015-riot", "es2015-script"]
+  "presets": ["es2015-riot"],
+  "compact": false
 }

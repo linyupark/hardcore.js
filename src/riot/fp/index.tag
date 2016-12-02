@@ -7,7 +7,7 @@
     <a href="#!/login">login</a>
   </p>
 
-  <pagination-select pages="10" page="1"><pagination-select>
+  <pagination-number pages="40" page="10"><pagination-number>
 
   <footer></footer>
 

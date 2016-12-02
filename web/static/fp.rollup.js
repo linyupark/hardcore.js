@@ -108,12 +108,16 @@ const xhr = (url, options = {}) => {
     xhr.setRequestHeader(k, opts.headers[k]);
   }
   // 如果支持进度条
-  xhr.upload.onprogress = xhr.onprogress = (e) => {
+  let progressFn = (e) => {
     if (e.lengthComputable) {
       progress = Math.round(e.loaded * 100 / e.total);
       opts.progress.call(e.target, progress);
     }
   };
+  if(xhr.upload){
+    xhr.upload.addEventListener('progress', progressFn, false);
+  }
+  xhr.addEventListener('progress', progressFn, false);
   xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
@@ -372,9 +376,10 @@ const emitter = (el = {}) => {
    */
   Object.defineProperty(el, "on", {
     value(event, fn) {
-      if (typeof fn !== "function") return el;
-      (_callbacks[event] = _callbacks[event] || []).push(fn);
-      el.__emited[event] && fn.apply(el, el.__emited[event]);
+      if (typeof fn == "function"){
+        (_callbacks[event] = _callbacks[event] || []).push(fn);
+        el.__emited[event] && fn.apply(el, el.__emited[event]);
+      }
       return el;
     }
   });
@@ -401,7 +406,9 @@ const emitter = (el = {}) => {
             if (_callbacks[event][_i] == fn)
               _callbacks[event].splice(_i, 1);
           }
-        } else delete _callbacks[event];
+        } else {
+          delete _callbacks[event];
+        }
         delete el.__emited[event];
       }
       return el;
@@ -441,6 +448,7 @@ let EmitterPromise = class {
     emitter(this);
     this._resolve = (value) => {
       this.emit("resolve", value);
+      this._emited_value = value;
       this.off("reject");
     };
     if (rr.length === 1) {
@@ -516,7 +524,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   then(cb = () => {}, _catch) {
-    this.on("resolve", value => {
+    this.once("resolve", value => {
       try {
         if (this.__chain_value instanceof Promise$1) {
           this.__chain_value.then(cb);
@@ -529,6 +537,9 @@ let EmitterPromise = class {
     });
     if (typeof _catch === "function") {
       return this.catch(_catch);
+    }
+    if(this._emited_value){
+      this.emit("resolve", this._emited_value);
     }
     return this;
   }
@@ -548,7 +559,7 @@ let EmitterPromise = class {
         if (result) this.emit("resolve", result);
       } catch (e) {
         this.emit("reject", e);
-        if (!this.__no_throw && this.__emited.reject[1] === e) {
+        if (!this.__no_throw) {
           throw e;
         }
       }
@@ -2615,7 +2626,6 @@ function Tag$$1(impl, conf, innerHTML) {
 
   // make this tag observable
   emitter(this);
-  window.console.log(this);
   // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) root._tag.unmount(true);
 

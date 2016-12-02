@@ -1471,7 +1471,6 @@ function Tag$$1(impl, conf, innerHTML) {
 
   // make this tag observable
   observable(this);
-  window.console.log(this);
   // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) root._tag.unmount(true);
 

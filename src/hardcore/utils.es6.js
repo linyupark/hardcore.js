@@ -103,12 +103,16 @@ export const xhr = (url, options = {}) => {
     xhr.setRequestHeader(k, opts.headers[k]);
   }
   // 如果支持进度条
-  xhr.upload.onprogress = xhr.onprogress = (e) => {
+  let progressFn = (e) => {
     if (e.lengthComputable) {
       progress = Math.round(e.loaded * 100 / e.total);
       opts.progress.call(e.target, progress);
     }
   };
+  if(xhr.upload){
+    xhr.upload.addEventListener('progress', progressFn, false);
+  }
+  xhr.addEventListener('progress', progressFn, false);
   xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
