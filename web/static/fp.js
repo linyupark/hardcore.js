@@ -3661,6 +3661,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.tagMounted = {};
         // 合并组件
         this.route = route;
+        this.xhr = xhr;
         this.utils = {
           cookie: cookie
         };
@@ -3739,6 +3740,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this13.emit('init::fail', files);
         });
       });
+    };
+
+    /**
+     * 信息打印
+     */
+
+
+    FP.prototype.log = function log() {
+      var _window$console;
+
+      return this.config.dev !== 'pro' ? window.console && (_window$console = window.console).log.apply(_window$console, arguments) : null;
+    };
+
+    FP.prototype.err = function err() {
+      var _window$console2;
+
+      return window.console && (_window$console2 = window.console).error.apply(_window$console2, arguments);
     };
 
     /**

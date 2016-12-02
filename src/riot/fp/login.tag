@@ -21,7 +21,7 @@
   this.fn = {
   };
   this.on('mount', () => {
-    console.log('login mounted');
+    this.app.log('login mounted');
   });
   </script>
 

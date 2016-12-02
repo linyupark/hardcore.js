@@ -7,13 +7,15 @@
     <a href="#!/login">login</a>
   </p>
 
+  <upload-base64 type="pic"></upload-base64>
+
   <pagination-number pages="40" page="10"><pagination-number>
 
   <footer></footer>
 
   <script>
   this.on('mount', () => {
-    console.log('index mounted', this.app.tagMounted);
+    this.app.log('index mounted', this.app.tagMounted);
   });
   </script>
 

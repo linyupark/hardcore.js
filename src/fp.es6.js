@@ -30,6 +30,7 @@ export class FP {
       this.tagMounted = {};
       // 合并组件
       this.route = route;
+      this.xhr = xhr;
       this.utils = {
         cookie: cookie
       };
@@ -105,6 +106,18 @@ export class FP {
       });
     });
 
+  }
+
+
+  /**
+   * 信息打印
+   */
+  log(...args){
+    return this.config.dev !== 'pro' ?
+      window.console && window.console.log(...args) : null;
+  }
+  err(...args){
+    return window.console && window.console.error(...args);
   }
 
   /**
