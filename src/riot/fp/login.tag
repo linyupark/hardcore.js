@@ -18,10 +18,11 @@
   </div>
 
   <script>
-  this.fn = {
+  var _this = this;
+  _this.fn = {
   };
-  this.on('mount', () => {
-    this.app.log('login mounted');
+  _this.on('mount', function() {
+    _this.app.log('login mounted');
   });
   </script>
 

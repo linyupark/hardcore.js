@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.App = global.App || {})));
-}(this, (function (exports) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.RiotApp = factory());
+}(this, (function () { 'use strict';
 
 /**
  * 优化 typeof 获取未知对象类型
@@ -3565,22 +3565,22 @@ route.start = function(autoExec) {
 route.base();
 route.parser();
 
-window.riot = riot$1;
-
-class FP {
+class RiotApp$1 {
 
   constructor(options={}){
     // 单例化
-    if(!FP.instance){
+    if(!this.instance){
+      // window.riot
+      window.riot = riot$1;
       // 可监听化
       emitter(this);
       // 配置信息
       this.config = assign({
-        id: 'fp', // 项目id
+        id: 'app', // 项目id
         env: 'dev', // 环境
         staticBase: './static/',
         routeBase: '#!', // route解析分隔符
-        mountPage: '#main', // 页面逻辑挂载点
+        mountPage: 'page', // 页面逻辑挂载点
         loginPage: 'login',
         indexPage: 'index',
         errorPage: '500',
@@ -3597,9 +3597,9 @@ class FP {
       };
       // 初始化操作
       this.init();
-      FP.instance = this;
+      this.instance = this;
     }
-    return FP.instance;
+    return this.instance;
   }
 
   init(){
@@ -3644,7 +3644,7 @@ class FP {
               ctags(tag$$1);
             } catch(e) {
               route(`/${cf.errorPage}?message=${e.message}`);
-              window.console.error(e);
+              this.err(e);
             }
           }).catch(() => {
             route('/' + cf.notFoundPage);
@@ -3710,8 +3710,6 @@ class FP {
 
 }
 
-exports.FP = FP;
-
-Object.defineProperty(exports, '__esModule', { value: true });
+return RiotApp$1;
 
 })));

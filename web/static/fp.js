@@ -1,14 +1,14 @@
-'use strict';
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function (global, factory) {
-  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : factory(global.App = global.App || {});
-})(this, function (exports) {
+  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.RiotApp = factory();
+})(this, function () {
   'use strict';
 
   /**
@@ -235,27 +235,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
     get: function get() {
       var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-      for (var _iterator = document.cookie.split("; "), _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
+      try {
+        for (var _iterator = document.cookie.split("; ")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _cookie = _step.value;
 
-        if (_isArray) {
-          if (_i2 >= _iterator.length) break;
-          _ref = _iterator[_i2++];
-        } else {
-          _i2 = _iterator.next();
-          if (_i2.done) break;
-          _ref = _i2.value;
+          var _cookie$split = _cookie.split("="),
+              _cookie$split2 = _slicedToArray(_cookie$split, 2),
+              _name = _cookie$split2[0],
+              value = _cookie$split2[1];
+
+          if (key !== "" && key === _name) {
+            return decodeURIComponent(value);
+          }
         }
-
-        var _cookie = _ref;
-
-        var _cookie$split = _cookie.split("="),
-            _name = _cookie$split[0],
-            value = _cookie$split[1];
-
-        if (key !== "" && key === _name) {
-          return decodeURIComponent(value);
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
       }
     }
@@ -449,22 +457,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           args[_key2 - 1] = arguments[_key2];
         }
 
-        for (var _iterator2 = fns, _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-          var _ref2;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
 
-          if (_isArray2) {
-            if (_i3 >= _iterator2.length) break;
-            _ref2 = _iterator2[_i3++];
-          } else {
-            _i3 = _iterator2.next();
-            if (_i3.done) break;
-            _ref2 = _i3.value;
+        try {
+          for (var _iterator2 = fns[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var _fn = _step2.value;
+
+            _fn.apply(el, args);
           }
-
-          var _fn = _ref2;
-
-          _fn.apply(el, args);
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
         }
+
         el.__emited[name] = [name].concat(args);
         if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
         return el;
@@ -474,9 +491,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return el;
   };
 
-  /**
-   * 模拟标准Promise类
-   */
   var Promise$1 = void 0;
   var EmitterPromise = function () {
     function EmitterPromise() {
@@ -523,28 +537,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       var values = [];
       return new EmitterPromise(function (resolve, reject) {
-        for (var _iterator3 = iterable, _isArray3 = Array.isArray(_iterator3), _i4 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-          var _ref3;
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
 
-          if (_isArray3) {
-            if (_i4 >= _iterator3.length) break;
-            _ref3 = _iterator3[_i4++];
-          } else {
-            _i4 = _iterator3.next();
-            if (_i4.done) break;
-            _ref3 = _i4.value;
+        try {
+          for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _p = _step3.value;
+
+            _p.then(function (value) {
+              values.push(value);
+              if (values.length === iterable.length) {
+                resolve(values);
+              }
+            }).catch(function (reason) {
+              reject(reason);
+            });
           }
-
-          var _p = _ref3;
-
-          _p.then(function (value) {
-            values.push(value);
-            if (values.length === iterable.length) {
-              resolve(values);
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
             }
-          }).catch(function (reason) {
-            reject(reason);
-          });
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
         }
       });
     };
@@ -669,23 +691,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var alias_names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
       var batch_list = [];
-      for (var _iterator4 = alias_names, _isArray4 = Array.isArray(_iterator4), _i5 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-        var _ref4;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
-        if (_isArray4) {
-          if (_i5 >= _iterator4.length) break;
-          _ref4 = _iterator4[_i5++];
-        } else {
-          _i5 = _iterator4.next();
-          if (_i5.done) break;
-          _ref4 = _i5.value;
+      try {
+        for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var _name2 = _step4.value;
+
+          if (!json[_name2] || json[_name2].length === 0) continue;
+          batch_list.push(json[_name2]);
         }
-
-        var _name2 = _ref4;
-
-        if (!json[_name2] || json[_name2].length === 0) continue;
-        batch_list.push(json[_name2]);
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
       }
+
       return this.depend.apply(this, batch_list);
     };
 
@@ -747,92 +778,113 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         files[_key4] = arguments[_key4];
       }
 
-      for (var _iterator5 = files, _isArray5 = Array.isArray(_iterator5), _i6 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
-        var _ref5;
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
 
-        if (_isArray5) {
-          if (_i6 >= _iterator5.length) break;
-          _ref5 = _iterator5[_i6++];
-        } else {
-          _i6 = _iterator5.next();
-          if (_i6.done) break;
-          _ref5 = _i6.value;
-        }
+      try {
+        for (var _iterator5 = files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var f = _step5.value;
 
-        var f = _ref5;
+          var exist = false;
+          var _iteratorNormalCompletion8 = true;
+          var _didIteratorError8 = false;
+          var _iteratorError8 = undefined;
 
-        var exist = false;
-        for (var _iterator8 = load_files, _isArray8 = Array.isArray(_iterator8), _i9 = 0, _iterator8 = _isArray8 ? _iterator8 : _iterator8[Symbol.iterator]();;) {
-          var _ref8;
+          try {
+            for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+              var lf = _step8.value;
 
-          if (_isArray8) {
-            if (_i9 >= _iterator8.length) break;
-            _ref8 = _iterator8[_i9++];
-          } else {
-            _i9 = _iterator8.next();
-            if (_i9.done) break;
-            _ref8 = _i9.value;
+              if (f.split("/").pop() === lf.split("/").pop()) {
+                exist = true;
+                backup_files = backup_files.concat(f);
+              }
+            }
+          } catch (err) {
+            _didIteratorError8 = true;
+            _iteratorError8 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                _iterator8.return();
+              }
+            } finally {
+              if (_didIteratorError8) {
+                throw _iteratorError8;
+              }
+            }
           }
 
-          var lf = _ref8;
-
-          if (f.split("/").pop() === lf.split("/").pop()) {
-            exist = true;
-            backup_files = backup_files.concat(f);
+          if (!exist) load_files = load_files.concat(f);
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
           }
         }
-        if (!exist) load_files = load_files.concat(f);
       }
+
       return new Promise$1(function (resolve, reject) {
         var load = function load() {
-          var _loop = function _loop() {
-            if (_isArray6) {
-              if (_i7 >= _iterator6.length) return 'break';
-              _ref6 = _iterator6[_i7++];
-            } else {
-              _i7 = _iterator6.next();
-              if (_i7.done) return 'break';
-              _ref6 = _i7.value;
-            }
+          var _iteratorNormalCompletion6 = true;
+          var _didIteratorError6 = false;
+          var _iteratorError6 = undefined;
 
-            var file = _ref6;
+          try {
+            var _loop = function _loop() {
+              var file = _step6.value;
 
-            var name = file.split("/").pop(),
-                ext = name.split(".").pop(),
-                attrs = { rel: file },
-                type = _this5.types[ext];
-            if (ext === "js") attrs.defer = true;
-            // 之前加载过的相同文件删除
-            // removeFile(type, "head", file);
-            if (_this5._loaded_files.indexOf(file) !== -1) {
-              check(done.push(file));
-              return 'continue';
-            }
-            loadFile(type, file, {
-              attrs: attrs,
-              success: function success() {
-                _this5._loaded_files.push(file);
+              var name = file.split("/").pop(),
+                  ext = name.split(".").pop(),
+                  attrs = { rel: file },
+                  type = _this5.types[ext];
+              if (ext === "js") attrs.defer = true;
+              // 之前加载过的相同文件删除
+              // removeFile(type, "head", file);
+              if (_this5._loaded_files.indexOf(file) !== -1) {
                 check(done.push(file));
-              },
-              error: function error() {
-                // 不留下失败文件
-                removeFile(type, "head", file);
-                check(fail.push(file));
+                return 'continue';
               }
-            });
-          };
+              loadFile(type, file, {
+                attrs: attrs,
+                success: function success() {
+                  _this5._loaded_files.push(file);
+                  check(done.push(file));
+                },
+                error: function error() {
+                  // 不留下失败文件
+                  removeFile(type, "head", file);
+                  check(fail.push(file));
+                }
+              });
+            };
 
-          _loop2: for (var _iterator6 = load_files, _isArray6 = Array.isArray(_iterator6), _i7 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
-            var _ref6;
+            for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+              var _ret = _loop();
 
-            var _ret = _loop();
-
-            switch (_ret) {
-              case 'break':
-                break _loop2;
-
-              case 'continue':
-                continue;}
+              if (_ret === 'continue') continue;
+            }
+          } catch (err) {
+            _didIteratorError6 = true;
+            _iteratorError6 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                _iterator6.return();
+              }
+            } finally {
+              if (_didIteratorError6) {
+                throw _iteratorError6;
+              }
+            }
           }
         },
             check = function check() {
@@ -853,23 +905,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
             if (exist && done.length === load_files.length) {
               // 移除已经加载的文件
-              for (var _iterator7 = load_files, _isArray7 = Array.isArray(_iterator7), _i8 = 0, _iterator7 = _isArray7 ? _iterator7 : _iterator7[Symbol.iterator]();;) {
-                var _ref7;
+              var _iteratorNormalCompletion7 = true;
+              var _didIteratorError7 = false;
+              var _iteratorError7 = undefined;
 
-                if (_isArray7) {
-                  if (_i8 >= _iterator7.length) break;
-                  _ref7 = _iterator7[_i8++];
-                } else {
-                  _i8 = _iterator7.next();
-                  if (_i8.done) break;
-                  _ref7 = _i8.value;
+              try {
+                for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                  var lf = _step7.value;
+
+                  removeFile(_this5.types[lf.split(".").pop()], "head", lf);
                 }
-
-                var lf = _ref7;
-
-                removeFile(_this5.types[lf.split(".").pop()], "head", lf);
+                // 替换成备份文件后能填补空缺就再执行一次
+              } catch (err) {
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                    _iterator7.return();
+                  }
+                } finally {
+                  if (_didIteratorError7) {
+                    throw _iteratorError7;
+                  }
+                }
               }
-              // 替换成备份文件后能填补空缺就再执行一次
+
               load_files = done;
               done = [];
               fail = [];
@@ -3632,25 +3693,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   route.base();
   route.parser();
 
-  window.riot = riot$1;
-
-  var FP = function () {
-    function FP() {
+  var RiotApp$1 = function () {
+    function RiotApp$1() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      _classCallCheck(this, FP);
+      _classCallCheck(this, RiotApp$1);
 
       // 单例化
-      if (!FP.instance) {
+      if (!this.instance) {
+        // window.riot
+        window.riot = riot$1;
         // 可监听化
         emitter(this);
         // 配置信息
         this.config = assign({
-          id: 'fp', // 项目id
+          id: 'app', // 项目id
           env: 'dev', // 环境
           staticBase: './static/',
           routeBase: '#!', // route解析分隔符
-          mountPage: '#main', // 页面逻辑挂载点
+          mountPage: 'page', // 页面逻辑挂载点
           loginPage: 'login',
           indexPage: 'index',
           errorPage: '500',
@@ -3667,12 +3728,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         };
         // 初始化操作
         this.init();
-        FP.instance = this;
+        this.instance = this;
       }
-      return FP.instance;
+      return this.instance;
     }
 
-    FP.prototype.init = function init() {
+    RiotApp$1.prototype.init = function init() {
       var _this13 = this;
 
       var cf = this.config;
@@ -3715,7 +3776,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 })();
               } catch (e) {
                 route('/' + cf.errorPage + '?message=' + e.message);
-                window.console.error(e);
+                _this13.err(e);
               }
             }).catch(function () {
               route('/' + cf.notFoundPage);
@@ -3747,13 +3808,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    FP.prototype.log = function log() {
+    RiotApp$1.prototype.log = function log() {
       var _window$console;
 
       return this.config.dev !== 'pro' ? window.console && (_window$console = window.console).log.apply(_window$console, arguments) : null;
     };
 
-    FP.prototype.err = function err() {
+    RiotApp$1.prototype.err = function err() {
       var _window$console2;
 
       return window.console && (_window$console2 = window.console).error.apply(_window$console2, arguments);
@@ -3765,7 +3826,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    FP.prototype.api = function api(method, url, data) {
+    RiotApp$1.prototype.api = function api(method, url, data) {
       var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
       return xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
         method: method,
@@ -3779,17 +3840,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    FP.prototype.addResource = function addResource(resName) {
+    RiotApp$1.prototype.addResource = function addResource(resName) {
       var existRes = void 0;
       if (!this.loaderJSON) return Promise.reject();
       if (this.loaderJSON[resName]) existRes = resName;else if (this.loaderJSON[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
       return Loader.alias(this.loaderJSON, [existRes]);
     };
 
-    return FP;
+    return RiotApp$1;
   }();
 
-  exports.FP = FP;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
+  return RiotApp$1;
 });

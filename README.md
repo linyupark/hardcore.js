@@ -12,6 +12,14 @@
   $ npm run web
 ```
 
+修改 node_modules/babel-preset-es2015-ie/index.js
+```
+  # 注释掉
+  require('babel-plugin-transform-es2015-modules-commonjs')
+  # 根据需要给不兼容的函数加上{loose: true}, 如：
+  require('babel-plugin-transform-es2015-typeof-symbol', {loose: true})
+```
+
 启动自动编译，进行开发
 ```
   #windows

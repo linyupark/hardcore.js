@@ -1,7 +1,4 @@
 
-/**
- * base64数据流上传
- */
 <upload-base64>
 
   <div class="progress" each={progressList}>
@@ -12,42 +9,44 @@
   <button class="btn" onclick={fn.upload}>上传</button>
 
   <script>
-  this.on('mount', () => {
-    this.uploadFiles = [];
+  var _this = this;
+  _this.on('mount', function() {
+    _this.uploadFiles = [];
   });
 
-  this.fn = {
-    upload: (e) => {
-      this.uploadFiles = this.refs.fileInput.files;
-      this.progressList = [];
-      for(let f of this.uploadFiles){
-        let fileReader = new FileReader();
-        fileReader.addEventListener('load', (e) => {
-          this.emit('base64::loaded', {
+  _this.fn = {
+    upload: function(e) {
+      _this.uploadFiles = _this.refs.fileInput.files;
+      _this.progressList = [];
+      for(var i in _this.uploadFiles){
+        if(i === 'length') continue;
+        var fileReader = new FileReader();
+        fileReader.addEventListener('load', function(e) {
+          _this.emit('base64::loaded', {
             base64: e.target.result,
-            name: f.name
+            name: _this.uploadFiles[i].name
           });
         }, { once: true });
-        fileReader.readAsDataURL(f);
+        fileReader.readAsDataURL(_this.uploadFiles[i]);
       }
     }
   };
 
-  this.on('base64::loaded', (data) => {
-    this.progressList.push({
+  _this.on('base64::loaded', function(data) {
+    _this.progressList.push({
       name: data.name,
       progress: 0
     });
-    this.app.xhr('//192.168.1.161/upload.php', {
+    _this.app.xhr('//192.168.1.161/upload.php', {
       data: { file: data.base64 },
       method: 'POST'
-    }).complete(() => {
-      this.app.log(`file ${data.name} completed.`);
-    }).progress(per => {
-      for(let progress of this.progressList){
-        if(progress.name == data.name){
-          progress.progress = per;
-          this.update();
+    }).complete(function() {
+      _this.app.log('file' + data.name + 'completed.');
+    }).progress(function(per) {
+      for(var i of _this.progressList){
+        if(_this.progressList[i].name == data.name){
+          _this.progressList[i].progress = per;
+          _this.update();
         }
       }
     });
@@ -57,26 +56,19 @@
 </upload-base64>
 
 
-/**
- * iframe模式上传
- */
-<upload-iframe></upload-iframe>
 
-
-/**
- * 数字按钮组件
- */
 <pagination-number>
+
   <ul class="pagination">
-    <li show={hasPrevPage}>
+    <li if={hasPrevPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>1</a>
     </li>
-    <li show={hasPrevPage}>
+    <li if={hasPrevPage}>
       <a href="javascript:;" onclick={fn.prevPage}>
         &lt;
       </a>
     </li>
-    <li show={hasPrevSpan}>...</li>
+    <li if={hasPrevSpan}>...</li>
     <li each={p in prevPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
@@ -86,138 +78,139 @@
     <li each={p in nextPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
-    <li show={hasNextSpan}>...</li>
-    <li show={hasNextPage}>
+    <li if={hasNextSpan}>...</li>
+    <li if={hasNextPage}>
       <a href="javascript:;" onclick={fn.nextPage}>
         &gt;
       </a>
     </li>
-    <li show={hasNextPage}>
+    <li if={hasNextPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>{pages}</a>
     </li>
   </ul>
   <script>
-  this.pageSpan = 4;
-  this.fn = {
-    prevPages: () => {
-      let i = this.pageSpan;
-      this.hasPrevSpan = (this.page - this.pageSpan) > 0;
-      this.prevPages = [];
+  var _this = this;
+  _this.pageSpan = 4;
+  _this.fn = {
+    prevPages: function() {
+      var i = _this.pageSpan;
+      _this.hasPrevSpan = (_this.page - _this.pageSpan) > 0;
+      _this.prevPages = [];
       while(i--){
-        if(this.page - i > 1 && i > 0){
-          this.prevPages.push(this.page - i);
+        if(_this.page - i > 1 && i > 0){
+          _this.prevPages.push(_this.page - i);
         }
       }
-      this.update();
+      _this.update();
     },
-    nextPages: () => {
-      let i = 0
-      this.hasNextSpan = (this.page + this.pageSpan) < this.pages;
-      this.nextPages = [];
-      while(++i < this.pageSpan){
-        if(this.page + i < this.pages){
-          this.nextPages.push(this.page + i);
+    nextPages: function() {
+      var i = 0;
+      _this.hasNextSpan = (_this.page + _this.pageSpan) < _this.pages;
+      _this.nextPages = [];
+      while(++i < _this.pageSpan){
+        if(_this.page + i < _this.pages){
+          _this.nextPages.push(_this.page + i);
         }
       }
-      this.update();
+      _this.update();
     },
     // 跳转页
-    jumpPage: (e) => {
-      this.fn.page(Number(e.item ? e.item.p : e.target.innerText));
+    jumpPage: function(e) {
+      _this.fn.page(Number(e.item ? e.item.p : e.target.innerText));
     },
     // 上一页
-    prevPage: () => {
-      if(this.hasPrevPage)
-      this.fn.page(this.page - 1);
+    prevPage: function() {
+      if(_this.hasPrevPage)
+      _this.fn.page(_this.page - 1);
     },
     // 下一页
-    nextPage: () => {
-      if(this.hasNextPage)
-      this.fn.page(this.page + 1);
+    nextPage: function() {
+      if(_this.hasNextPage)
+      _this.fn.page(_this.page + 1);
     },
     // 切换页面
-    page: (n) => {
-      this.page = n;
-      this.hasNextPage = this.pages > this.page;
-      this.hasPrevPage = this.page > 1;
-      this.fn.prevPages();
-      this.fn.nextPages();
-      this.emit('page', n);
+    page: function(n) {
+      _this.page = n;
+      _this.hasNextPage = _this.pages > _this.page;
+      _this.hasPrevPage = _this.page > 1;
+      _this.fn.prevPages();
+      _this.fn.nextPages();
+      _this.emit('page', n);
     }
   };
 
-  this.on('mount', () => {
-    this.page = Number(opts.page);
-    this.pages = Number(opts.pages);
-    this.fn.page(this.page);
-    this.update();
+  _this.on('mount', function() {
+    _this.page = Number(opts.page || 1);
+    _this.pages = Number(opts.pages);
+    _this.fn.page(_this.page);
+    _this.update();
   });
   </script>
+
 </pagination-number>
 
 
 
 
-/**
- * 下拉框分页组件
- */
 <pagination-select>
-  <dl>
-    <dd>
+
+  <ul class="pagination">
+    <li>
       <a href="javascript:;" class="{'disabled': !hasPrevPage}" onclick={fn.prevPage}>
         上页
       </a>
-    </dd>
-    <dd>
-      <select onchange={fn.jumpPage} value={page}>
+    </li>
+    <li>
+      <select onchange={fn.jumpPage} value="{page}">
         <option each={p in pageList} value="{p}">{p}</option>
       </select>
-    </dd>
-    <dd>
+    </li>
+    <li>
       <a href="javascript:;" class="{'disabled': !hasNextPage}" onclick={fn.nextPage}>
         下页
       </a>
-    </dd>
-  </dl>
+    </li>
+  </ul>
   <script>
-
-  this.fn = {
+  var _this = this;
+  _this.fn = {
     // 循环总页数生成option选项
-    pageList: () => {
-      this.pageList = [];
-      for(let page = 1; page <= this.pages; page++){
-        this.pageList.push(page);
+    pageList: function() {
+      _this.pageList = [];
+      for(var page = 1; page <= _this.pages; page++){
+        _this.pageList.push(page);
       }
     },
     // 跳转页
-    jumpPage: (e) => {
-      this.fn.page(Number(e.target.value));
+    jumpPage: function(e) {
+      _this.fn.page(Number(e.target.value));
     },
     // 上一页
-    prevPage: () => {
-      if(this.hasPrevPage)
-      this.fn.page(this.page - 1);
+    prevPage: function() {
+      if(_this.hasPrevPage)
+      _this.fn.page(_this.page - 1);
     },
     // 下一页
-    nextPage: () => {
-      if(this.hasNextPage)
-      this.fn.page(this.page + 1);
+    nextPage: function() {
+      if(_this.hasNextPage)
+      _this.fn.page(_this.page + 1);
     },
     // 切换页面
-    page: (n) => {
-      this.page = n;
-      this.hasNextPage = this.pages > this.page;
-      this.hasPrevPage = this.page > 1;
-      this.emit('page', n);
+    page: function(n) {
+      _this.page = n;
+      _this.hasNextPage = _this.pages > _this.page;
+      _this.hasPrevPage = _this.page > 1;
+      _this.emit('page', n);
     }
   };
 
-  this.on('mount', () => {
-    this.page = Number(opts.page);
-    this.pages = Number(opts.pages);
-    this.fn.pageList();
-    this.fn.page(this.page);
-    this.update();
+  _this.on('mount', function() {
+    _this.page = Number(opts.page);
+    _this.pages = Number(opts.pages);
+    _this.fn.pageList();
+    _this.fn.page(_this.page);
+    _this.update();
   });
   </script>
+  
 </pagination-select>

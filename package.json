@@ -4,9 +4,8 @@
   "description": "",
   "scripts": {
     "web": "browser-sync start -s \"web\" -f \"./web/**/*\"",
-    "riot": "riot -w -s ./src/riot/ ./web/static/riot/",
-    "babel:riot": "babel -w ./web/static/riot/ -d ./web/static/riot/",
-    "rollup:fp": "onchange ./src/*/*.es6.js ./src/fp.es6.js -- rollup ./src/fp.es6.js -o ./web/static/fp.rollup.js -f umd -n App",
+    "riot": "riot -w -s -c ./src/riot/ ./web/static/riot/",
+    "rollup:fp": "rollup -w  -i ./src/fp.es6.js -o ./web/static/fp.rollup.js -f umd -n RiotApp",
     "babel:fp": "babel -w ./web/static/fp.rollup.js -o ./web/static/fp.js",
     "sass:fp": "node-sass -w -r ./src/sass/fp.sass -o ./web/static/",
     "windev:fp": "start npm run riot && start npm run rollup:fp && start npm run babel:fp && start npm run sass:fp",
@@ -22,6 +21,6 @@
     "babel-preset-es2015-ie": "^6.6.2",
     "gulp": "^3.9.1",
     "gulp-uglifyjs": "^0.6.2",
-    "onchange": "^3.0.2"
+    "rollup-watch": "^2.5.0"
   }
 }
