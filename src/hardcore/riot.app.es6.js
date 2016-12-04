@@ -125,16 +125,8 @@ export class RiotApp {
 
   /**
    * 适配项目接口
-   * @return {[type]} [description]
    */
-  api(method, url, data){
-    const prefix = {dev: 'dev.', test: 'test.', pro: ''}[this.config.env];
-    return xhr(`//${prefix}h5.sosho.cn/server/${url}`, {
-      method: method,
-      data: data,
-      headers: {}
-    });
-  }
+  api(){}
 
   /**
    * 追加资源载入

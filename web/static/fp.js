@@ -4,6 +4,12 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function (global, factory) {
@@ -3833,18 +3839,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     /**
      * 适配项目接口
-     * @return {[type]} [description]
      */
 
 
-    RiotApp.prototype.api = function api(method, url, data) {
-      var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
-      return xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
-        method: method,
-        data: data,
-        headers: {}
-      });
-    };
+    RiotApp.prototype.api = function api() {};
 
     /**
      * 追加资源载入
@@ -3872,9 +3870,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   if (ltIE(9)) {
     window.location.href = './upgrade.html';
   } else {
-    new RiotApp({
-      id: 'fp',
-      env: env('pro')
-    });
+    var App = function (_RiotApp) {
+      _inherits(App, _RiotApp);
+
+      function App() {
+        _classCallCheck(this, App);
+
+        return _possibleConstructorReturn(this, _RiotApp.call(this, {
+          id: 'fp',
+          env: env('pro')
+        }));
+      }
+
+      /**
+       * 适配项目接口
+       * @return {[type]} [description]
+       */
+
+
+      App.prototype.api = function api(method, url, data) {
+        var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
+        return this.xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
+          method: method,
+          data: data,
+          headers: {}
+        });
+      };
+
+      return App;
+    }(RiotApp);
+
+    new App();
   }
 });
