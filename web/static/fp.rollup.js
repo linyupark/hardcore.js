@@ -669,7 +669,7 @@ class Loader {
       let load = () => {
           for (const file of load_files) {
             let name = file.split("/").pop(),
-              ext = name.split(".").pop(),
+              ext = name.split(".").pop().split("?")[0],
               attrs = { rel: file },
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;
@@ -3721,7 +3721,8 @@ class RiotApp {
 
 }
 
-let env = () => {
+let env = (env) => {
+  if(env) return env;
   if(/localhost|127\.0/.test(window.location.origin)){
     return 'dev';
   }
@@ -3734,7 +3735,7 @@ if(ltIE(9)){
 else{
   new RiotApp({
     id: 'fp',
-    env: env()
+    env: env('pro')
   });
 }
 

@@ -1,7 +1,8 @@
 import { ltIE } from './hardcore/utils.es6.js';
 import { RiotApp } from './hardcore/riot.app.es6.js';
 
-let env = () => {
+let env = (env) => {
+  if(env) return env;
   if(/localhost|127\.0/.test(window.location.origin)){
     return 'dev';
   }
@@ -14,6 +15,6 @@ if(ltIE(9)){
 else{
   new RiotApp({
     id: 'fp',
-    env: env()
+    env: env('pro')
   });
 }

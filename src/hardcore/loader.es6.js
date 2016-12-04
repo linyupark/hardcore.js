@@ -87,7 +87,7 @@ export class Loader {
       let load = () => {
           for (const file of load_files) {
             let name = file.split("/").pop(),
-              ext = name.split(".").pop(),
+              ext = name.split(".").pop().split("?")[0],
               attrs = { rel: file },
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;

@@ -45,7 +45,7 @@
     }).complete(function() {
       _this.app.log('file' + data.name + 'completed.');
     }).progress(function(per) {
-      for(var i of _this.progressList){
+      for(var i in _this.progressList){
         if(_this.progressList[i].name == data.name){
           _this.progressList[i].progress = per;
           _this.update();

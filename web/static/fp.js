@@ -854,7 +854,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               var file = _step6.value;
 
               var name = file.split("/").pop(),
-                  ext = name.split(".").pop(),
+                  ext = name.split(".").pop().split("?")[0],
                   attrs = { rel: file },
                   type = _this5.types[ext];
               if (ext === "js") attrs.defer = true;
@@ -3861,7 +3861,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return RiotApp;
   }();
 
-  var env = function env() {
+  var env = function env(_env) {
+    if (_env) return _env;
     if (/localhost|127\.0/.test(window.location.origin)) {
       return 'dev';
     }
@@ -3873,7 +3874,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   } else {
     new RiotApp({
       id: 'fp',
-      env: env()
+      env: env('pro')
     });
   }
 });

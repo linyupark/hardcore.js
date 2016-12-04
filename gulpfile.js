@@ -1,9 +1,15 @@
 const
   fs = require('fs');
   gulp = require('gulp'),
-  uglify = require('gulp-uglifyjs');
+  uglify = require('gulp-uglifyjs'),
+  cleancss = require('gulp-clean-css')
+  rename = require('gulp-rename'),
+  cssver = require('gulp-make-css-url-version'),
+  filemd5 = require('md5-file');
 
 gulp.task('build:fp', () => {
+
+  let name = 'fp';
 
   // riot common+component
   gulp.src([
@@ -15,22 +21,50 @@ gulp.task('build:fp', () => {
 
   // fp
   gulp.src([
-    './web/static/fp.js'
-  ]).pipe(uglify('fp.min.js', {
+    './web/static/'+name+'.js'
+  ]).pipe(uglify(name+'.min.js', {
     mangle: true
   }))
   .pipe(gulp.dest('./web/static/'));
 
   // fp pages
-  fs.readdir('./web/static/riot/fp', (err, files) => {
+  fs.readdir('./web/static/riot/'+name, (err, files) => {
     if(err) throw 'Read dir error.';
     files.forEach(f => {
-      gulp.src([`./web/static/riot/fp/${f}`])
+      gulp.src([`./web/static/riot/${name}/${f}`])
       .pipe(uglify({ mangle: true }))
-      .pipe(gulp.dest('./web/static/riot/fp/'));
+      .pipe(gulp.dest('./web/static/riot/'+name+'/'));
     });
   });
 
-});
+  // fp css
+  gulp.src('./web/static/'+name+'.css')
+  .pipe(cleancss())
+  .pipe(cssver())
+  .pipe(rename({
+    suffix: '.min'
+  }))
+  .pipe(gulp.dest('./web/static/'));
 
-// TODO: 要给loader里的来源文件加上?md5=xxx来确保刷新缓存
+  // md5
+  let loaderFile = './web/static/'+name+'.json';
+  fs.readFile(loaderFile, (err, data) => {
+    let json;
+    if(err) throw err;
+    json = JSON.parse(data);
+    // 只给pro加后缀
+    if(!json.pro){
+      throw 'production files not found in json file:' + name+'.json';
+    }
+    json.pro.forEach((f, i) => {
+      if(f.split('/')[0] === '.'){
+        f =  f.substring(1);
+      }
+      f = f.replace(/\?v=.+/, '');
+      f = f + '?v=' + filemd5.sync('./web/' + f);
+      json.pro[i] = f;
+    });
+    fs.writeFileSync(loaderFile, JSON.stringify(json), 'utf8');
+  });
+
+});
