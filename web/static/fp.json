@@ -1,10 +1,19 @@
 {
-  "riot": [
-    "//cdn.bootcss.com/riot/2.6.7/riot.min.js"
-  ],
   "dev": [
     "./static/fp.css",
     "./static/riot/component.js",
     "./static/riot/common.js"
+  ],
+  "header-nav": [
+    { "name": "首页", "url": "/index" },
+    { "name": "协议", "url": "/agreement" },
+    { "name": "设置", "url": "/setting", "sub": [
+      { "name": "日志", "url": "/log" },
+      { "name": "密码", "url": "/password" }
+    ]},
+    { "name": "查询", "url": "/search", "sub": [
+      { "name": "日志", "url": "/log" },
+      { "name": "密码", "url": "/password" }
+    ]}
   ]
 }

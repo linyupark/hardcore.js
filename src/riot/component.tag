@@ -1,4 +1,6 @@
 
+
+
 <upload-base64>
 
   <div class="progress" each={progressList}>
@@ -60,15 +62,15 @@
 <pagination-number>
 
   <ul class="pagination">
-    <li if={hasPrevPage}>
+    <li show={hasPrevPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>1</a>
     </li>
-    <li if={hasPrevPage}>
+    <li show={hasPrevPage}>
       <a href="javascript:;" onclick={fn.prevPage}>
         &lt;
       </a>
     </li>
-    <li if={hasPrevSpan}>...</li>
+    <li show={hasPrevSpan}>...</li>
     <li each={p in prevPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
@@ -78,20 +80,33 @@
     <li each={p in nextPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
-    <li if={hasNextSpan}>...</li>
-    <li if={hasNextPage}>
+    <li show={hasNextSpan}>...</li>
+    <li show={hasNextPage}>
       <a href="javascript:;" onclick={fn.nextPage}>
         &gt;
       </a>
     </li>
-    <li if={hasNextPage}>
+    <li show={hasNextPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>{pages}</a>
+    </li>
+    <li show={opts.select=='y'}>
+      第
+      <select onchange={fn.jumpPage} value="{page}">
+        <option each={p in pageList} value="{p}">{p}</option>
+      </select>
+      页
     </li>
   </ul>
   <script>
   var _this = this;
   _this.pageSpan = 4;
   _this.fn = {
+    pageList: function() {
+      _this.pageList = [];
+      for(var page = 1; page <= _this.pages; page++){
+        _this.pageList.push(page);
+      }
+    },
     prevPages: function() {
       var i = _this.pageSpan;
       _this.hasPrevSpan = (_this.page - _this.pageSpan) > 0;
@@ -116,7 +131,10 @@
     },
     // 跳转页
     jumpPage: function(e) {
-      _this.fn.page(Number(e.item ? e.item.p : e.target.innerText));
+      _this.fn.page(Number(
+        e.item ? e.item.p :
+        e.target.value || e.target.innerText
+      ));
     },
     // 上一页
     prevPage: function() {
@@ -142,13 +160,13 @@
   _this.on('mount', function() {
     _this.page = Number(opts.page || 1);
     _this.pages = Number(opts.pages);
+    _this.fn.pageList();
     _this.fn.page(_this.page);
     _this.update();
   });
   </script>
 
 </pagination-number>
-
 
 
 
@@ -212,5 +230,5 @@
     _this.update();
   });
   </script>
-  
+
 </pagination-select>

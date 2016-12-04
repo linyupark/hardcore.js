@@ -1,8 +1,20 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.RiotApp = factory());
+  (factory());
 }(this, (function () { 'use strict';
+
+/**
+ * 是否小于某版本ie
+ * @param  {number} ver 版本号
+ * @return {[boolean]}
+ */
+const ltIE = (ver) => {
+    let b = document.createElement('b');
+    b.innerHTML = `<!--[if lt IE ${ver}]><i></i><![endif]-->`;
+    return b.getElementsByTagName('i').length === 1;
+};
+
 
 /**
  * 优化 typeof 获取未知对象类型
@@ -435,9 +447,6 @@ const emitter = (el = {}) => {
 
 };
 
-/**
- * 模拟标准Promise类
- */
 let Promise$1;
 let EmitterPromise = class {
 
@@ -3565,7 +3574,7 @@ route.start = function(autoExec) {
 route.base();
 route.parser();
 
-class RiotApp$1 {
+class RiotApp {
 
   constructor(options={}){
     // 单例化
@@ -3643,11 +3652,13 @@ class RiotApp$1 {
               this.tagMounted[tagName] = tag$$1;
               ctags(tag$$1);
             } catch(e) {
-              route(`/${cf.errorPage}?message=${e.message}`);
+              window.location.replace(
+                `${cf.routeBase}/${cf.errorPage}?message=${e.message}`
+              );
               this.err(e);
             }
           }).catch(() => {
-            route('/' + cf.notFoundPage);
+            window.location.replace(cf.routeBase+'/'+cf.notFoundPage);
           });
         });
         // 开始监听路由变化
@@ -3710,6 +3721,21 @@ class RiotApp$1 {
 
 }
 
-return RiotApp$1;
+let env = () => {
+  if(/localhost|127\.0/.test(window.location.origin)){
+    return 'dev';
+  }
+  return 'pro';
+};
+
+if(ltIE(9)){
+  window.location.href = './upgrade.html';
+}
+else{
+  new RiotApp({
+    id: 'fp',
+    env: env()
+  });
+}
 
 })));

@@ -7,9 +7,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function (global, factory) {
-  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.RiotApp = factory();
+  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory() : typeof define === 'function' && define.amd ? define(factory) : factory();
 })(this, function () {
   'use strict';
+
+  /**
+   * 是否小于某版本ie
+   * @param  {number} ver 版本号
+   * @return {[boolean]}
+   */
+
+  var ltIE = function ltIE(ver) {
+    var b = document.createElement('b');
+    b.innerHTML = '<!--[if lt IE ' + ver + ']><i></i><![endif]-->';
+    return b.getElementsByTagName('i').length === 1;
+  };
 
   /**
    * 优化 typeof 获取未知对象类型
@@ -23,7 +35,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @param  {object} ext 扩充对象
    * @return {object}
    */
-
   var assign = function assign() {
     var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var ext = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -3693,11 +3704,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   route.base();
   route.parser();
 
-  var RiotApp$1 = function () {
-    function RiotApp$1() {
+  var RiotApp = function () {
+    function RiotApp() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      _classCallCheck(this, RiotApp$1);
+      _classCallCheck(this, RiotApp);
 
       // 单例化
       if (!this.instance) {
@@ -3733,7 +3744,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return this.instance;
     }
 
-    RiotApp$1.prototype.init = function init() {
+    RiotApp.prototype.init = function init() {
       var _this13 = this;
 
       var cf = this.config;
@@ -3775,11 +3786,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                   ctags(tag$$1);
                 })();
               } catch (e) {
-                route('/' + cf.errorPage + '?message=' + e.message);
+                window.location.replace(cf.routeBase + '/' + cf.errorPage + '?message=' + e.message);
                 _this13.err(e);
               }
             }).catch(function () {
-              route('/' + cf.notFoundPage);
+              window.location.replace(cf.routeBase + '/' + cf.notFoundPage);
             });
           });
           // 开始监听路由变化
@@ -3808,13 +3819,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    RiotApp$1.prototype.log = function log() {
+    RiotApp.prototype.log = function log() {
       var _window$console;
 
       return this.config.dev !== 'pro' ? window.console && (_window$console = window.console).log.apply(_window$console, arguments) : null;
     };
 
-    RiotApp$1.prototype.err = function err() {
+    RiotApp.prototype.err = function err() {
       var _window$console2;
 
       return window.console && (_window$console2 = window.console).error.apply(_window$console2, arguments);
@@ -3826,7 +3837,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    RiotApp$1.prototype.api = function api(method, url, data) {
+    RiotApp.prototype.api = function api(method, url, data) {
       var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
       return xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
         method: method,
@@ -3840,15 +3851,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    RiotApp$1.prototype.addResource = function addResource(resName) {
+    RiotApp.prototype.addResource = function addResource(resName) {
       var existRes = void 0;
       if (!this.loaderJSON) return Promise.reject();
       if (this.loaderJSON[resName]) existRes = resName;else if (this.loaderJSON[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
       return Loader.alias(this.loaderJSON, [existRes]);
     };
 
-    return RiotApp$1;
+    return RiotApp;
   }();
 
-  return RiotApp$1;
+  var env = function env() {
+    if (/localhost|127\.0/.test(window.location.origin)) {
+      return 'dev';
+    }
+    return 'pro';
+  };
+
+  if (ltIE(9)) {
+    window.location.href = './upgrade.html';
+  } else {
+    new RiotApp({
+      id: 'fp',
+      env: env()
+    });
+  }
 });

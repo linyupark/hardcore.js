@@ -1,4 +1,16 @@
 /**
+ * 是否小于某版本ie
+ * @param  {number} ver 版本号
+ * @return {[boolean]}
+ */
+export const ltIE = (ver) => {
+    let b = document.createElement('b');
+    b.innerHTML = `<!--[if lt IE ${ver}]><i></i><![endif]-->`;
+    return b.getElementsByTagName('i').length === 1;
+};
+
+
+/**
  * 优化 typeof 获取未知对象类型
  * @param  {mixed} mixed
  * @return {string}       Number|String|Object|Array|Function

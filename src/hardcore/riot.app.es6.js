@@ -83,11 +83,13 @@ export class RiotApp {
               this.tagMounted[tagName] = tag;
               ctags(tag);
             } catch(e) {
-              route(`/${cf.errorPage}?message=${e.message}`);
+              window.location.replace(
+                `${cf.routeBase}/${cf.errorPage}?message=${e.message}`
+              );
               this.err(e);
             }
           }).catch(() => {
-            route('/' + cf.notFoundPage);
+            window.location.replace(cf.routeBase+'/'+cf.notFoundPage);
           });
         });
         // 开始监听路由变化
