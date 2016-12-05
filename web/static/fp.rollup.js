@@ -1,19 +1,16 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.RiotApp = global.RiotApp || {})));
+}(this, (function (exports) { 'use strict';
 
 /**
- * 是否小于某版本ie
+ * 是否某版本ie
  * @param  {number} ver 版本号
+ * @param  {string} op 操作符
  * @return {[boolean]}
  */
-const ltIE = (ver) => {
-    let b = document.createElement('b');
-    b.innerHTML = `<!--[if lt IE ${ver}]><i></i><![endif]-->`;
-    return b.getElementsByTagName('i').length === 1;
-};
+
 
 
 /**
@@ -1165,6 +1162,8 @@ var tmpl = (function() {
 
 })();
 
+// 3.0.2
+
 const __TAGS_CACHE = [];
 const __TAG_IMPL = {};
 const GLOBAL_MIXIN = '__global_mixin';
@@ -1182,6 +1181,7 @@ const RE_SPECIAL_TAGS_NO_OPTION = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:g
 const RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|refs|parent|opts|emit|o(?:n|ff|ne))$/;
 const RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(?:Blend|ColorMatrix|ComponentTransfer|Composite|ConvolveMatrix|DiffuseLighting|DisplacementMap|Flood|GaussianBlur|Image|Merge|Morphology|Offset|SpecularLighting|Tile|Turbulence)|filter|font|foreignObject|g(?:lyph)?(?:Ref)?|image|line(?:arGradient)?|ma(?:rker|sk)|missing-glyph|path|pattern|poly(?:gon|line)|radialGradient|rect|stop|svg|switch|symbol|text(?:Path)?|tref|tspan|use)$/;
 const RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
+const CASE_SENSITIVE_ATTRIBUTES = { 'viewbox': 'viewBox' };
 const RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
 const IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
 
@@ -1811,8 +1811,11 @@ function updateExpression(expr) {
     dom.value = value;
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
+    attrName = attrName.slice(RIOT_PREFIX.length);
+    if (CASE_SENSITIVE_ATTRIBUTES[attrName])
+      attrName = CASE_SENSITIVE_ATTRIBUTES[attrName];
     if (value != null)
-      setAttr(dom, attrName.slice(RIOT_PREFIX.length), value);
+      setAttr(dom, attrName, value);
   } else {
     // <select> <option selected={true}> </select>
     if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
@@ -2823,6 +2826,13 @@ function Tag$$1(impl, conf, innerHTML) {
 
     this.emit('before-unmount');
 
+    // clear all attributes coming from the mounted tag
+    walkAttrs(impl.attrs, (name) => {
+      if (startsWith(name, RIOT_PREFIX))
+        name = name.slice(RIOT_PREFIX.length);
+      remAttr(root, name);
+    });
+
     // remove this tag instance from the global virtualDom variable
     if (~tagIndex)
       __TAGS_CACHE.splice(tagIndex, 1);
@@ -3224,17 +3234,11 @@ var riot$1 = Object.freeze({
 	unregister: unregister$$1
 });
 
-/**
- * Simple client-side router
- * @module riot-route
- */
-
 const RE_ORIGIN = /^.+?\/\/+[^\/]+/;
 const EVENT_LISTENER = 'EventListener';
 const REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER;
 const ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER;
 const HAS_ATTRIBUTE = 'hasAttribute';
-const REPLACE = 'replace';
 const POPSTATE = 'popstate';
 const HASHCHANGE = 'hashchange';
 const TRIGGER = 'emit';
@@ -3263,7 +3267,7 @@ let emitStackLevel = 0;
  * @returns {array} array
  */
 function DEFAULT_PARSER(path) {
-  return path.split(/[/?#]/);
+  return path.split(/[/?#]/)
 }
 
 /**
@@ -3273,10 +3277,14 @@ function DEFAULT_PARSER(path) {
  * @returns {array} array
  */
 function DEFAULT_SECOND_PARSER(path, filter) {
-  const re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
-    args = path.match(re);
+  const f = filter
+    .replace(/\?/g, '\\?')
+    .replace(/\*/g, '([^/?#]+?)')
+    .replace(/\.\./, '.*');
+  const re = new RegExp(`^${f}$`);
+  const args = path.match(re);
 
-  if (args) return args.slice(1);
+  if (args) return args.slice(1)
 }
 
 /**
@@ -3287,10 +3295,10 @@ function DEFAULT_SECOND_PARSER(path, filter) {
  */
 function debounce(fn, delay) {
   let t;
-  return function() {
+  return function () {
     clearTimeout(t);
     t = setTimeout(fn, delay);
-  };
+  }
 }
 
 /**
@@ -3316,11 +3324,11 @@ function Router() {
 }
 
 function normalize(path) {
-  return path[REPLACE](/^\/|\/$/, '');
+  return path.replace(/^\/|\/$/, '')
 }
 
 function isString$1(str) {
-  return typeof str == 'string';
+  return typeof str == 'string'
 }
 
 /**
@@ -3329,7 +3337,7 @@ function isString$1(str) {
  * @returns {string} path from root
  */
 function getPathFromRoot(href) {
-  return (href || loc.href)[REPLACE](RE_ORIGIN, '');
+  return (href || loc.href).replace(RE_ORIGIN, '')
 }
 
 /**
@@ -3338,15 +3346,15 @@ function getPathFromRoot(href) {
  * @returns {string} path from base
  */
 function getPathFromBase(href) {
-  return base[0] === '#' ?
-    (href || loc.href || '').split(base)[1] || '' :
-    (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '');
+  return base[0] === '#'
+    ? (href || loc.href || '').split(base)[1] || ''
+    : (loc ? getPathFromRoot(href) : href || '').replace(base, '')
 }
 
 function emit(force) {
   // the stack is needed for redirections
   const isRoot = emitStackLevel === 0;
-  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return;
+  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return
 
   emitStackLevel++;
   emitStack.push(function() {
@@ -3357,14 +3365,8 @@ function emit(force) {
     }
   });
   if (isRoot) {
-    let first, loop = function() {
-      first = emitStack.shift();
-      if (first) {
-        first();
-        loop();
-      }
-    };
-    loop();
+    let first;
+    while (first = emitStack.shift()) first(); // stack increses within this call
     emitStackLevel = 0;
   }
 }
@@ -3372,36 +3374,28 @@ function emit(force) {
 function click(e) {
   if (
     e.which !== 1 // not left click
-    ||
-    e.metaKey || e.ctrlKey || e.shiftKey // or meta keys
-    ||
-    e.defaultPrevented // or default prevented
-  ) return;
+    || e.metaKey || e.ctrlKey || e.shiftKey // or meta keys
+    || e.defaultPrevented // or default prevented
+  ) return
 
   let el = e.target;
   while (el && el.nodeName !== 'A') el = el.parentNode;
 
-  if (!el || el.nodeName !== 'A' // not A tag
-    ||
-    el[HAS_ATTRIBUTE]('download') // has download attr
-    ||
-    !el[HAS_ATTRIBUTE]('href') // has no href attr
-    ||
-    el.target && el.target !== '_self' // another window or frame
-    ||
-    el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) === -1 // cross origin
-  ) return;
+  if (
+    !el || el.nodeName !== 'A' // not A tag
+    || el[HAS_ATTRIBUTE]('download') // has download attr
+    || !el[HAS_ATTRIBUTE]('href') // has no href attr
+    || el.target && el.target !== '_self' // another window or frame
+    || el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) === -1 // cross origin
+  ) return
 
-  if (el.href !== loc.href &&
-    (
+  if (el.href !== loc.href
+    && (
       el.href.split('#')[0] === loc.href.split('#')[0] // internal jump
-      ||
-      base[0] !== '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
-      ||
-      base[0] === '#' && el.href.split(base)[0] !== loc.href.split(base)[0] // outside of #base
-      ||
-      !go(getPathFromBase(el.href), el.title || doc.title) // route not found
-    )) return;
+      || base[0] !== '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
+      || base[0] === '#' && el.href.split(base)[0] !== loc.href.split(base)[0] // outside of #base
+      || !go(getPathFromBase(el.href), el.title || doc.title) // route not found
+    )) return
 
   e.preventDefault();
 }
@@ -3415,20 +3409,19 @@ function click(e) {
  */
 function go(path, title, shouldReplace) {
   // Server-side usage: directly execute handlers for the path
-  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path));
+  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path))
 
   path = base + normalize(path);
   title = title || doc.title;
   // browsers ignores the second parameter `title`
   shouldReplace
-    ?
-    hist.replaceState(null, title, path) :
-    hist.pushState(null, title, path);
+    ? hist.replaceState(null, title, path)
+    : hist.pushState(null, title, path);
   // so we need to set it manually
   doc.title = title;
   routeFound = false;
   emit();
-  return routeFound;
+  return routeFound
 }
 
 /**
@@ -3465,7 +3458,7 @@ prot.e = function(path) {
     const args = (filter === '@' ? parser : secondParser)(normalize(path), normalize(filter));
     if (typeof args != 'undefined') {
       this[TRIGGER].apply(null, [filter].concat(args));
-      return routeFound = true; // exit from loop
+      return routeFound = true // exit from loop
     }
   }, this);
 };
@@ -3496,7 +3489,7 @@ route.create = function() {
   const router = newSubRouter.m.bind(newSubRouter);
   // stop only this sub-router
   router.stop = newSubRouter.s.bind(newSubRouter);
-  return router;
+  return router
 };
 
 /**
@@ -3535,12 +3528,12 @@ route.parser = function(fn, fn2) {
 route.query = function() {
   const q = {};
   const href = loc.href || current;
-  href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v; });
-  return q;
+  href.replace(/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v; });
+  return q
 };
 
 /** Stop routing **/
-route.stop = function() {
+route.stop = function () {
   if (started) {
     if (win) {
       win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit);
@@ -3556,7 +3549,7 @@ route.stop = function() {
  * Start routing
  * @param {boolean} autoExec - automatically exec after starting if true
  */
-route.start = function(autoExec) {
+route.start = function (autoExec) {
   if (!started) {
     if (win) {
       if (document.readyState === 'complete') start(autoExec);
@@ -3713,44 +3706,33 @@ class RiotApp {
 
 }
 
-let env = (env) => {
-  if(env) return env;
-  if(/localhost|127\.0/.test(window.location.origin)){
-    return 'dev';
-  }
-  return 'pro';
-};
+class FP extends RiotApp{
 
-if(ltIE(9)){
-  window.location.href = './upgrade.html';
-}
-else{
-  class App extends RiotApp{
-
-    constructor(){
-      super({
-        id: 'fp',
-        env: env('pro')
-      });
-    }
-
-    /**
-     * 适配项目接口
-     * @return {[type]} [description]
-     */
-    api(method, url, data){
-      const prefix = {dev: 'dev.', test: 'test.', pro: ''}[this.config.env];
-      return this.xhr(`//${prefix}h5.sosho.cn/server/${url}`, {
-        method: method,
-        data: data,
-        headers: {}
-      });
-    }
-
+  /**
+   * 适配项目接口
+   * @return {[type]} [description]
+   */
+  api(method, url, data){
+    const prefix = {dev: 'dev.', test: 'test.', pro: ''}[this.config.env];
+    return this.xhr(`//${prefix}h5.sosho.cn/server/${url}`, {
+      method: method,
+      data: data,
+      headers: {}
+    });
   }
 
-  new App();
-  
+  static detectEnv(env){
+    if(env) return env;
+    if(/localhost|127\.0|192\.168/.test(window.location.origin)){
+      return 'dev';
+    }
+    return 'pro';
+  }
+
 }
+
+exports.FP = FP;
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

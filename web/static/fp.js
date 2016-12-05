@@ -4,30 +4,23 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function (global, factory) {
-  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory() : typeof define === 'function' && define.amd ? define(factory) : factory();
-})(this, function () {
+  (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : factory(global.RiotApp = global.RiotApp || {});
+})(this, function (exports) {
   'use strict';
 
   /**
-   * 是否小于某版本ie
+   * 是否某版本ie
    * @param  {number} ver 版本号
+   * @param  {string} op 操作符
    * @return {[boolean]}
    */
-
-  var ltIE = function ltIE(ver) {
-    var b = document.createElement('b');
-    b.innerHTML = '<!--[if lt IE ' + ver + ']><i></i><![endif]-->';
-    return b.getElementsByTagName('i').length === 1;
-  };
 
   /**
    * 优化 typeof 获取未知对象类型
@@ -41,6 +34,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @param  {object} ext 扩充对象
    * @return {object}
    */
+
   var assign = function assign() {
     var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var ext = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -549,140 +543,147 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
 
-    EmitterPromise.all = function all() {
-      var iterable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    _createClass(EmitterPromise, [{
+      key: 'then',
 
-      var values = [];
-      return new EmitterPromise(function (resolve, reject) {
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
 
-        try {
-          for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var _p = _step3.value;
+      /**
+       * 当resolve执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+      value: function then() {
+        var _this2 = this;
 
-            _p.then(function (value) {
-              values.push(value);
-              if (values.length === iterable.length) {
-                resolve(values);
-              }
-            }).catch(function (reason) {
-              reject(reason);
-            });
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+        var _catch = arguments[1];
+
+        this.once("resolve", function (value) {
           try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
+            if (_this2.__chain_value instanceof Promise$1) {
+              _this2.__chain_value.then(cb);
+              return;
             }
+            _this2.__chain_value = cb.call(null, _this2.__chain_value || value);
+          } catch (e) {
+            _this2.emit("reject", e);
+          }
+        });
+        if (typeof _catch === "function") {
+          return this.catch(_catch);
+        }
+        if (this._emited_value) {
+          this.emit("resolve", this._emited_value);
+        }
+        return this;
+      }
+
+      /**
+       * 当reject执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: 'catch',
+      value: function _catch() {
+        var _this3 = this;
+
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+        this.once("reject", function (reason) {
+          var result = void 0;
+          try {
+            if (_this3.__no_throw) return;
+            result = cb.call(null, reason);
+            _this3.__no_throw = true;
+            if (result) _this3.emit("resolve", result);
+          } catch (e) {
+            _this3.emit("reject", e);
+            if (!_this3.__no_throw) {
+              throw e;
+            }
+          }
+        });
+        return this;
+      }
+    }], [{
+      key: 'all',
+      value: function all() {
+        var iterable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var values = [];
+        return new EmitterPromise(function (resolve, reject) {
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var _p = _step3.value;
+
+              _p.then(function (value) {
+                values.push(value);
+                if (values.length === iterable.length) {
+                  resolve(values);
+                }
+              }).catch(function (reason) {
+                reject(reason);
+              });
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
           } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
             }
           }
-        }
-      });
-    };
-
-    /**
-     * 直接触发 resolve
-     * @param  {mixed} value
-     * @return {EmitterPromise}
-     */
-
-
-    EmitterPromise.resolve = function resolve(value) {
-      if (value instanceof Promise$1) {
-        return value;
+        });
       }
-      return new EmitterPromise(function (resolve) {
-        setTimeout(function () {
-          resolve(value);
-        }, 0);
-      });
-    };
 
-    /**
-     * 直接触发 reject
-     * @param  {mixed} reason
-     * @return {EmitterPromise}
-     */
+      /**
+       * 直接触发 resolve
+       * @param  {mixed} value
+       * @return {EmitterPromise}
+       */
 
-
-    EmitterPromise.reject = function reject(reason) {
-      return new EmitterPromise(function (resolve, reject) {
-        setTimeout(function () {
-          reject(reason);
-        }, 0);
-        resolve;
-      });
-    };
-
-    /**
-     * 当resolve执行时触发
-     * @param  {Function} cb 执行回调
-     * @return {EmitterPromise}
-     */
-
-
-    EmitterPromise.prototype.then = function then() {
-      var _this2 = this;
-
-      var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-      var _catch = arguments[1];
-
-      this.once("resolve", function (value) {
-        try {
-          if (_this2.__chain_value instanceof Promise$1) {
-            _this2.__chain_value.then(cb);
-            return;
-          }
-          _this2.__chain_value = cb.call(null, _this2.__chain_value || value);
-        } catch (e) {
-          _this2.emit("reject", e);
+    }, {
+      key: 'resolve',
+      value: function resolve(value) {
+        if (value instanceof Promise$1) {
+          return value;
         }
-      });
-      if (typeof _catch === "function") {
-        return this.catch(_catch);
+        return new EmitterPromise(function (resolve) {
+          setTimeout(function () {
+            resolve(value);
+          }, 0);
+        });
       }
-      if (this._emited_value) {
-        this.emit("resolve", this._emited_value);
+
+      /**
+       * 直接触发 reject
+       * @param  {mixed} reason
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: 'reject',
+      value: function reject(reason) {
+        return new EmitterPromise(function (resolve, reject) {
+          setTimeout(function () {
+            reject(reason);
+          }, 0);
+          resolve;
+        });
       }
-      return this;
-    };
-
-    /**
-     * 当reject执行时触发
-     * @param  {Function} cb 执行回调
-     * @return {EmitterPromise}
-     */
-
-
-    EmitterPromise.prototype.catch = function _catch() {
-      var _this3 = this;
-
-      var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-
-      this.once("reject", function (reason) {
-        var result = void 0;
-        try {
-          if (_this3.__no_throw) return;
-          result = cb.call(null, reason);
-          _this3.__no_throw = true;
-          if (result) _this3.emit("resolve", result);
-        } catch (e) {
-          _this3.emit("reject", e);
-          if (!_this3.__no_throw) {
-            throw e;
-          }
-        }
-      });
-      return this;
-    };
+    }]);
 
     return EmitterPromise;
   }();
@@ -698,270 +699,275 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _classCallCheck(this, Loader);
     }
 
-    /**
-     * 资源别名载入（依赖模式）
-     * @param {object} json json格式的资源
-     * @param  {...[type]} alias_names [description]
-     * @return {[type]}                [description]
-     */
-    Loader.alias = function alias(json) {
-      var alias_names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      var batch_list = [];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var _name2 = _step4.value;
-
-          if (!json[_name2] || json[_name2].length === 0) continue;
-          batch_list.push(json[_name2]);
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      return this.depend.apply(this, batch_list);
-    };
-
-    /**
-     * 依赖载入
-     * @param  {array} batch_list [前置资源,...],[后置,...]
-     * @return {promise}
-     */
-
-
-    Loader.depend = function depend() {
-      var _this4 = this;
-
-      for (var _len3 = arguments.length, batch_list = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        batch_list[_key3] = arguments[_key3];
-      }
-
-      var i = 0,
-          fail = [],
-          done = [],
-          next = function next(resolve, reject) {
-        if (i === batch_list.length) {
-          if (fail.length > 0) {
-            reject(fail);
-          } else resolve(done);
-        }
-        _this4.batch.apply(_this4, batch_list[i]).then(function (files) {
-          done = done.concat(files);
-          i++;
-          next(resolve, reject);
-        }).catch(function (files) {
-          fail = fail.concat(files);
-          i++;
-          next(resolve, reject);
-        });
-      };
-      return new Promise$1(next);
-    };
-
-    /**
-     * 并行载入
-     * @param  {arguments}  files 资源,...
-     * @return {promise}
-     */
-
-
-    Loader.batch = function batch() {
-      var _this5 = this;
-
-      var load_files = [],
-          backup_files = [],
-          fail = [],
-          done = [];
-      // 已经通过loader加载过的文件
-      this._loaded_files = this._loaded_files || [];
-      // 收集重复文件，放入备份文件
-
-      for (var _len4 = arguments.length, files = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        files[_key4] = arguments[_key4];
-      }
-
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-
-      try {
-        for (var _iterator5 = files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var f = _step5.value;
-
-          var exist = false;
-          var _iteratorNormalCompletion8 = true;
-          var _didIteratorError8 = false;
-          var _iteratorError8 = undefined;
-
-          try {
-            for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-              var lf = _step8.value;
-
-              if (f.split("/").pop() === lf.split("/").pop()) {
-                exist = true;
-                backup_files = backup_files.concat(f);
-              }
-            }
-          } catch (err) {
-            _didIteratorError8 = true;
-            _iteratorError8 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                _iterator8.return();
-              }
-            } finally {
-              if (_didIteratorError8) {
-                throw _iteratorError8;
-              }
-            }
-          }
-
-          if (!exist) load_files = load_files.concat(f);
-        }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return) {
-            _iterator5.return();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
-      }
-
-      return new Promise$1(function (resolve, reject) {
-        var load = function load() {
-          var _iteratorNormalCompletion6 = true;
-          var _didIteratorError6 = false;
-          var _iteratorError6 = undefined;
-
-          try {
-            var _loop = function _loop() {
-              var file = _step6.value;
-
-              var name = file.split("/").pop(),
-                  ext = name.split(".").pop().split("?")[0],
-                  attrs = { rel: file },
-                  type = _this5.types[ext];
-              if (ext === "js") attrs.defer = true;
-              // 之前加载过的相同文件删除
-              // removeFile(type, "head", file);
-              if (_this5._loaded_files.indexOf(file) !== -1) {
-                check(done.push(file));
-                return 'continue';
-              }
-              loadFile(type, file, {
-                attrs: attrs,
-                success: function success() {
-                  _this5._loaded_files.push(file);
-                  check(done.push(file));
-                },
-                error: function error() {
-                  // 不留下失败文件
-                  removeFile(type, "head", file);
-                  check(fail.push(file));
-                }
-              });
-            };
-
-            for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-              var _ret = _loop();
-
-              if (_ret === 'continue') continue;
-            }
-          } catch (err) {
-            _didIteratorError6 = true;
-            _iteratorError6 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                _iterator6.return();
-              }
-            } finally {
-              if (_didIteratorError6) {
-                throw _iteratorError6;
-              }
-            }
-          }
-        },
-            check = function check() {
-          if (done.length === load_files.length) {
-            return resolve(done);
-          }
-          if (done.length + fail.length === load_files.length) {
-            // 检查是否有备份，有则再尝试
-            var exist = false;
-            for (var fi in fail) {
-              for (var bi in backup_files) {
-                if (backup_files[bi].split("/").pop() === fail[fi].split("/").pop()) {
-                  exist = true;
-                  done = done.concat(backup_files[bi]);
-                  backup_files.splice(bi, 1);
-                }
-              }
-            }
-            if (exist && done.length === load_files.length) {
-              // 移除已经加载的文件
-              var _iteratorNormalCompletion7 = true;
-              var _didIteratorError7 = false;
-              var _iteratorError7 = undefined;
-
-              try {
-                for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                  var lf = _step7.value;
-
-                  removeFile(_this5.types[lf.split(".").pop()], "head", lf);
-                }
-                // 替换成备份文件后能填补空缺就再执行一次
-              } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                    _iterator7.return();
-                  }
-                } finally {
-                  if (_didIteratorError7) {
-                    throw _iteratorError7;
-                  }
-                }
-              }
-
-              load_files = done;
-              done = [];
-              fail = [];
-              load();
-            } else {
-              reject(fail);
-            }
-          }
-        };
-        load();
-      });
-    };
-
     _createClass(Loader, null, [{
+      key: 'alias',
+
+
+      /**
+       * 资源别名载入（依赖模式）
+       * @param {object} json json格式的资源
+       * @param  {...[type]} alias_names [description]
+       * @return {[type]}                [description]
+       */
+      value: function alias(json) {
+        var alias_names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        var batch_list = [];
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var _name2 = _step4.value;
+
+            if (!json[_name2] || json[_name2].length === 0) continue;
+            batch_list.push(json[_name2]);
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+
+        return this.depend.apply(this, batch_list);
+      }
+
+      /**
+       * 依赖载入
+       * @param  {array} batch_list [前置资源,...],[后置,...]
+       * @return {promise}
+       */
+
+    }, {
+      key: 'depend',
+      value: function depend() {
+        var _this4 = this;
+
+        for (var _len3 = arguments.length, batch_list = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          batch_list[_key3] = arguments[_key3];
+        }
+
+        var i = 0,
+            fail = [],
+            done = [],
+            next = function next(resolve, reject) {
+          if (i === batch_list.length) {
+            if (fail.length > 0) {
+              reject(fail);
+            } else resolve(done);
+          }
+          _this4.batch.apply(_this4, batch_list[i]).then(function (files) {
+            done = done.concat(files);
+            i++;
+            next(resolve, reject);
+          }).catch(function (files) {
+            fail = fail.concat(files);
+            i++;
+            next(resolve, reject);
+          });
+        };
+        return new Promise$1(next);
+      }
+
+      /**
+       * 并行载入
+       * @param  {arguments}  files 资源,...
+       * @return {promise}
+       */
+
+    }, {
+      key: 'batch',
+      value: function batch() {
+        var _this5 = this;
+
+        var load_files = [],
+            backup_files = [],
+            fail = [],
+            done = [];
+        // 已经通过loader加载过的文件
+        this._loaded_files = this._loaded_files || [];
+        // 收集重复文件，放入备份文件
+
+        for (var _len4 = arguments.length, files = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          files[_key4] = arguments[_key4];
+        }
+
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var f = _step5.value;
+
+            var exist = false;
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
+
+            try {
+              for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                var lf = _step8.value;
+
+                if (f.split("/").pop() === lf.split("/").pop()) {
+                  exist = true;
+                  backup_files = backup_files.concat(f);
+                }
+              }
+            } catch (err) {
+              _didIteratorError8 = true;
+              _iteratorError8 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                  _iterator8.return();
+                }
+              } finally {
+                if (_didIteratorError8) {
+                  throw _iteratorError8;
+                }
+              }
+            }
+
+            if (!exist) load_files = load_files.concat(f);
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+              _iterator5.return();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
+        }
+
+        return new Promise$1(function (resolve, reject) {
+          var load = function load() {
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+              var _loop = function _loop() {
+                var file = _step6.value;
+
+                var name = file.split("/").pop(),
+                    ext = name.split(".").pop().split("?")[0],
+                    attrs = { rel: file },
+                    type = _this5.types[ext];
+                if (ext === "js") attrs.defer = true;
+                // 之前加载过的相同文件删除
+                // removeFile(type, "head", file);
+                if (_this5._loaded_files.indexOf(file) !== -1) {
+                  check(done.push(file));
+                  return 'continue';
+                }
+                loadFile(type, file, {
+                  attrs: attrs,
+                  success: function success() {
+                    _this5._loaded_files.push(file);
+                    check(done.push(file));
+                  },
+                  error: function error() {
+                    // 不留下失败文件
+                    removeFile(type, "head", file);
+                    check(fail.push(file));
+                  }
+                });
+              };
+
+              for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                var _ret = _loop();
+
+                if (_ret === 'continue') continue;
+              }
+            } catch (err) {
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                  _iterator6.return();
+                }
+              } finally {
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
+                }
+              }
+            }
+          },
+              check = function check() {
+            if (done.length === load_files.length) {
+              return resolve(done);
+            }
+            if (done.length + fail.length === load_files.length) {
+              // 检查是否有备份，有则再尝试
+              var exist = false;
+              for (var fi in fail) {
+                for (var bi in backup_files) {
+                  if (backup_files[bi].split("/").pop() === fail[fi].split("/").pop()) {
+                    exist = true;
+                    done = done.concat(backup_files[bi]);
+                    backup_files.splice(bi, 1);
+                  }
+                }
+              }
+              if (exist && done.length === load_files.length) {
+                // 移除已经加载的文件
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
+
+                try {
+                  for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var lf = _step7.value;
+
+                    removeFile(_this5.types[lf.split(".").pop()], "head", lf);
+                  }
+                  // 替换成备份文件后能填补空缺就再执行一次
+                } catch (err) {
+                  _didIteratorError7 = true;
+                  _iteratorError7 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                      _iterator7.return();
+                    }
+                  } finally {
+                    if (_didIteratorError7) {
+                      throw _iteratorError7;
+                    }
+                  }
+                }
+
+                load_files = done;
+                done = [];
+                fail = [];
+                load();
+              } else {
+                reject(fail);
+              }
+            }
+          };
+          load();
+        });
+      }
+    }, {
       key: 'types',
 
 
@@ -1355,6 +1361,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return _tmpl;
   }();
 
+  // 3.0.2
+
   var __TAGS_CACHE = [];
   var __TAG_IMPL = {};
   var GLOBAL_MIXIN = '__global_mixin';
@@ -1372,6 +1380,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   var RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|refs|parent|opts|emit|o(?:n|ff|ne))$/;
   var RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(?:Blend|ColorMatrix|ComponentTransfer|Composite|ConvolveMatrix|DiffuseLighting|DisplacementMap|Flood|GaussianBlur|Image|Merge|Morphology|Offset|SpecularLighting|Tile|Turbulence)|filter|font|foreignObject|g(?:lyph)?(?:Ref)?|image|line(?:arGradient)?|ma(?:rker|sk)|missing-glyph|path|pattern|poly(?:gon|line)|radialGradient|rect|stop|svg|switch|symbol|text(?:Path)?|tref|tspan|use)$/;
   var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
+  var CASE_SENSITIVE_ATTRIBUTES = { 'viewbox': 'viewBox' };
   var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
   var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
 
@@ -1989,7 +1998,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       dom.value = value;
       // <img src="{ expr }">
     } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
-      if (value != null) setAttr(dom, attrName.slice(RIOT_PREFIX.length), value);
+      attrName = attrName.slice(RIOT_PREFIX.length);
+      if (CASE_SENSITIVE_ATTRIBUTES[attrName]) attrName = CASE_SENSITIVE_ATTRIBUTES[attrName];
+      if (value != null) setAttr(dom, attrName, value);
     } else {
       // <select> <option selected={true}> </select>
       if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
@@ -2986,6 +2997,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       this.emit('before-unmount');
 
+      // clear all attributes coming from the mounted tag
+      walkAttrs(impl.attrs, function (name) {
+        if (startsWith(name, RIOT_PREFIX)) name = name.slice(RIOT_PREFIX.length);
+        remAttr(root, name);
+      });
+
       // remove this tag instance from the global virtualDom variable
       if (~tagIndex) __TAGS_CACHE.splice(tagIndex, 1);
 
@@ -3372,17 +3389,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     unregister: unregister$$1
   });
 
-  /**
-   * Simple client-side router
-   * @module riot-route
-   */
-
   var RE_ORIGIN = /^.+?\/\/+[^\/]+/;
   var EVENT_LISTENER = 'EventListener';
   var REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER;
   var ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER;
   var HAS_ATTRIBUTE = 'hasAttribute';
-  var REPLACE = 'replace';
   var POPSTATE = 'popstate';
   var HASHCHANGE = 'hashchange';
   var TRIGGER = 'emit';
@@ -3421,8 +3432,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @returns {array} array
    */
   function DEFAULT_SECOND_PARSER(path, filter) {
-    var re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
-        args = path.match(re);
+    var f = filter.replace(/\?/g, '\\?').replace(/\*/g, '([^/?#]+?)').replace(/\.\./, '.*');
+    var re = new RegExp('^' + f + '$');
+    var args = path.match(re);
 
     if (args) return args.slice(1);
   }
@@ -3464,7 +3476,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
 
   function normalize(path) {
-    return path[REPLACE](/^\/|\/$/, '');
+    return path.replace(/^\/|\/$/, '');
   }
 
   function isString$1(str) {
@@ -3477,7 +3489,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @returns {string} path from root
    */
   function getPathFromRoot(href) {
-    return (href || loc.href)[REPLACE](RE_ORIGIN, '');
+    return (href || loc.href).replace(RE_ORIGIN, '');
   }
 
   /**
@@ -3486,7 +3498,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @returns {string} path from base
    */
   function getPathFromBase(href) {
-    return base[0] === '#' ? (href || loc.href || '').split(base)[1] || '' : (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '');
+    return base[0] === '#' ? (href || loc.href || '').split(base)[1] || '' : (loc ? getPathFromRoot(href) : href || '').replace(base, '');
   }
 
   function emit(force) {
@@ -3503,18 +3515,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
     });
     if (isRoot) {
-      (function () {
-        var first = void 0,
-            loop = function loop() {
-          first = emitStack.shift();
-          if (first) {
-            first();
-            loop();
-          }
-        };
-        loop();
-        emitStackLevel = 0;
-      })();
+      var first = void 0;
+      while (first = emitStack.shift()) {
+        first();
+      } // stack increses within this call
+      emitStackLevel = 0;
     }
   }
 
@@ -3667,7 +3672,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   route.query = function () {
     var q = {};
     var href = loc.href || current;
-    href[REPLACE](/[?&](.+?)=([^&]*)/g, function (_, k, v) {
+    href.replace(/[?&](.+?)=([^&]*)/g, function (_, k, v) {
       q[k] = v;
     });
     return q;
@@ -3750,156 +3755,162 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return this.instance;
     }
 
-    RiotApp.prototype.init = function init() {
-      var _this13 = this;
+    _createClass(RiotApp, [{
+      key: 'init',
+      value: function init() {
+        var _this13 = this;
 
-      var cf = this.config;
-      // 初始化必要资源
-      cf.resource.push(this.config.env);
-      cacheJSON('' + cf.staticBase + cf.id + '.json', {
-        force: cf.env !== 'pro'
-      }).done(function (resp) {
-        // 记录方便不刷新情况下获取
-        _this13.loaderJSON = resp;
-        Loader.alias(_this13.loaderJSON, cf.resource).then(function (files) {
-          // 开始初始化路由
-          route.base(cf.routeBase);
-          // 路由解析方式
-          route.parser(function (path) {
-            var raw = path.split('?'),
-                uri = raw[0].split('/'),
-                qs = raw[1];
-            if (qs) uri.push(search2obj(qs));
-            return uri;
-          });
-          // 设置路由控制
-          _this13.on('route::change', function (params) {
-            var page = params[0] || cf.indexPage,
-                pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js',
-                tagName = cf.id + '-' + page;
-            _this13.route.params = params;
-            Loader.batch(pageFile).then(function () {
-              try {
-                (function () {
-                  var tag$$1 = riot$1.mount(cf.mountPage, tagName)[0],
-                      ctags = function ctags(tag$$1) {
-                    for (var childTagName in tag$$1.tags) {
-                      _this13.tagMounted[childTagName] = tag$$1.tags[childTagName];
-                      ctags(tag$$1.tags[childTagName]);
-                    }
-                  };
-                  _this13.tagMounted[tagName] = tag$$1;
-                  ctags(tag$$1);
-                })();
-              } catch (e) {
-                window.location.replace(cf.routeBase + '/' + cf.errorPage + '?message=' + e.message);
-                _this13.err(e);
-              }
-            }).catch(function () {
-              window.location.replace(cf.routeBase + '/' + cf.notFoundPage);
+        var cf = this.config;
+        // 初始化必要资源
+        cf.resource.push(this.config.env);
+        cacheJSON('' + cf.staticBase + cf.id + '.json', {
+          force: cf.env !== 'pro'
+        }).done(function (resp) {
+          // 记录方便不刷新情况下获取
+          _this13.loaderJSON = resp;
+          Loader.alias(_this13.loaderJSON, cf.resource).then(function (files) {
+            // 开始初始化路由
+            route.base(cf.routeBase);
+            // 路由解析方式
+            route.parser(function (path) {
+              var raw = path.split('?'),
+                  uri = raw[0].split('/'),
+                  qs = raw[1];
+              if (qs) uri.push(search2obj(qs));
+              return uri;
             });
+            // 设置路由控制
+            _this13.on('route::change', function (params) {
+              var page = params[0] || cf.indexPage,
+                  pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js',
+                  tagName = cf.id + '-' + page;
+              _this13.route.params = params;
+              Loader.batch(pageFile).then(function () {
+                try {
+                  (function () {
+                    var tag$$1 = riot$1.mount(cf.mountPage, tagName)[0],
+                        ctags = function ctags(tag$$1) {
+                      for (var childTagName in tag$$1.tags) {
+                        _this13.tagMounted[childTagName] = tag$$1.tags[childTagName];
+                        ctags(tag$$1.tags[childTagName]);
+                      }
+                    };
+                    _this13.tagMounted[tagName] = tag$$1;
+                    ctags(tag$$1);
+                  })();
+                } catch (e) {
+                  window.location.replace(cf.routeBase + '/' + cf.errorPage + '?message=' + e.message);
+                  _this13.err(e);
+                }
+              }).catch(function () {
+                window.location.replace(cf.routeBase + '/' + cf.notFoundPage);
+              });
+            });
+            // 开始监听路由变化
+            route(function () {
+              for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+                args[_key5] = arguments[_key5];
+              }
+
+              _this13.emit('route::change', args);
+            });
+            // 启动路由
+            route.start(true);
+
+            // 将项目实例导入riot全局app对象
+            riot$1.mixin({ app: _this13 });
+
+            _this13.emit('init::done', files);
+          }).catch(function (files) {
+            _this13.emit('init::fail', files);
           });
-          // 开始监听路由变化
-          route(function () {
-            for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-              args[_key5] = arguments[_key5];
-            }
-
-            _this13.emit('route::change', args);
-          });
-          // 启动路由
-          route.start(true);
-
-          // 将项目实例导入riot全局app对象
-          riot$1.mixin({ app: _this13 });
-
-          _this13.emit('init::done', files);
-        }).catch(function (files) {
-          _this13.emit('init::fail', files);
         });
-      });
-    };
+      }
 
-    /**
-     * 信息打印
-     */
+      /**
+       * 信息打印
+       */
 
+    }, {
+      key: 'log',
+      value: function log() {
+        var _window$console;
 
-    RiotApp.prototype.log = function log() {
-      var _window$console;
+        return this.config.dev !== 'pro' ? window.console && (_window$console = window.console).log.apply(_window$console, arguments) : null;
+      }
+    }, {
+      key: 'err',
+      value: function err() {
+        var _window$console2;
 
-      return this.config.dev !== 'pro' ? window.console && (_window$console = window.console).log.apply(_window$console, arguments) : null;
-    };
+        return window.console && (_window$console2 = window.console).error.apply(_window$console2, arguments);
+      }
 
-    RiotApp.prototype.err = function err() {
-      var _window$console2;
+      /**
+       * 适配项目接口
+       */
 
-      return window.console && (_window$console2 = window.console).error.apply(_window$console2, arguments);
-    };
+    }, {
+      key: 'api',
+      value: function api() {}
 
-    /**
-     * 适配项目接口
-     */
+      /**
+       * 追加资源载入
+       */
 
-
-    RiotApp.prototype.api = function api() {};
-
-    /**
-     * 追加资源载入
-     */
-
-
-    RiotApp.prototype.addResource = function addResource(resName) {
-      var existRes = void 0;
-      if (!this.loaderJSON) return Promise.reject();
-      if (this.loaderJSON[resName]) existRes = resName;else if (this.loaderJSON[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
-      return Loader.alias(this.loaderJSON, [existRes]);
-    };
+    }, {
+      key: 'addResource',
+      value: function addResource(resName) {
+        var existRes = void 0;
+        if (!this.loaderJSON) return Promise.reject();
+        if (this.loaderJSON[resName]) existRes = resName;else if (this.loaderJSON[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
+        return Loader.alias(this.loaderJSON, [existRes]);
+      }
+    }]);
 
     return RiotApp;
   }();
 
-  var env = function env(_env) {
-    if (_env) return _env;
-    if (/localhost|127\.0/.test(window.location.origin)) {
-      return 'dev';
+  var FP = function (_RiotApp) {
+    _inherits(FP, _RiotApp);
+
+    function FP() {
+      _classCallCheck(this, FP);
+
+      return _possibleConstructorReturn(this, (FP.__proto__ || Object.getPrototypeOf(FP)).apply(this, arguments));
     }
-    return 'pro';
-  };
 
-  if (ltIE(9)) {
-    window.location.href = './upgrade.html';
-  } else {
-    var App = function (_RiotApp) {
-      _inherits(App, _RiotApp);
+    _createClass(FP, [{
+      key: 'api',
 
-      function App() {
-        _classCallCheck(this, App);
-
-        return _possibleConstructorReturn(this, _RiotApp.call(this, {
-          id: 'fp',
-          env: env('pro')
-        }));
-      }
 
       /**
        * 适配项目接口
        * @return {[type]} [description]
        */
-
-
-      App.prototype.api = function api(method, url, data) {
+      value: function api(method, url, data) {
         var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
         return this.xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
           method: method,
           data: data,
           headers: {}
         });
-      };
+      }
+    }], [{
+      key: 'detectEnv',
+      value: function detectEnv(env) {
+        if (env) return env;
+        if (/localhost|127\.0|192\.168/.test(window.location.origin)) {
+          return 'dev';
+        }
+        return 'pro';
+      }
+    }]);
 
-      return App;
-    }(RiotApp);
+    return FP;
+  }(RiotApp);
 
-    new App();
-  }
+  exports.FP = FP;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 });

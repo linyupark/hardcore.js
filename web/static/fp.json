@@ -1,1 +1,31 @@
-{"pro":["/static/fp.min.css?v=2e35f4de1b64e0b5ed2791280a9c9e44","/static/riot/common+component.min.js?v=3f0667bcedfe62f1050f853d2b815d36"],"dev":["./static/fp.css","./static/riot/component.js","./static/riot/common.js"],"header-nav":[{"name":"首页","url":"/index"},{"name":"协议","url":"/agreement"},{"name":"设置","url":"/setting","sub":[{"name":"日志","url":"/log"},{"name":"密码","url":"/password"}]},{"name":"查询","url":"/search","sub":[{"name":"日志","url":"/log"},{"name":"密码","url":"/password"}]}]}
+{
+  "pro": ["/static/fp.min.css?v=2e35f4de1b64e0b5ed2791280a9c9e44", "/static/riot/common+component.min.js?v=3f0667bcedfe62f1050f853d2b815d36"],
+  "dev": ["./static/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
+  "header-nav": [{
+    "name": "首页",
+    "url": "/index"
+  }, {
+    "name": "协议",
+    "url": "/agreement"
+  }, {
+    "name": "设置",
+    "url": "/setting",
+    "sub": [{
+      "name": "日志",
+      "url": "/log"
+    }, {
+      "name": "密码",
+      "url": "/password"
+    }]
+  }, {
+    "name": "查询",
+    "url": "/search",
+    "sub": [{
+      "name": "日志",
+      "url": "/log"
+    }, {
+      "name": "密码",
+      "url": "/password"
+    }]
+  }]
+}

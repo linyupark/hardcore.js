@@ -1,4 +1,4 @@
 {
-  "presets": ["es2015-ie"],
+  "presets": ["es2015-script"],
   "compact": false
 }

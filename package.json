@@ -18,7 +18,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babel-preset-es2015-ie": "^6.6.2",
+    "babel-preset-es2015-script": "^1.1.0",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^2.0.13",
     "gulp-make-css-url-version": "0.0.13",

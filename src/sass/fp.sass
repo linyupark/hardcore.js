@@ -1,7 +1,28 @@
-@import "materialize/materialize.scss"
+@import "normalize"
+@import "gridle/settings"
+@import "gridle/gridle"
 
+@include gridle_setup((gutter-width: 0, gutter-left: 0, gutter-right: 0))
+@include gridle_register_state(mobile, (max-width: 480px))
+@include gridle_register_state(tablet, (min-width: 481px, max-width: 1200px))
+@include gridle_init()
+
+// @include gridle_generate_classes()
+
+
+// layout
+#main
+  @include gridle_container()
+  @include gridle_grid_centered()
+  max-width: 1200px
+  background: #eee
+
+// component
 header-nav
+  // @include gridle_grid(12)
   ul
+    padding: 0
+    margin: 0
     height: 40px
     line-height: 40px
     li

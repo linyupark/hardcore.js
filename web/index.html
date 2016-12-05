@@ -2,15 +2,44 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>fp app</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width">
+    <title>校友会基金系统</title>
   </head>
   <body>
-
-    <page></page>
+    <div id="main"></div>
 
     <script src="./static/fp.js"></script>
     <!-- <script src="./static/fp.min.js"></script> -->
+
+    <!--[if lt IE 9]><script>
+      // ie9 以下强制要求升级
+      location.href = './upgrade.html';
+    </script><![endif]-->
+
+    <script>
+    var
+      ms_ie = false,
+      ua = window.navigator.userAgent,
+      old_ie = ua.indexOf('MSIE '),
+      new_ie = ua.indexOf('Trident/'),
+      app_init = function(){
+        new RiotApp.FP({
+          id: 'fp',
+          env: RiotApp.FP.detectEnv(),
+          mountPage: '#main'
+        });
+      };
+    if(old_ie > -1 || new_ie > -1){
+      ms_ie = true;
+    }
+    if(ms_ie){
+      var el = document.createElement('script');
+      el.src = "//cdn.bootcss.com/babel-polyfill/6.16.0/polyfill.min.js";
+      el.onload = app_init;
+      document.head.appendChild(el);
+      return;
+    }
+    app_init();
     </script>
   </body>
 </html>
