@@ -1,11 +1,14 @@
+
+
 /**
- * 是否小于某版本ie
+ * 是否某版本ie
  * @param  {number} ver 版本号
+ * @param  {string} op 操作符
  * @return {[boolean]}
  */
-export const ltIE = (ver) => {
+export const isIE = (ver="", op="") => {
     let b = document.createElement('b');
-    b.innerHTML = `<!--[if lt IE ${ver}]><i></i><![endif]-->`;
+    b.innerHTML = `<!--[if ${op?op+' ':''}IE${ver?' '+ver:''}]><i></i><![endif]-->`;
     return b.getElementsByTagName('i').length === 1;
 };
 

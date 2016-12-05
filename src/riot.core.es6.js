@@ -1,3 +1,5 @@
+// 3.0.2
+
 import { brackets, tmpl } from './riot.tmpl.es6.js';
 import { emitter as observable } from './emitter.es6.js';
 
@@ -18,6 +20,7 @@ const RE_SPECIAL_TAGS_NO_OPTION = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:g
 const RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|refs|parent|opts|emit|o(?:n|ff|ne))$/;
 const RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(?:Blend|ColorMatrix|ComponentTransfer|Composite|ConvolveMatrix|DiffuseLighting|DisplacementMap|Flood|GaussianBlur|Image|Merge|Morphology|Offset|SpecularLighting|Tile|Turbulence)|filter|font|foreignObject|g(?:lyph)?(?:Ref)?|image|line(?:arGradient)?|ma(?:rker|sk)|missing-glyph|path|pattern|poly(?:gon|line)|radialGradient|rect|stop|svg|switch|symbol|text(?:Path)?|tref|tspan|use)$/;
 const RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
+const CASE_SENSITIVE_ATTRIBUTES = { 'viewbox': 'viewBox' };
 const RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
 const IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
 
@@ -647,8 +650,11 @@ function updateExpression(expr) {
     dom.value = value;
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
+    attrName = attrName.slice(RIOT_PREFIX.length);
+    if (CASE_SENSITIVE_ATTRIBUTES[attrName])
+      attrName = CASE_SENSITIVE_ATTRIBUTES[attrName];
     if (value != null)
-      setAttr(dom, attrName.slice(RIOT_PREFIX.length), value);
+      setAttr(dom, attrName, value);
   } else {
     // <select> <option selected={true}> </select>
     if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
@@ -1658,6 +1664,13 @@ function Tag$$1(impl, conf, innerHTML) {
       tagIndex = __TAGS_CACHE.indexOf(this);
 
     this.emit('before-unmount');
+
+    // clear all attributes coming from the mounted tag
+    walkAttrs(impl.attrs, (name) => {
+      if (startsWith(name, RIOT_PREFIX))
+        name = name.slice(RIOT_PREFIX.length);
+      remAttr(root, name);
+    });
 
     // remove this tag instance from the global virtualDom variable
     if (~tagIndex)
