@@ -34,12 +34,13 @@
     }
     if(ms_ie){
       var el = document.createElement('script');
-      el.src = "//cdn.bootcss.com/babel-polyfill/6.16.0/polyfill.min.js";
+      el.src = "./static/polyfill.min.js";
       el.onload = app_init;
       document.head.appendChild(el);
-      return;
     }
-    app_init();
+    else{
+      app_init();
+    }
     </script>
   </body>
 </html>

@@ -3900,7 +3900,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'detectEnv',
       value: function detectEnv(env) {
         if (env) return env;
-        if (/localhost|127\.0|192\.168/.test(window.location.origin)) {
+        if (/localhost|127\.0|192\.168/.test(window.location.href)) {
           return 'dev';
         }
         return 'pro';

@@ -1,7 +1,85 @@
 
+<input-valid>
+
+  <span show={message}>{message}</span>
+
+  <script>
+  // <input-valid
+  //   for='检查目标1,检查目标2...'
+  //   index='如果有同名的设置检测第几个，默认为0'
+  //   rule='一些校验规则用, 分隔'
+  //   reg='正则规则' flag='正则的flag'
+  //   msg='如果不符合的报错信息'>
+  var _this = this, target = [], invalid = false;
+
+  this.on('mount', function(){
+
+    try{
+      for(var i in opts.for.split(',')){
+        target[i] = _this.parent.refs[opts.for.split(',')[i]];
+        if(target[i] instanceof Array){
+          target[i] = target[opts.index || 0];
+        }
+      }
+      if(typeof target[0] === 'undefined'){
+        throw new Error();
+      }
+    }
+    catch(e){
+      return _this.update({
+        message: '属性for所指定的校验对象没找到.'
+      });
+    }
+
+    if(typeof target[0] === 'undefined'){
+      return _this.update({
+        message: '属性for所指定的校验对象没找到.'
+      });
+    }
+
+    if(!opts.rule && !opts.reg){
+      return _this.update({
+        message: '请指定校验规则，添加rule或reg属性.'
+      });
+    }
+
+    // 改变值得时候清空校验结果信息
+    for(var i in target){
+      target[i].addEventListener('focus', function(){
+        _this.update({
+          message: ''
+        })
+      }, false);
+    }
+  });
+
+  _this.on('check', function(){
+    // 必填
+    if(opts.rule.split(',').indexOf('required') !== -1){
+      for(var i in target){
+        invalid = target[i].value.replace(/\s/g, '') === '';
+      }
+    }
+    // 正则
+    if(!invalid && opts.reg){
+      var reg = new RegExp(opts.reg, opts.flag);
+      for(var i in target){
+        invalid = reg.test(target[i].value) === false;
+      }
+    }
+    if(invalid){
+      _this.emit('invalid', target);
+      return _this.update({
+        message: opts.msg
+      });
+    }
+  });
+  </script>
+</input-valid>
 
 
-<upload-base64>
+
+<!-- <upload-base64>
 
   <div class="progress" each={progressList}>
     <div class="determinate" ref={name} style="width: {progress||0}%"></div>
@@ -13,6 +91,10 @@
   <script>
   var _this = this;
   _this.on('mount', function() {
+    // 浏览器支持检测
+    if('FileReader' in window === false){
+      alert('Your browser not support FileReader!');
+    }
     _this.uploadFiles = [];
   });
 
@@ -20,6 +102,12 @@
     upload: function(e) {
       _this.uploadFiles = _this.refs.fileInput.files;
       _this.progressList = [];
+      if(!_this.uploadFiles.length){
+        e.target.innerText = '请选择文件';
+        return setTimeout(function(){
+          e.target.innerText = '上传';
+        } ,1000);
+      }
       for(var i in _this.uploadFiles){
         if(i === 'length') continue;
         var fileReader = new FileReader();
@@ -55,7 +143,7 @@
   });
   </script>
 
-</upload-base64>
+</upload-base64> -->
 
 
 
@@ -168,9 +256,7 @@
 
 </pagination-number>
 
-
-
-<pagination-select>
+<!-- <pagination-select>
 
   <ul class="pagination">
     <li>
@@ -231,4 +317,4 @@
   });
   </script>
 
-</pagination-select>
+</pagination-select> -->

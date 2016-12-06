@@ -436,3 +436,6 @@ header-nav ul {
       height: auto; }
       header-nav ul li .sub li {
         display: block; }
+
+input-valid span {
+  color: #d98989; }
