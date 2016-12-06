@@ -1,31 +1,67 @@
 <fp-login>
 
-  <div class="row">
-    <div class="col l6 push-l3 m6 push-m3 s11">
-      <h4>请登录</h4>
-      <p>
-        <input placeholder="账号" ref="account" type="text">
-      </p>
-      <p>
-        <input placeholder="密码" ref="password" type="password">
-      </p>
-      <p>
-        <input-valid for="account,password" rule="required" msg="账号密码不能为空"></input-valid>
-        <button onclick={fn.login} class="btn" name="action">
-          提&nbsp;交
-        </button>
-      </p>
+  <header for="login"></header>
+
+  <div class="body fp-login">
+
+    <div class="wrapper">
+      <div class="login-from">
+        <p class="tab-line">
+          <a href="javscript:;" class="{active: role=='admin'}"  onclick={fn.loginAdmin}>{app.lang.login.admin}</a>
+          <a href="javscript:;" class="{active: role=='user'}"  onclick={fn.loginUser}>{app.lang.login.user}</a>
+        </p>
+        <p>
+          <input type="text" ref="username" placeholder="{app.lang.login.placehoder.username}">
+        </p>
+        <p style="position: relative">
+          <input type="password" ref="password" placeholder="{app.lang.login.placehoder.password}">
+          <a href="javascript:;" onclick={fn.pwdToggle} class="pwd-{pwd}"></a>
+        </p>
+        <div class="msg-space">
+          <input-valid for="username,password" rule="required" msg="请填写帐号密码"></input-valid>
+        </div>
+        <p class="btn-line">
+          <button onclick={fn.login}>{app.lang.login.btn}</button>
+          <br>
+          <a href="#!/findpass">{app.lang.login.findpass}</a>
+        </p>
+      </div>
     </div>
+
   </div>
+
+  <footer></footer>
 
   <script>
   var _this = this;
+  _this.role = 'admin';
+  _this.pwd = 'hide';
   _this.fn = {
     login: function(e){
+      _this.tags['input-valid'].once('valid', function(target){
+        // 尝试登录
+        _this.app.api('POST', 'login/default/index', {
+          data: {},
+          trigger: e.target
+        });
+      });
       _this.tags['input-valid'].emit('check');
-      // for(var i in _this.tags['input-valid']){
-      //   _this.tags['input-valid'][i].emit('check');
-      // }
+    },
+    loginAdmin: function(){
+      _this.role = 'admin';
+    },
+    loginUser: function(){
+      _this.role = 'user';
+    },
+    // 切换密码显示隐藏
+    pwdToggle: function(){
+      _this.pwd = _this.pwd === 'hide' ? 'show' : 'hide';
+      if(_this.pwd === 'hide'){
+        _this.refs.password.type = 'password';
+      }
+      else{
+        _this.refs.password.type = 'text';
+      }
     }
   };
   _this.on('mount', function() {

@@ -1,27 +1,161 @@
 @import "normalize"
 @import "gridle/settings"
 @import "gridle/gridle"
+@import "globals/color"
+@import "globals/font"
 
-@include gridle_setup((gutter-width: 0, gutter-left: 0, gutter-right: 0))
-@include gridle_register_state(mobile, (max-width: 480px))
-@include gridle_register_state(tablet, (min-width: 481px, max-width: 1200px))
-@include gridle_init()
 
-// @include gridle_generate_classes()
 
-// color
-$error-color: #d98989
+// 项目变量
+$tablet-max-width: 1400px
+$mobile-max-width: 480px
+$header-logo: (w: 50px, h: 50)
+
++gridle_setup((gutter-width: 0, gutter-left: 0, gutter-right: 0))
++gridle_register_state(mobile, (max-width: $mobile-max-width))
++gridle_register_state(tablet, (min-width: 481px, max-width: $tablet-max-width))
++gridle_init()
+
+// global
+a
+  text-decoration: none
+button
+  border: none
+  border-radius: 5px
+  cursor: pointer
+
+:focus
+  outline: none
+
+// mixin
+=focus-border($radius)
+  border-radius: $radius
+  box-shadow: 0 0 0 1px rgba(getColor(base, primary), .6) inset
+=hover-bg($color)
+  background-color: darken($color, 5%)
+=hover-text($color)
+  color: darken($color, 5%)
+  border-bottom: 1px dotted $color
+=focus-bg($color)
+  background-color: lighten($color, 5%)
+=focus-text($color)
+  color: lighten($color, 5%)
+
 
 // layout
-#main
-  @include gridle_container()
-  @include gridle_grid_centered()
-  max-width: 1200px
-  background: #eee
+.wrapper
+  +gridle(container)
+  max-width: $tablet-max-width
+  margin: 0 auto
+
+
+header
+  h1
+    font-size: $font-xl
+    margin: 0
+  .login-header
+    background: getColor(background, body)
+    h1
+      height: 90px
+      line-height: 90px
+      text-indent: 110+map-get($header-logo, w)+15px
+      background: url(../img/fp/header-logo.png) no-repeat 110px center
+      color: getColor(gray, base)
+
+footer
+  height: 90px
+  .info
+    margin: 29px auto 29px 110px
+    line-height: 150%
+    font-size: $font-xs
+    color: getColor(text, secondary)
+
+
+
+.body
+  padding: 0
+  margin: 0
+  overflow: hidden
+  background: getColor(background, body)
+
+.body.fp-login
+  box-shadow: 0 2px 4px getColor(base, lines) inset
+  background: #F2EDEF
+
+
+
+
+
+// classes
+.login-from
+  width: 350px
+  height: 320px
+  border-radius: 4px
+  box-shadow: 0 0 5px getColor(base, lines)
+  background: getColor(background, body)
+  float: right
+  margin: 140px 140px 140px 0
+  input
+    margin: 10px 0 0 25px
+    width: 290px
+    height: 34px
+    padding: 5px 0 5px 10px
+    border-radius: 5px
+    border: 1px solid getColor(border, input)
+    &:focus
+      +focus-border(5px)
+  .pwd-show, .pwd-hide
+    width: 40px
+    height: 40px
+    position: absolute
+    right: 30px
+    top: 13px
+    background: url(../img/fp/icon-close-eye.png) no-repeat center
+  .pwd-show
+    background: url(../img/fp/icon-eye.png) no-repeat center
+  .msg-space
+    font-size: $font-xs
+    height: 1px
+    text-align: center
+  .btn-line
+    button
+      margin: 10px 0 0 25px
+      background: getColor(base, primary)
+      width: 300px
+      height: 44px
+      line-height: 44px
+      color: getColor(text, primary-invert)
+      &:hover
+        +hover-bg(getColor(base, primary))
+    a
+      color: getColor(text, link)
+      font-size: $font-xs
+      display: inline-block
+      margin: 15px 0 0 270px
+      &:hover
+        +hover-text(getColor(text, link))
+  .tab-line
+    height: 50px
+    margin: 0
+    a
+      float: left
+      display: block
+      width: 50%
+      height: 48px
+      line-height: 48px
+      font-size: $font-m
+      text-align: center
+      color: getColor(text, secondary)
+      border-bottom: 2px solid getColor(background, light)
+      &.active
+        color: getColor(text, primary)
+        border-color: getColor(base, primary)
+
+
+
 
 // component
 header-nav
-  // @include gridle_grid(12)
   ul
     padding: 0
     margin: 0
@@ -43,4 +177,4 @@ header-nav
 
 input-valid
   span
-    color: $error-color
+    color: getColor(state, error)

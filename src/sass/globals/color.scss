@@ -1,0 +1,79 @@
+//
+// getColor Function
+// --------------------------------------------------
+// Easily retrieve colors from the $colors map.
+//
+
+@function getColor($color, $value: "base") {
+  @return map-get(map-get($colors, $color), $value);
+}
+
+//
+// Color Palette
+// --------------------------------------------------
+// Use the getColor() function to use those values in
+// your stylesheets. Example: getColor(base, primary)
+
+$colors: (
+  base: (
+    "primary":   #DF3A5E,
+    "selection": #EBE1D3,
+    "lines":     #DCDCDC
+  ),
+
+  border: (
+    "input":     #e3e3e3
+  ),
+
+  text: (
+    "primary":   #222,
+    "secondary": #999,
+    "primary-invert": #fff,
+    "link": #575E85
+  ),
+
+  background: (
+    "dark":  #32373d,
+    "light": #f5f5f5,
+    "body":  white
+  ),
+
+  state: (
+    "muted":   #eee,
+    "success": #10a887,
+    "warning": #F17F42,
+    "error":   #DF3A5E
+  ),
+
+  blue: (
+    "darker":  #1573b6,
+    "dark":    #1e80c6,
+    "base":    #2b90d9,
+    "light":   #3fa2e9,
+    "lighter": #4eb1f9
+  ),
+
+  green: (
+    "darker":  #089073,
+    "dark":    #0b9d7d,
+    "base":    #10a887,
+    "light":   #1eb896,
+    "lighter": #28ceaa
+  ),
+
+  red: (
+    "darker":  #653131,
+    "dark":    #b73333,
+    "base":    #da3c3c,
+    "light":   #f25a5a,
+    "lighter": #fa8181
+  ),
+
+  gray: (
+    "darker":  #333333,
+    "dark":    #4d4d4d,
+    "base":    #666666,
+    "light":   #808080,
+    "lighter": #999999
+  )
+) !default;

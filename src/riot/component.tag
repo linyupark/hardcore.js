@@ -73,6 +73,9 @@
         message: opts.msg
       });
     }
+    else{
+      _this.emit('valid', target);
+    }
   });
   </script>
 </input-valid>

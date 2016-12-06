@@ -1,6 +1,6 @@
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -14,6 +14,311 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : factory(global.RiotApp = global.RiotApp || {});
 })(this, function (exports) {
   'use strict';
+
+  var emitter = function emitter() {
+    var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+
+    /**
+     * 所有监听中的回调函数
+     * @type {Object}
+     */
+    var _callbacks = {};
+
+    /**
+     * 寄存器
+     * @type {[type]}
+     */
+    el.__emited = el.__emited || {};
+
+    /**
+     * object defineProperty 默认
+     * writable : false, configurable : false, enumerable : false
+     * 避免被复写
+     * 自定义事件
+     */
+    Object.defineProperty(el, "on", {
+      value: function value(event, fn) {
+        if (typeof fn == "function") {
+          (_callbacks[event] = _callbacks[event] || []).push(fn);
+          el.__emited[event] && fn.apply(el, el.__emited[event]);
+        }
+        return el;
+      }
+    });
+
+    Object.defineProperty(el, "once", {
+      value: function value(event, fn) {
+        var on = function on() {
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          el.off(event, on);
+          fn.apply(el, args);
+        };
+        return el.on(event, on);
+      }
+    });
+
+    /**
+     * 解除某自定义事件
+     */
+    Object.defineProperty(el, "off", {
+      value: function value(event, fn) {
+        if (event === "*" && !fn) _callbacks = {};else {
+          if (fn) {
+            for (var _i in _callbacks[event]) {
+              if (_callbacks[event][_i] == fn) _callbacks[event].splice(_i, 1);
+            }
+          } else {
+            delete _callbacks[event];
+          }
+          delete el.__emited[event];
+        }
+        return el;
+      }
+    });
+
+    /**
+     * 触发某自定义事件
+     */
+    Object.defineProperty(el, "emit", {
+      value: function value(event) {
+        var fns = (_callbacks[event] || []).slice(0);
+
+        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          args[_key2 - 1] = arguments[_key2];
+        }
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = fns[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var _fn = _step.value;
+
+            _fn.apply(el, args);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        el.__emited[name] = [name].concat(args);
+        if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
+        return el;
+      }
+    });
+
+    return el;
+  };
+
+  /**
+   * 模拟标准Promise类
+   */
+  var Promise$1 = void 0;
+  var EmitterPromise = function () {
+    function EmitterPromise() {
+      var _this = this;
+
+      var rr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+      _classCallCheck(this, EmitterPromise);
+
+      if (rr.length === 0) {
+        throw new Error("Promise needs (resolve, reject) at least one function name.");
+      }
+      emitter(this);
+      this._resolve = function (value) {
+        _this.emit("resolve", value);
+        _this._emited_value = value;
+        _this.off("reject");
+      };
+      if (rr.length === 1) {
+        rr.call(this, this._resolve);
+      } else {
+        this._reject = function (reason) {
+          _this.emit("reject", reason);
+          _this.off("resolve");
+        };
+        rr.call(this, this._resolve, this._reject);
+      }
+      return this;
+    }
+
+    /**
+     * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
+        console.log(values);
+      }, reason => {
+        console.log(reason)
+      });
+     * @param  {Array}  iterable [p1,p2,p3..]
+     * @return {EmitterPromise}
+     */
+
+
+    _createClass(EmitterPromise, [{
+      key: 'then',
+
+
+      /**
+       * 当resolve执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+      value: function then() {
+        var _this2 = this;
+
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+        var _catch = arguments[1];
+
+        this.once("resolve", function (value) {
+          try {
+            if (_this2.__chain_value instanceof Promise$1) {
+              _this2.__chain_value.then(cb);
+              return;
+            }
+            _this2.__chain_value = cb.call(null, _this2.__chain_value || value);
+          } catch (e) {
+            _this2.emit("reject", e);
+          }
+        });
+        if (typeof _catch === "function") {
+          return this.catch(_catch);
+        }
+        if (this._emited_value) {
+          this.emit("resolve", this._emited_value);
+        }
+        return this;
+      }
+
+      /**
+       * 当reject执行时触发
+       * @param  {Function} cb 执行回调
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: 'catch',
+      value: function _catch() {
+        var _this3 = this;
+
+        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+        this.once("reject", function (reason) {
+          var result = void 0;
+          try {
+            if (_this3.__no_throw) return;
+            result = cb.call(null, reason);
+            _this3.__no_throw = true;
+            if (result) _this3.emit("resolve", result);
+          } catch (e) {
+            _this3.emit("reject", e);
+            if (!_this3.__no_throw) {
+              throw e;
+            }
+          }
+        });
+        return this;
+      }
+    }], [{
+      key: 'all',
+      value: function all() {
+        var iterable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+        var values = [];
+        return new EmitterPromise(function (resolve, reject) {
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = iterable[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var _p = _step2.value;
+
+              _p.then(function (value) {
+                values.push(value);
+                if (values.length === iterable.length) {
+                  resolve(values);
+                }
+              }).catch(function (reason) {
+                reject(reason);
+              });
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+        });
+      }
+
+      /**
+       * 直接触发 resolve
+       * @param  {mixed} value
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: 'resolve',
+      value: function resolve(value) {
+        if (value instanceof Promise$1) {
+          return value;
+        }
+        return new EmitterPromise(function (resolve) {
+          setTimeout(function () {
+            resolve(value);
+          }, 0);
+        });
+      }
+
+      /**
+       * 直接触发 reject
+       * @param  {mixed} reason
+       * @return {EmitterPromise}
+       */
+
+    }, {
+      key: 'reject',
+      value: function reject(reason) {
+        return new EmitterPromise(function (resolve, reject) {
+          setTimeout(function () {
+            reject(reason);
+          }, 0);
+          resolve;
+        });
+      }
+    }]);
+
+    return EmitterPromise;
+  }();
+
+  // 当支持原生promise的时候Promise替换成原生
+  Promise$1 = EmitterPromise;
+  if ("Promise" in window) {
+    Promise$1 = window.Promise;
+  }
 
   /**
    * 是否某版本ie
@@ -34,7 +339,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @param  {object} ext 扩充对象
    * @return {object}
    */
-
   var assign = function assign() {
     var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var ext = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -246,13 +550,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
     get: function get() {
       var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator = document.cookie.split("; ")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var _cookie = _step.value;
+        for (var _iterator3 = document.cookie.split("; ")[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var _cookie = _step3.value;
 
           var _cookie$split = _cookie.split("="),
               _cookie$split2 = _slicedToArray(_cookie$split, 2),
@@ -264,16 +568,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
           }
         } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }
@@ -391,308 +695,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
     return callback;
   };
-
-  var emitter = function emitter() {
-    var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-
-    /**
-     * 所有监听中的回调函数
-     * @type {Object}
-     */
-    var _callbacks = {};
-
-    /**
-     * 寄存器
-     * @type {[type]}
-     */
-    el.__emited = el.__emited || {};
-
-    /**
-     * object defineProperty 默认
-     * writable : false, configurable : false, enumerable : false
-     * 避免被复写
-     * 自定义事件
-     */
-    Object.defineProperty(el, "on", {
-      value: function value(event, fn) {
-        if (typeof fn == "function") {
-          (_callbacks[event] = _callbacks[event] || []).push(fn);
-          el.__emited[event] && fn.apply(el, el.__emited[event]);
-        }
-        return el;
-      }
-    });
-
-    Object.defineProperty(el, "once", {
-      value: function value(event, fn) {
-        var on = function on() {
-          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-
-          el.off(event, on);
-          fn.apply(el, args);
-        };
-        return el.on(event, on);
-      }
-    });
-
-    /**
-     * 解除某自定义事件
-     */
-    Object.defineProperty(el, "off", {
-      value: function value(event, fn) {
-        if (event === "*" && !fn) _callbacks = {};else {
-          if (fn) {
-            for (var _i in _callbacks[event]) {
-              if (_callbacks[event][_i] == fn) _callbacks[event].splice(_i, 1);
-            }
-          } else {
-            delete _callbacks[event];
-          }
-          delete el.__emited[event];
-        }
-        return el;
-      }
-    });
-
-    /**
-     * 触发某自定义事件
-     */
-    Object.defineProperty(el, "emit", {
-      value: function value(event) {
-        var fns = (_callbacks[event] || []).slice(0);
-
-        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-          args[_key2 - 1] = arguments[_key2];
-        }
-
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = fns[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _fn = _step2.value;
-
-            _fn.apply(el, args);
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-
-        el.__emited[name] = [name].concat(args);
-        if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
-        return el;
-      }
-    });
-
-    return el;
-  };
-
-  var Promise$1 = void 0;
-  var EmitterPromise = function () {
-    function EmitterPromise() {
-      var _this = this;
-
-      var rr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-
-      _classCallCheck(this, EmitterPromise);
-
-      if (rr.length === 0) {
-        throw new Error("Promise needs (resolve, reject) at least one function name.");
-      }
-      emitter(this);
-      this._resolve = function (value) {
-        _this.emit("resolve", value);
-        _this._emited_value = value;
-        _this.off("reject");
-      };
-      if (rr.length === 1) {
-        rr.call(this, this._resolve);
-      } else {
-        this._reject = function (reason) {
-          _this.emit("reject", reason);
-          _this.off("resolve");
-        };
-        rr.call(this, this._resolve, this._reject);
-      }
-      return this;
-    }
-
-    /**
-     * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
-        console.log(values);
-      }, reason => {
-        console.log(reason)
-      });
-     * @param  {Array}  iterable [p1,p2,p3..]
-     * @return {EmitterPromise}
-     */
-
-
-    _createClass(EmitterPromise, [{
-      key: 'then',
-
-
-      /**
-       * 当resolve执行时触发
-       * @param  {Function} cb 执行回调
-       * @return {EmitterPromise}
-       */
-      value: function then() {
-        var _this2 = this;
-
-        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-        var _catch = arguments[1];
-
-        this.once("resolve", function (value) {
-          try {
-            if (_this2.__chain_value instanceof Promise$1) {
-              _this2.__chain_value.then(cb);
-              return;
-            }
-            _this2.__chain_value = cb.call(null, _this2.__chain_value || value);
-          } catch (e) {
-            _this2.emit("reject", e);
-          }
-        });
-        if (typeof _catch === "function") {
-          return this.catch(_catch);
-        }
-        if (this._emited_value) {
-          this.emit("resolve", this._emited_value);
-        }
-        return this;
-      }
-
-      /**
-       * 当reject执行时触发
-       * @param  {Function} cb 执行回调
-       * @return {EmitterPromise}
-       */
-
-    }, {
-      key: 'catch',
-      value: function _catch() {
-        var _this3 = this;
-
-        var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-
-        this.once("reject", function (reason) {
-          var result = void 0;
-          try {
-            if (_this3.__no_throw) return;
-            result = cb.call(null, reason);
-            _this3.__no_throw = true;
-            if (result) _this3.emit("resolve", result);
-          } catch (e) {
-            _this3.emit("reject", e);
-            if (!_this3.__no_throw) {
-              throw e;
-            }
-          }
-        });
-        return this;
-      }
-    }], [{
-      key: 'all',
-      value: function all() {
-        var iterable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-        var values = [];
-        return new EmitterPromise(function (resolve, reject) {
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
-
-          try {
-            for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var _p = _step3.value;
-
-              _p.then(function (value) {
-                values.push(value);
-                if (values.length === iterable.length) {
-                  resolve(values);
-                }
-              }).catch(function (reason) {
-                reject(reason);
-              });
-            }
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
-            }
-          }
-        });
-      }
-
-      /**
-       * 直接触发 resolve
-       * @param  {mixed} value
-       * @return {EmitterPromise}
-       */
-
-    }, {
-      key: 'resolve',
-      value: function resolve(value) {
-        if (value instanceof Promise$1) {
-          return value;
-        }
-        return new EmitterPromise(function (resolve) {
-          setTimeout(function () {
-            resolve(value);
-          }, 0);
-        });
-      }
-
-      /**
-       * 直接触发 reject
-       * @param  {mixed} reason
-       * @return {EmitterPromise}
-       */
-
-    }, {
-      key: 'reject',
-      value: function reject(reason) {
-        return new EmitterPromise(function (resolve, reject) {
-          setTimeout(function () {
-            reject(reason);
-          }, 0);
-          resolve;
-        });
-      }
-    }]);
-
-    return EmitterPromise;
-  }();
-
-  // 当支持原生promise的时候Promise替换成原生
-  Promise$1 = EmitterPromise;
-  if ("Promise" in window) {
-    Promise$1 = window.Promise;
-  }
 
   var Loader = function () {
     function Loader() {
@@ -3389,6 +3391,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     unregister: unregister$$1
   });
 
+  /**
+   * Simple client-side router
+   * @module riot-route
+   */
+
   var RE_ORIGIN = /^.+?\/\/+[^\/]+/;
   var EVENT_LISTENER = 'EventListener';
   var REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER;
@@ -3730,6 +3737,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // 配置信息
         this.config = assign({
           id: 'app', // 项目id
+          lang: 'cn',
           env: 'dev', // 环境
           staticBase: './static/',
           routeBase: '#!', // route解析分隔符
@@ -3767,8 +3775,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           force: cf.env !== 'pro'
         }).done(function (resp) {
           // 记录方便不刷新情况下获取
-          _this13.loaderJSON = resp;
-          Loader.alias(_this13.loaderJSON, cf.resource).then(function (files) {
+          _this13.data = resp;
+          // 语言包
+          _this13.lang = resp.lang && resp.lang[cf.lang] || {};
+          Loader.alias(_this13.data, cf.resource).then(function (files) {
             // 开始初始化路由
             route.base(cf.routeBase);
             // 路由解析方式
@@ -3862,9 +3872,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'addResource',
       value: function addResource(resName) {
         var existRes = void 0;
-        if (!this.loaderJSON) return Promise.reject();
-        if (this.loaderJSON[resName]) existRes = resName;else if (this.loaderJSON[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
-        return Loader.alias(this.loaderJSON, [existRes]);
+        if (!this.data) return Promise.reject();
+        if (this.data[resName]) existRes = resName;else if (this.data[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
+        return Loader.alias(this.data, [existRes]);
       }
     }]);
 
@@ -3888,12 +3898,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * 适配项目接口
        * @return {[type]} [description]
        */
-      value: function api(method, url, data) {
-        var prefix = { dev: 'dev.', test: 'test.', pro: '' }[this.config.env];
-        return this.xhr('//' + prefix + 'h5.sosho.cn/server/' + url, {
-          method: method,
-          data: data,
-          headers: {}
+      value: function api(method, url) {
+        var _this15 = this;
+
+        var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var prefix = { dev: 'dev.', test: 'test.', pro: 'www' }[this.config.env];
+        // 如果设定了发起请求的元素，则在请求完毕前禁用
+        this.__api = this.__api || [];
+        for (var i in this.__api) {
+          if (this.__api[i] === url) {
+            return this.err('api busy: ' + url);
+          }
+        }
+        return new Promise$1(function (resolve, reject) {
+          _this15.__api.push(url);
+          if (opts.trigger) {
+            opts.trigger.disabled = true;
+          }
+          _this15.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
+            method: method,
+            data: opts.data || {},
+            headers: opts.headers || {}
+          }).done(function (resp) {
+            if (resp.errno == 0) resolve(resp);else reject(resp.errmsg);
+          }).complete(function () {
+            _this15.__api.splice(_this15.__api.indexOf(url), 1);
+            if (opts.trigger) {
+              opts.trigger.disabled = false;
+            }
+          });
         });
       }
     }], [{

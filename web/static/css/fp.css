@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
 /**
  * 1. Change the default font family in all browsers (opinionated).
@@ -402,21 +403,125 @@ template {
 [hidden] {
   display: none; }
 
-#main:after {
+body {
+  font-size: 14px;
+  font-family: "黑体", "Arial", sans-serif; }
+
+.wrapper:after {
   content: "";
   display: table;
   clear: both; }
 
-#main {
-  display: block !important;
-  float: none !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  clear: both !important; }
+a {
+  text-decoration: none; }
 
-#main {
-  max-width: 1200px;
-  background: #eee; }
+button {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer; }
+
+:focus {
+  outline: none; }
+
+.wrapper {
+  max-width: 1400px;
+  margin: 0 auto; }
+
+header h1 {
+  font-size: 28px;
+  margin: 0; }
+
+header .login-header {
+  background: white; }
+  header .login-header h1 {
+    height: 90px;
+    line-height: 90px;
+    text-indent: 175px;
+    background: url(../img/fp/header-logo.png) no-repeat 110px center;
+    color: #666666; }
+
+footer {
+  height: 90px; }
+  footer .info {
+    margin: 29px auto 29px 110px;
+    line-height: 150%;
+    font-size: 13px;
+    color: #999; }
+
+.body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background: white; }
+
+.body.fp-login {
+  box-shadow: 0 2px 4px #DCDCDC inset;
+  background: #F2EDEF; }
+
+.login-from {
+  width: 350px;
+  height: 320px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px #DCDCDC;
+  background: white;
+  float: right;
+  margin: 140px 140px 140px 0; }
+  .login-from input {
+    margin: 10px 0 0 25px;
+    width: 290px;
+    height: 34px;
+    padding: 5px 0 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3; }
+    .login-from input:focus {
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.6) inset; }
+  .login-from .pwd-show, .login-from .pwd-hide {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    right: 30px;
+    top: 13px;
+    background: url(../img/fp/icon-close-eye.png) no-repeat center; }
+  .login-from .pwd-show {
+    background: url(../img/fp/icon-eye.png) no-repeat center; }
+  .login-from .msg-space {
+    font-size: 13px;
+    height: 1px;
+    text-align: center; }
+  .login-from .btn-line button {
+    margin: 10px 0 0 25px;
+    background: #DF3A5E;
+    width: 300px;
+    height: 44px;
+    line-height: 44px;
+    color: #fff; }
+    .login-from .btn-line button:hover {
+      background-color: #db244c; }
+  .login-from .btn-line a {
+    color: #575E85;
+    font-size: 13px;
+    display: inline-block;
+    margin: 15px 0 0 270px; }
+    .login-from .btn-line a:hover {
+      color: #4d5376;
+      border-bottom: 1px dotted #575E85; }
+  .login-from .tab-line {
+    height: 50px;
+    margin: 0; }
+    .login-from .tab-line a {
+      float: left;
+      display: block;
+      width: 50%;
+      height: 48px;
+      line-height: 48px;
+      font-size: 16px;
+      text-align: center;
+      color: #999;
+      border-bottom: 2px solid #f5f5f5; }
+      .login-from .tab-line a.active {
+        color: #222;
+        border-color: #DF3A5E; }
 
 header-nav ul {
   padding: 0;
@@ -438,4 +543,4 @@ header-nav ul {
         display: block; }
 
 input-valid span {
-  color: #d98989; }
+  color: #DF3A5E; }

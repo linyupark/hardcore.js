@@ -38,13 +38,13 @@ gulp.task('build:fp', () => {
   });
 
   // fp css
-  gulp.src('./web/static/'+name+'.css')
+  gulp.src('./web/static/css/'+name+'.css')
   .pipe(cleancss())
   .pipe(cssver())
   .pipe(rename({
     suffix: '.min'
   }))
-  .pipe(gulp.dest('./web/static/'));
+  .pipe(gulp.dest('./web/static/css/'));
 
   // md5
   let loaderFile = './web/static/'+name+'.json';
