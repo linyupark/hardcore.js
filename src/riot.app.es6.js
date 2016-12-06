@@ -17,6 +17,7 @@ export class RiotApp {
       // 配置信息
       this.config = assign({
         id: 'app', // 项目id
+        lang: 'cn',
         env: 'dev', // 环境
         staticBase: './static/',
         routeBase: '#!', // route解析分隔符
@@ -51,8 +52,10 @@ export class RiotApp {
     })
     .done(resp => {
       // 记录方便不刷新情况下获取
-      this.loaderJSON = resp;
-      Loader.alias(this.loaderJSON, cf.resource)
+      this.data = resp;
+      // 语言包
+      this.lang = (resp.lang && resp.lang[cf.lang]) || {};
+      Loader.alias(this.data, cf.resource)
       .then(files => {
         // 开始初始化路由
         route.base(cf.routeBase);
@@ -133,13 +136,13 @@ export class RiotApp {
    */
   addResource(resName){
     let existRes;
-    if(!this.loaderJSON)
+    if(!this.data)
       return Promise.reject();
-    if(this.loaderJSON[resName])
+    if(this.data[resName])
       existRes = resName;
-    else if(this.loaderJSON[`${resName}.${this.config.env}`])
+    else if(this.data[`${resName}.${this.config.env}`])
       existRes = `${resName}.${this.config.env}`;
-    return Loader.alias(this.loaderJSON, [existRes]);
+    return Loader.alias(this.data, [existRes]);
   }
 
 }
