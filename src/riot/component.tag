@@ -77,6 +77,12 @@
       _this.emit('valid', target);
     }
   });
+
+  _this.on('msg', function(msg){
+    _this.update({
+      message: msg
+    });
+  });
   </script>
 </input-valid>
 

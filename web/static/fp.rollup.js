@@ -4,226 +4,6 @@
   (factory((global.RiotApp = global.RiotApp || {})));
 }(this, (function (exports) { 'use strict';
 
-const emitter = (el = {}) => {
-
-  /**
-   * 所有监听中的回调函数
-   * @type {Object}
-   */
-  let _callbacks = {};
-
-  /**
-   * 寄存器
-   * @type {[type]}
-   */
-  el.__emited = el.__emited || {};
-
-  /**
-   * object defineProperty 默认
-   * writable : false, configurable : false, enumerable : false
-   * 避免被复写
-   * 自定义事件
-   */
-  Object.defineProperty(el, "on", {
-    value(event, fn) {
-      if (typeof fn == "function"){
-        (_callbacks[event] = _callbacks[event] || []).push(fn);
-        el.__emited[event] && fn.apply(el, el.__emited[event]);
-      }
-      return el;
-    }
-  });
-
-  Object.defineProperty(el, "once", {
-    value(event, fn) {
-      let on = (...args) => {
-        el.off(event, on);
-        fn.apply(el, args);
-      };
-      return el.on(event, on);
-    }
-  });
-
-  /**
-   * 解除某自定义事件
-   */
-  Object.defineProperty(el, "off", {
-    value(event, fn) {
-      if (event === "*" && !fn) _callbacks = {};
-      else {
-        if (fn) {
-          for (const _i in _callbacks[event]) {
-            if (_callbacks[event][_i] == fn)
-              _callbacks[event].splice(_i, 1);
-          }
-        } else {
-          delete _callbacks[event];
-        }
-        delete el.__emited[event];
-      }
-      return el;
-    }
-  });
-
-  /**
-   * 触发某自定义事件
-   */
-  Object.defineProperty(el, "emit", {
-    value(event, ...args) {
-      const fns = (_callbacks[event] || []).slice(0);
-      for (let _fn of fns) {
-        _fn.apply(el, args);
-      }
-      el.__emited[name] = [name].concat(args);
-      if (_callbacks["*"] && event !== "*")
-        el.emit.apply(el, ["*", event].concat(args));
-      return el;
-    }
-  });
-
-  return el;
-
-};
-
-/**
- * 模拟标准Promise类
- */
-let Promise$1;
-let EmitterPromise = class {
-
-  constructor(rr = () => {}) {
-    if (rr.length === 0) {
-      throw new Error("Promise needs (resolve, reject) at least one function name.");
-    }
-    emitter(this);
-    this._resolve = (value) => {
-      this.emit("resolve", value);
-      this._emited_value = value;
-      this.off("reject");
-    };
-    if (rr.length === 1) {
-      rr.call(this, this._resolve);
-    } else {
-      this._reject = (reason) => {
-        this.emit("reject", reason);
-        this.off("resolve");
-      };
-      rr.call(this, this._resolve, this._reject);
-    }
-    return this;
-  }
-
-  /**
-   * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
-      console.log(values);
-    }, reason => {
-      console.log(reason)
-    });
-   * @param  {Array}  iterable [p1,p2,p3..]
-   * @return {EmitterPromise}
-   */
-  static all(iterable = []) {
-    let values = [];
-    return new EmitterPromise((resolve, reject) => {
-      for (let _p of iterable) {
-        _p.then(value => {
-          values.push(value);
-          if (values.length === iterable.length) {
-            resolve(values);
-          }
-        }).catch(reason => {
-          reject(reason);
-        });
-      }
-    });
-  }
-
-  /**
-   * 直接触发 resolve
-   * @param  {mixed} value
-   * @return {EmitterPromise}
-   */
-  static resolve(value) {
-    if (value instanceof Promise$1) {
-      return value;
-    }
-    return new EmitterPromise((resolve) => {
-      setTimeout(function() {
-        resolve(value);
-      }, 0);
-    });
-  }
-
-  /**
-   * 直接触发 reject
-   * @param  {mixed} reason
-   * @return {EmitterPromise}
-   */
-  static reject(reason) {
-    return new EmitterPromise((resolve, reject) => {
-      setTimeout(function() {
-        reject(reason);
-      }, 0);
-      resolve;
-    });
-  }
-
-  /**
-   * 当resolve执行时触发
-   * @param  {Function} cb 执行回调
-   * @return {EmitterPromise}
-   */
-  then(cb = () => {}, _catch) {
-    this.once("resolve", value => {
-      try {
-        if (this.__chain_value instanceof Promise$1) {
-          this.__chain_value.then(cb);
-          return;
-        }
-        this.__chain_value = cb.call(null, this.__chain_value || value);
-      } catch (e) {
-        this.emit("reject", e);
-      }
-    });
-    if (typeof _catch === "function") {
-      return this.catch(_catch);
-    }
-    if(this._emited_value){
-      this.emit("resolve", this._emited_value);
-    }
-    return this;
-  }
-
-  /**
-   * 当reject执行时触发
-   * @param  {Function} cb 执行回调
-   * @return {EmitterPromise}
-   */
-  catch (cb = () => {}) {
-    this.once("reject", reason => {
-      let result;
-      try {
-        if (this.__no_throw) return;
-        result = cb.call(null, reason);
-        this.__no_throw = true;
-        if (result) this.emit("resolve", result);
-      } catch (e) {
-        this.emit("reject", e);
-        if (!this.__no_throw) {
-          throw e;
-        }
-      }
-    });
-    return this;
-  }
-};
-
-// 当支持原生promise的时候Promise替换成原生
-Promise$1 = EmitterPromise;
-if ("Promise" in window) {
-  Promise$1 = window.Promise;
-}
-
 /**
  * 是否某版本ie
  * @param  {number} ver 版本号
@@ -583,6 +363,226 @@ const cacheJSON = (url, options={}) => {
   return callback;
 };
 
+const emitter = (el = {}) => {
+
+  /**
+   * 所有监听中的回调函数
+   * @type {Object}
+   */
+  let _callbacks = {};
+
+  /**
+   * 寄存器
+   * @type {[type]}
+   */
+  el.__emited = el.__emited || {};
+
+  /**
+   * object defineProperty 默认
+   * writable : false, configurable : false, enumerable : false
+   * 避免被复写
+   * 自定义事件
+   */
+  Object.defineProperty(el, "on", {
+    value(event, fn) {
+      if (typeof fn == "function"){
+        (_callbacks[event] = _callbacks[event] || []).push(fn);
+        el.__emited[event] && fn.apply(el, el.__emited[event]);
+      }
+      return el;
+    }
+  });
+
+  Object.defineProperty(el, "once", {
+    value(event, fn) {
+      let on = (...args) => {
+        el.off(event, on);
+        fn.apply(el, args);
+      };
+      return el.on(event, on);
+    }
+  });
+
+  /**
+   * 解除某自定义事件
+   */
+  Object.defineProperty(el, "off", {
+    value(event, fn) {
+      if (event === "*" && !fn) _callbacks = {};
+      else {
+        if (fn) {
+          for (const _i in _callbacks[event]) {
+            if (_callbacks[event][_i] == fn)
+              _callbacks[event].splice(_i, 1);
+          }
+        } else {
+          delete _callbacks[event];
+        }
+        delete el.__emited[event];
+      }
+      return el;
+    }
+  });
+
+  /**
+   * 触发某自定义事件
+   */
+  Object.defineProperty(el, "emit", {
+    value(event, ...args) {
+      const fns = (_callbacks[event] || []).slice(0);
+      for (let _fn of fns) {
+        _fn.apply(el, args);
+      }
+      el.__emited[name] = [name].concat(args);
+      if (_callbacks["*"] && event !== "*")
+        el.emit.apply(el, ["*", event].concat(args));
+      return el;
+    }
+  });
+
+  return el;
+
+};
+
+/**
+ * 模拟标准Promise类
+ */
+let Promise;
+let EmitterPromise = class {
+
+  constructor(rr = () => {}) {
+    if (rr.length === 0) {
+      throw new Error("Promise needs (resolve, reject) at least one function name.");
+    }
+    emitter(this);
+    this._resolve = (value) => {
+      this.emit("resolve", value);
+      this._emited_value = value;
+      this.off("reject");
+    };
+    if (rr.length === 1) {
+      rr.call(this, this._resolve);
+    } else {
+      this._reject = (reason) => {
+        this.emit("reject", reason);
+        this.off("resolve");
+      };
+      rr.call(this, this._resolve, this._reject);
+    }
+    return this;
+  }
+
+  /**
+   * EmitterPromise.all([p1, p2, p3, p4, p5]).then(values => {
+      console.log(values);
+    }, reason => {
+      console.log(reason)
+    });
+   * @param  {Array}  iterable [p1,p2,p3..]
+   * @return {EmitterPromise}
+   */
+  static all(iterable = []) {
+    let values = [];
+    return new EmitterPromise((resolve, reject) => {
+      for (let _p of iterable) {
+        _p.then(value => {
+          values.push(value);
+          if (values.length === iterable.length) {
+            resolve(values);
+          }
+        }).catch(reason => {
+          reject(reason);
+        });
+      }
+    });
+  }
+
+  /**
+   * 直接触发 resolve
+   * @param  {mixed} value
+   * @return {EmitterPromise}
+   */
+  static resolve(value) {
+    if (value instanceof Promise) {
+      return value;
+    }
+    return new EmitterPromise((resolve) => {
+      setTimeout(function() {
+        resolve(value);
+      }, 0);
+    });
+  }
+
+  /**
+   * 直接触发 reject
+   * @param  {mixed} reason
+   * @return {EmitterPromise}
+   */
+  static reject(reason) {
+    return new EmitterPromise((resolve, reject) => {
+      setTimeout(function() {
+        reject(reason);
+      }, 0);
+      resolve;
+    });
+  }
+
+  /**
+   * 当resolve执行时触发
+   * @param  {Function} cb 执行回调
+   * @return {EmitterPromise}
+   */
+  then(cb = () => {}, _catch) {
+    this.once("resolve", value => {
+      try {
+        if (this.__chain_value instanceof Promise) {
+          this.__chain_value.then(cb);
+          return;
+        }
+        this.__chain_value = cb.call(null, this.__chain_value || value);
+      } catch (e) {
+        this.emit("reject", e);
+      }
+    });
+    if (typeof _catch === "function") {
+      return this.catch(_catch);
+    }
+    if(this._emited_value){
+      this.emit("resolve", this._emited_value);
+    }
+    return this;
+  }
+
+  /**
+   * 当reject执行时触发
+   * @param  {Function} cb 执行回调
+   * @return {EmitterPromise}
+   */
+  catch (cb = () => {}) {
+    this.once("reject", reason => {
+      let result;
+      try {
+        if (this.__no_throw) return;
+        result = cb.call(null, reason);
+        this.__no_throw = true;
+        if (result) this.emit("resolve", result);
+      } catch (e) {
+        this.emit("reject", e);
+        if (!this.__no_throw) {
+          throw e;
+        }
+      }
+    });
+    return this;
+  }
+};
+
+// 当支持原生promise的时候Promise替换成原生
+Promise = EmitterPromise;
+if ("Promise" in window) {
+  Promise = window.Promise;
+}
+
 class Loader {
 
   /**
@@ -639,7 +639,7 @@ class Loader {
             next(resolve, reject);
           });
       };
-    return new Promise$1(next);
+    return new Promise(next);
   }
 
   /**
@@ -665,7 +665,7 @@ class Loader {
       }
       if (!exist) load_files = load_files.concat(f);
     }
-    return new Promise$1((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let load = () => {
           for (const file of load_files) {
             let name = file.split("/").pop(),
@@ -3601,6 +3601,7 @@ class RiotApp {
       // 记录已经加载的tag
       this.tagMounted = {};
       // 合并组件
+      this.Promise = Promise;
       this.route = route;
       this.xhr = xhr;
       this.utils = {
@@ -3724,31 +3725,36 @@ class FP extends RiotApp{
    * @return {[type]} [description]
    */
   api(method, url, opts={}){
-    const prefix = {dev: 'dev.', test: 'test.', pro: 'www'}[this.config.env];
+    const prefix = {
+      dev: 'dev.',
+      test: 'test.',
+      pro: 'www.'
+    }[this.config.env];
     // 如果设定了发起请求的元素，则在请求完毕前禁用
     this.__api = this.__api || [];
     for(let i in this.__api){
       if(this.__api[i] === url){
-        return this.err('api busy: ' + url);
+        return this.Promise.reject('api busy:'+url);
       }
     }
-    return new Promise$1((resolve, reject) => {
-      this.__api.push(url);
-      if(opts.trigger){
-        opts.trigger.disabled = true;
-      }
+    this.__api.push(url);
+    if(opts.trigger){
+      opts.trigger.disabled = true;
+    }
+    return new this.Promise((resolve, reject) => {
       this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
         method: method,
         data: opts.data || {},
         headers: opts.headers || {}
       }).done(resp => {
-        if(resp.errno == 0) resolve(resp);
+        if(resp.errno == 0) resolve(resp.data);
         else reject(resp.errmsg);
       }).complete(() => {
         this.__api.splice(this.__api.indexOf(url), 1);
         if(opts.trigger){
           opts.trigger.disabled = false;
         }
+        this.emit('api::complete', url);
       });
     });
   }

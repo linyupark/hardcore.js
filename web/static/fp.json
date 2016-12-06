@@ -42,7 +42,9 @@
           "password": "请输入密码"
         },
         "btn": "登 录",
-        "findpass": "忘记密码"
+        "findpass": "忘记密码",
+        "fail": "登录失败: 账号密码错误",
+        "btn:loading": "登 录 中"
       },
       "footer": {
         "icp": "浙ICP备1202106号-2",

@@ -1,6 +1,7 @@
 import { xhr, assign, cacheJSON, search2obj, cookie } from './utils.es6.js';
 import { Loader } from './loader.es6.js';
 import { emitter } from './emitter.es6.js';
+import { Promise } from './promise.es6.js';
 import riot from './riot.core.es6.js';
 import route from './riot.route.es6.js';
 
@@ -31,6 +32,7 @@ export class RiotApp {
       // 记录已经加载的tag
       this.tagMounted = {};
       // 合并组件
+      this.Promise = Promise;
       this.route = route;
       this.xhr = xhr;
       this.utils = {

@@ -10,6 +10,7 @@
 $tablet-max-width: 1400px
 $mobile-max-width: 480px
 $header-logo: (w: 50px, h: 50)
+$border-radius: 5px
 
 +gridle_setup((gutter-width: 0, gutter-left: 0, gutter-right: 0))
 +gridle_register_state(mobile, (max-width: $mobile-max-width))
@@ -20,15 +21,14 @@ $header-logo: (w: 50px, h: 50)
 a
   text-decoration: none
 button
-  border: none
-  border-radius: 5px
   cursor: pointer
-
+  border: none
+  border-radius: $border-radius
 :focus
   outline: none
 
 // mixin
-=focus-border($radius)
+=focus-border($radius: $border-radius)
   border-radius: $radius
   box-shadow: 0 0 0 1px rgba(getColor(base, primary), .6) inset
 =hover-bg($color)
@@ -40,6 +40,13 @@ button
   background-color: lighten($color, 5%)
 =focus-text($color)
   color: lighten($color, 5%)
+=button-primary
+  background: getColor(base, primary)
+  color: getColor(text, primary-invert)
+  &:hover
+    +hover-bg(getColor(base, primary))
+  &[disabled]
+    background: rgba(getColor(base, primary), .3)
 
 
 // layout
@@ -90,7 +97,7 @@ footer
 .login-from
   width: 350px
   height: 320px
-  border-radius: 4px
+  border-radius: $border-radius
   box-shadow: 0 0 5px getColor(base, lines)
   background: getColor(background, body)
   float: right
@@ -100,33 +107,33 @@ footer
     width: 290px
     height: 34px
     padding: 5px 0 5px 10px
-    border-radius: 5px
+    border-radius: $border-radius
     border: 1px solid getColor(border, input)
     &:focus
-      +focus-border(5px)
+      +focus-border()
   .pwd-show, .pwd-hide
-    width: 40px
-    height: 40px
+    width: 25px
+    height: 25px
     position: absolute
-    right: 30px
-    top: 13px
-    background: url(../img/fp/icon-close-eye.png) no-repeat center
+    right: 35px
+    top: 20px
+    background-size: 25px 25px
+    background-image: url(../img/fp/icon-close-eye.png)
+    background-repeat: no-repeat
+    background-position: center
   .pwd-show
-    background: url(../img/fp/icon-eye.png) no-repeat center
+    background-image: url(../img/fp/icon-eye.png)
   .msg-space
     font-size: $font-xs
     height: 1px
     text-align: center
   .btn-line
     button
+      +button-primary()
       margin: 10px 0 0 25px
-      background: getColor(base, primary)
       width: 300px
       height: 44px
       line-height: 44px
-      color: getColor(text, primary-invert)
-      &:hover
-        +hover-bg(getColor(base, primary))
     a
       color: getColor(text, link)
       font-size: $font-xs

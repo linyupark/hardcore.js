@@ -5,9 +5,9 @@
   "scripts": {
     "web": "browser-sync start -s \"web\" -f \"./web/**/*\"",
     "riot": "riot -w -s -c ./src/riot/ ./web/static/riot/",
-    "rollup:fp": "onchange ./src/**/*.es6.js -- rollup -i ./src/fp.es6.js -o ./web/static/fp.rollup.js -f umd -n RiotApp",
-    "babel:fp": "babel -w ./web/static/fp.rollup.js -o ./web/static/fp.js",
-    "sass:fp": "onchange ./src/sass/**/* -- node-sass ./src/sass/fp.sass -o  ./web/static/css/",
+    "rollup:fp": "onchange './src/**/*.es6.js' -- rollup -i ./src/fp.es6.js -o ./web/static/fp.rollup.js -f umd -n RiotApp",
+    "babel:fp": "onchange './web/static/fp.rollup.js' -- babel ./web/static/fp.rollup.js -o ./web/static/fp.js",
+    "sass:fp": "onchange './src/sass/**/*' -- node-sass ./src/sass/fp.sass -o  ./web/static/css/",
     "windev:fp": "start npm run riot && start npm run rollup:fp && start npm run babel:fp && start npm run sass:fp",
     "macdev:fp": "npm run riot & npm run rollup:fp & npm run babel:fp & npm run sass:fp",
     "build:fp": "gulp build:fp"
