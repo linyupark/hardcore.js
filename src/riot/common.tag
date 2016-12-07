@@ -1,10 +1,12 @@
 <!-- 用户信息 -->
 <userinfo>
-  <div class="username" onmouseenter={fn.active} onmouseleave={fn.hidden}>
+  <div class="username" onmouseenter={fn.active}
+    onmouseover={fn.active} onmouseleave={fn.hidden}>
     <a href="javascript:;" class="{active: active}">
-      {user_name} <i class="icon-menu"></i>
+      {user_name} <i class="{'icon-down-open-big': !active, 'icon-menu': active}"></i>
     </a>
-    <dl class="menu {active: active}">
+    <dl class="menu {active: active}" onmouseenter={fn.active}
+      onmouseover={fn.active} onmouseleave={fn.hidden}>
       <dd><a href="javascript:;">{app.lang.header.userinfo.account}</a></dd>
       <dd><a href="javascript:;">{app.lang.header.userinfo.logout}</a></dd>
     </dl>
@@ -21,10 +23,15 @@
       _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
     },
     active: function(){
+      clearTimeout(_this.timer);
       _this.active = true;
     },
     hidden: function(){
-      _this.active = false;
+      clearTimeout(_this.timer);
+      _this.timer = setTimeout(function(){
+        _this.active = false;
+        _this.update();
+      }, 800);
     }
   };
 

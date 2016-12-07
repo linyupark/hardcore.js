@@ -58,6 +58,48 @@ button
   &:focus
     background-color: getColor(background, focus)
     +focus-border()
+=css-arrow($pos: 'top', $size: 5px, $color: #fff)
+  &:after
+    border: solid transparent
+    content: " "
+    height: 0
+    width: 0
+    position: absolute
+    pointer-events: none
+    border-width: $size
+    @if $pos == 'top'
+      bottom: 100%
+      left: 50%
+      margin-left: -$size
+      border-bottom-color: $color
+    @if $pos == 'bottom'
+      top: 100%
+      left: 50%
+      margin-left: -$size
+      border-top-color: $color
+    @if $pos == 'left'
+      top: 50%
+      right: 100%
+      margin-top: -$size
+      border-right-color: $color
+    @if $pos == 'right'
+      top: 50%
+      left: 100%
+      margin-top: -$size
+      border-left-color: $color
+
+@-webkit-keyframes fadeInDown
+  from
+    opacity: 0
+    -webkit-transform: translate3d(0, -30%, 0)
+    transform: translate3d(0, -30%, 0)
+  to
+    opacity: 1
+    -webkit-transform: none
+    transform: none
+
+
+
 
 
 .wrapper
@@ -115,16 +157,20 @@ header
         display: none
         width: 100%
         position: absolute
-        top: 25px
+        top: 30px
         text-align: center
         border-radius: $border-radius
-        box-shadow: 0 2px 3px getColor(gray, lighter)
+        box-shadow: 0 1px 3px getColor(gray, lighter)
         background: getColor(background, body)
+        animation: fadeInDown .3s
         &.active
           display: block
+        +css-arrow('top')
         dd
           margin: 0
           border-bottom: 1px solid getColor(base, lines)
+          &:last-child
+            border: none
           a
             margin: 0
             width: 100%

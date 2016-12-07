@@ -522,6 +522,16 @@ button {
 :focus {
   outline: none; }
 
+@-webkit-keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -30%, 0);
+    transform: translate3d(0, -30%, 0); }
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none; } }
+
 .wrapper {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -620,16 +630,31 @@ header userinfo {
       display: none;
       width: 100%;
       position: absolute;
-      top: 25px;
+      top: 30px;
       text-align: center;
       border-radius: 5px;
-      box-shadow: 0 2px 3px #999999;
-      background: white; }
+      box-shadow: 0 1px 3px #999999;
+      background: white;
+      animation: fadeInDown .3s; }
       header userinfo .username .menu.active {
         display: block; }
+      header userinfo .username .menu:after {
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-width: 5px;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-bottom-color: #fff; }
       header userinfo .username .menu dd {
         margin: 0;
         border-bottom: 1px solid #DCDCDC; }
+        header userinfo .username .menu dd:last-child {
+          border: none; }
         header userinfo .username .menu dd a {
           margin: 0;
           width: 100%;
