@@ -89,6 +89,8 @@ export const xhr = (url, options = {}) => {
       headers: {},
       cache: false,
       type: "json",
+      withCredentials: false,
+      showProgress: false,
       done() {},
       fail() {},
       progress() {},
@@ -108,7 +110,7 @@ export const xhr = (url, options = {}) => {
   }
   // 如果是put /post 则用formdata
   if (/^put$|^post$/i.test(opts.method)) {
-    opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+    opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   } else if(send_data.length > 0) {
     url += (has_q ? "&" : "?") + send_data;
   }
@@ -117,17 +119,20 @@ export const xhr = (url, options = {}) => {
   for (let k in opts.headers) {
     xhr.setRequestHeader(k, opts.headers[k]);
   }
+  xhr.withCredentials = opts.withCredentials;
   // 如果支持进度条
-  let progressFn = (e) => {
-    if (e.lengthComputable) {
-      progress = Math.round(e.loaded * 100 / e.total);
-      opts.progress.call(e.target, progress);
+  if(opts.showProgress){
+    let progressFn = (e) => {
+      if (e.lengthComputable) {
+        progress = Math.round(e.loaded * 100 / e.total);
+        opts.progress.call(e.target, progress);
+      }
+    };
+    if(xhr.upload){
+      xhr.upload.addEventListener('progress', progressFn, false);
     }
-  };
-  if(xhr.upload){
-    xhr.upload.addEventListener('progress', progressFn, false);
+    xhr.addEventListener('progress', progressFn, false);
   }
-  xhr.addEventListener('progress', progressFn, false);
   xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
@@ -140,13 +145,13 @@ export const xhr = (url, options = {}) => {
     else{
       opts.fail.call(e.target, e.target.status);
     }
-  }, false);
+  }, { once: true });
   xhr.addEventListener('error', () => {
     opts.fail();
-  }, false);
+  }, { once: true });
   xhr.addEventListener('loadend', () => {
     opts.complete();
-  }, false);
+  }, { once: true });
   // done().fail().progress()
   xhr.done = fn => {
     opts.done = fn;
