@@ -32,7 +32,11 @@
   "lang": {
     "cn": {
       "header": {
-        "sitename": "浙江大学教育基金会管理后台"
+        "sitename": "浙江大学教育基金会管理后台",
+        "userinfo": {
+          "account": "帐号信息",
+          "logout": "退出"
+        }
       },
       "login": {
         "admin": "管理员登录",
@@ -44,7 +48,10 @@
         "btn": "登 录",
         "findpass": "忘记密码",
         "fail": "登录失败: 账号密码错误",
-        "btn:loading": "登 录 中"
+        "invalid": "请填写帐号密码",
+        "btn:loading": "登 录 中",
+        "btn:ok": "登录成功",
+        "relogin": "访问失败: 需要重新登录"
       },
       "footer": {
         "icp": "浙ICP备1202106号-2",

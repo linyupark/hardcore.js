@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>校友会基金系统</title>
   </head>
   <body>
@@ -26,7 +26,7 @@
         new RiotApp.FP({
           id: 'fp',
           lang: 'cn',
-          env: RiotApp.FP.detectEnv(),
+          env: RiotApp.FP.detectEnv('dev'),
           mountPage: '#main',
           resource: []
         });

@@ -28,10 +28,19 @@ class FP extends RiotApp{
       this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
         method: method,
         data: opts.data || {},
-        headers: opts.headers || {}
+        headers: opts.headers || {},
+        cache: opts.cache || false
       }).done(resp => {
         if(resp.errno == 0) resolve(resp.data);
-        else reject(resp.errmsg);
+        else reject({
+          code: resp.errno,
+          errmsg: resp.errmsg
+        });
+      }).fail(status => {
+        reject({
+          code: status,
+          errmsg: ''
+        });
       }).complete(() => {
         this.__api.splice(this.__api.indexOf(url), 1);
         if(opts.trigger){

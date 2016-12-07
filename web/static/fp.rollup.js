@@ -88,6 +88,8 @@ const xhr = (url, options = {}) => {
       headers: {},
       cache: false,
       type: "json",
+      withCredentials: false,
+      showProgress: false,
       done() {},
       fail() {},
       progress() {},
@@ -107,7 +109,7 @@ const xhr = (url, options = {}) => {
   }
   // 如果是put /post 则用formdata
   if (/^put$|^post$/i.test(opts.method)) {
-    opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+    opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   } else if(send_data.length > 0) {
     url += (has_q ? "&" : "?") + send_data;
   }
@@ -116,17 +118,20 @@ const xhr = (url, options = {}) => {
   for (let k in opts.headers) {
     xhr.setRequestHeader(k, opts.headers[k]);
   }
+  xhr.withCredentials = opts.withCredentials;
   // 如果支持进度条
-  let progressFn = (e) => {
-    if (e.lengthComputable) {
-      progress = Math.round(e.loaded * 100 / e.total);
-      opts.progress.call(e.target, progress);
+  if(opts.showProgress){
+    let progressFn = (e) => {
+      if (e.lengthComputable) {
+        progress = Math.round(e.loaded * 100 / e.total);
+        opts.progress.call(e.target, progress);
+      }
+    };
+    if(xhr.upload){
+      xhr.upload.addEventListener('progress', progressFn, false);
     }
-  };
-  if(xhr.upload){
-    xhr.upload.addEventListener('progress', progressFn, false);
+    xhr.addEventListener('progress', progressFn, false);
   }
-  xhr.addEventListener('progress', progressFn, false);
   xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
@@ -139,13 +144,13 @@ const xhr = (url, options = {}) => {
     else{
       opts.fail.call(e.target, e.target.status);
     }
-  }, false);
+  }, { once: true });
   xhr.addEventListener('error', () => {
     opts.fail();
-  }, false);
+  }, { once: true });
   xhr.addEventListener('loadend', () => {
     opts.complete();
-  }, false);
+  }, { once: true });
   // done().fail().progress()
   xhr.done = fn => {
     opts.done = fn;
@@ -3745,10 +3750,19 @@ class FP extends RiotApp{
       this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
         method: method,
         data: opts.data || {},
-        headers: opts.headers || {}
+        headers: opts.headers || {},
+        cache: opts.cache || false
       }).done(resp => {
         if(resp.errno == 0) resolve(resp.data);
-        else reject(resp.errmsg);
+        else reject({
+          code: resp.errno,
+          errmsg: resp.errmsg
+        });
+      }).fail(status => {
+        reject({
+          code: status,
+          errmsg: ''
+        });
       }).complete(() => {
         this.__api.splice(this.__api.indexOf(url), 1);
         if(opts.trigger){

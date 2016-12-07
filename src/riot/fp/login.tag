@@ -19,12 +19,12 @@
           <a href="javascript:;" onclick={fn.pwdToggle} class="pwd-{pwd}"></a>
         </p>
         <div class="msg-space">
-          <input-valid for="username,password" rule="required" msg="请填写帐号密码"></input-valid>
+          <input-valid for="username,password" rule="required" msg="{app.lang.login.invalid}"></input-valid>
         </div>
         <p class="btn-line">
           <button onclick={fn.login}>{app.lang.login.btn}</button>
           <br>
-          <a href="#!/findpass">{app.lang.login.findpass}</a>
+          <a href="#!findpass">{app.lang.login.findpass}</a>
         </p>
       </div>
     </form>
@@ -38,6 +38,7 @@
   var _this = this;
   _this.role = 'admin';
   _this.pwd = 'hide';
+  _this.ref = _this.app.route.params[1] && _this.app.route.params[1].ref;
 
   _this.fn = {
     login: function(e){
@@ -45,13 +46,30 @@
         e.target.innerText = _this.app.lang.login['btn:loading'];
         // 尝试登录
         _this.app.api('POST', 'login/default/index', {
+          withCredentials: true,
           data: {
             'LoginForm[username]': target[0].value,
             'LoginForm[password]': target[1].value
           },
           trigger: e.target
         })
+        .then(function(){
+          e.target.innerText = _this.app.lang.login['btn:ok'];
+          // 登录成功
+          _this.app.utils.cookie.set('role', _this.role, {
+            'max-age': 3600*24*7
+          });
+          // 如果有来源页
+          if(_this.ref){
+            location.href = (_this.app.route.params[1].ref);
+          }
+          else{
+            // admin-index || user-index
+            // _this.app.route(_this.role+'-'+_this.app.config.indexPage);
+          }
+        })
         .catch(function(msg){
+          // 接口失败错误信息提示
           _this.tags['input-valid'].emit(
             'msg', _this.app.lang.login.fail
           );
@@ -81,7 +99,13 @@
   };
 
   _this.on('mount', function(){
-
+    if(_this.ref){
+      // 告诉用户需要重新登录
+      _this.tags['input-valid'].emit(
+        'msg', _this.app.lang.login.relogin
+      );
+      _this.refs.username.focus();
+    }
   });
 
   </script>

@@ -98,6 +98,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       headers: {},
       cache: false,
       type: "json",
+      withCredentials: false,
+      showProgress: false,
       done: function done() {},
       fail: function fail() {},
       progress: function progress() {},
@@ -118,7 +120,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
     // 如果是put /post 则用formdata
     if (/^put$|^post$/i.test(opts.method)) {
-      opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+      opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
     } else if (send_data.length > 0) {
       url += (has_q ? "&" : "?") + send_data;
     }
@@ -127,17 +129,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     for (var k in opts.headers) {
       xhr.setRequestHeader(k, opts.headers[k]);
     }
+    xhr.withCredentials = opts.withCredentials;
     // 如果支持进度条
-    var progressFn = function progressFn(e) {
-      if (e.lengthComputable) {
-        progress = Math.round(e.loaded * 100 / e.total);
-        opts.progress.call(e.target, progress);
+    if (opts.showProgress) {
+      var progressFn = function progressFn(e) {
+        if (e.lengthComputable) {
+          progress = Math.round(e.loaded * 100 / e.total);
+          opts.progress.call(e.target, progress);
+        }
+      };
+      if (xhr.upload) {
+        xhr.upload.addEventListener('progress', progressFn, false);
       }
-    };
-    if (xhr.upload) {
-      xhr.upload.addEventListener('progress', progressFn, false);
+      xhr.addEventListener('progress', progressFn, false);
     }
-    xhr.addEventListener('progress', progressFn, false);
     xhr.addEventListener('load', function (e) {
       var res = void 0;
       if (e.target.status === 200 || e.target.status === 304) {
@@ -149,13 +154,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       } else {
         opts.fail.call(e.target, e.target.status);
       }
-    }, false);
+    }, { once: true });
     xhr.addEventListener('error', function () {
       opts.fail();
-    }, false);
+    }, { once: true });
     xhr.addEventListener('loadend', function () {
       opts.complete();
-    }, false);
+    }, { once: true });
     // done().fail().progress()
     xhr.done = function (fn) {
       opts.done = fn;
@@ -3925,9 +3930,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this15.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
             method: method,
             data: opts.data || {},
-            headers: opts.headers || {}
+            headers: opts.headers || {},
+            cache: opts.cache || false
           }).done(function (resp) {
-            if (resp.errno == 0) resolve(resp.data);else reject(resp.errmsg);
+            if (resp.errno == 0) resolve(resp.data);else reject({
+              code: resp.errno,
+              errmsg: resp.errmsg
+            });
+          }).fail(function (status) {
+            reject({
+              code: status,
+              errmsg: ''
+            });
           }).complete(function () {
             _this15.__api.splice(_this15.__api.indexOf(url), 1);
             if (opts.trigger) {

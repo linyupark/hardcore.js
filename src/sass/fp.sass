@@ -1,25 +1,29 @@
 @import "normalize"
+@import "fontello"
+
 @import "gridle/settings"
 @import "gridle/gridle"
 @import "globals/color"
 @import "globals/font"
 
 
-
 // 项目变量
 $tablet-max-width: 1400px
+$tablet-min-width: 481px
 $mobile-max-width: 480px
+$mobile-min-width: 320px
 $header-logo: (w: 50px, h: 50)
 $border-radius: 5px
 
-+gridle_setup((gutter-width: 0, gutter-left: 0, gutter-right: 0))
-+gridle_register_state(mobile, (max-width: $mobile-max-width))
-+gridle_register_state(tablet, (min-width: 481px, max-width: $tablet-max-width))
++gridle_setup((context: 14, gutter-width: 0, gutter-left: 0, gutter-right: 0))
++gridle_register_state(mobile, (min-width: $mobile-min-width, max-width: $mobile-max-width))
++gridle_register_state(tablet, (min-width: $tablet-min-width, max-width: $tablet-max-width))
 +gridle_init()
 
 // global
 a
   text-decoration: none
+  color: getColor(text, link)
 button
   cursor: pointer
   border: none
@@ -35,7 +39,6 @@ button
   background-color: darken($color, 5%)
 =hover-text($color)
   color: darken($color, 5%)
-  border-bottom: 1px dotted $color
 =focus-bg($color)
   background-color: lighten($color, 5%)
 =focus-text($color)
@@ -47,70 +50,130 @@ button
     +hover-bg(getColor(base, primary))
   &[disabled]
     background: rgba(getColor(base, primary), .3)
+=input-text-primary($height: 34px, $padding: 5px 0 5px 10px)
+  height: $height
+  padding: $padding
+  border-radius: $border-radius
+  border: 1px solid getColor(border, input)
+  &:focus
+    background-color: getColor(background, focus)
+    +focus-border()
 
 
-// layout
 .wrapper
-  +gridle(container)
+  +gridle(row)
+  min-width: $mobile-min-width
   max-width: $tablet-max-width
   margin: 0 auto
 
-
 header
-  h1
-    font-size: $font-xl
-    margin: 0
-  .login-header
+  // 登录页的header
+  &.login
     background: getColor(background, body)
+  .login-header
+    +gridle(13 push 0.5)
+  // 管理页的heander
+  &.admin, &.user
+    background: getColor(base, primary)
+  .admin-header
+    +gridle(row)
+    height: 60px
     h1
-      height: 90px
-      line-height: 90px
-      text-indent: 110+map-get($header-logo, w)+15px
-      background: url(../img/fp/header-logo.png) no-repeat 110px center
-      color: getColor(gray, base)
+      +gridle(11 push 0.5)
+      height: 60px
+      line-height: 60px
+      color: getColor(text, primary-invert)
+  h1
+    +gridle_state(mobile)
+      font-size: $font-m
+    font-size: $font-l
+    margin: 0
+    text-indent: 65px
+    height: 90px
+    line-height: 90px
+    background: url(../img/fp/header-logo.png) no-repeat left center
+    color: getColor(gray, base)
+  userinfo
+    +gridle(1.5 pull 0.5 float right)
+    // 用户信息
+    .username
+      min-width: 100px
+      position: relative
+      a
+        margin-top: 10px
+        height: 40px
+        line-height: 40px
+        text-align: center
+        display: block
+        font-size: $font-m
+        color: getColor(text, primary-invert)
+        &.active
+          border-radius: $border-radius
+          box-shadow: 0 1px 2px darken(getColor(base, primary), 15%) inset
+          +hover-bg(getColor(base, primary))
+      .menu
+        display: none
+        width: 100%
+        position: absolute
+        top: 25px
+        text-align: center
+        border-radius: $border-radius
+        box-shadow: 0 2px 3px getColor(gray, lighter)
+        background: getColor(background, body)
+        &.active
+          display: block
+        dd
+          margin: 0
+          border-bottom: 1px solid getColor(base, lines)
+          a
+            margin: 0
+            width: 100%
+            font-size: $font-s
+            color: getColor(text, primary)
+            &:hover
+              background: none
+              box-shadow: none
+              color: getColor(text, link)
 
 footer
   height: 90px
   .info
-    margin: 29px auto 29px 110px
+    +gridle(12 push 1)
     line-height: 150%
     font-size: $font-xs
     color: getColor(text, secondary)
 
-
-
 .body
-  padding: 0
-  margin: 0
   overflow: hidden
   background: getColor(background, body)
 
+// 登录页
 .body.fp-login
-  box-shadow: 0 2px 4px getColor(base, lines) inset
+  box-shadow: 0 2px 4px darken(getColor(base, lines), 10%) inset
   background: #F2EDEF
-
-
-
+// 管理页
+.body.admin
+  box-shadow: 0 2px 4px darken(getColor(base, lines), 10%) inset
+  background: #fff
 
 
 // classes
 .login-from
-  width: 350px
+  +gridle(3.5 pull 1.4 float right)
+  max-width: 350px
+  min-width: 350px
   height: 320px
   border-radius: $border-radius
   box-shadow: 0 0 5px getColor(base, lines)
   background: getColor(background, body)
-  float: right
-  margin: 140px 140px 140px 0
+  margin: 140px 0
+  +gridle_state(mobile)
+    +gridle(14 pull 0 grid-centered)
+    margin: 80px 0
   input
     margin: 10px 0 0 25px
     width: 290px
-    height: 34px
-    padding: 5px 0 5px 10px
-    border-radius: $border-radius
-    border: 1px solid getColor(border, input)
-    &:focus
-      +focus-border()
+    +input-text-primary()
   .pwd-show, .pwd-hide
     width: 25px
     height: 25px

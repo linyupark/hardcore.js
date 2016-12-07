@@ -403,17 +403,116 @@ template {
 [hidden] {
   display: none; }
 
+@font-face {
+  font-family: 'fontello';
+  src: url("../font/fontello.eot?83900098");
+  src: url("../font/fontello.eot?83900098#iefix") format("embedded-opentype"), url("../font/fontello.woff2?83900098") format("woff2"), url("../font/fontello.woff?83900098") format("woff"), url("../font/fontello.ttf?83900098") format("truetype"), url("../font/fontello.svg?83900098#fontello") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'fontello';
+    src: url('../font/fontello.svg?83900098#fontello') format('svg');
+  }
+}
+*/
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: "fontello";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */ }
+
+.icon-down-open-big:before {
+  content: '\e800'; }
+
+/* '' */
+.icon-up-open-big:before {
+  content: '\e801'; }
+
+/* '' */
+.icon-menu:before {
+  content: '\e802'; }
+
+/* '' */
 body {
   font-size: 14px;
   font-family: "黑体", "Arial", sans-serif; }
 
-.wrapper:after {
+.wrapper:before, header .admin-header:before, .wrapper:after, header .admin-header:after {
   content: "";
-  display: table;
+  display: table; }
+
+.wrapper:after, header .admin-header:after {
   clear: both; }
 
+.wrapper, header .admin-header {
+  zoom: 1; }
+
+header .login-header, header .admin-header h1, header userinfo, footer .info, .login-from {
+  display: inline-block;
+  min-height: 1px;
+  float: left;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  vertical-align: top; }
+
+header .login-header, header .admin-header h1, footer .info {
+  position: relative; }
+
+header userinfo, .login-from {
+  position: relative; }
+
+@media screen and (min-width: 320px) and (max-width: 480px) {
+  .login-from {
+    display: inline-block;
+    min-height: 1px;
+    float: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    vertical-align: top; } }
+
+@media screen and (min-width: 320px) and (max-width: 480px) {
+  .login-from {
+    position: relative; } }
+
+@media screen and (min-width: 320px) and (max-width: 480px) {
+  .login-from {
+    display: block !important;
+    float: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    clear: both !important; } }
+
 a {
-  text-decoration: none; }
+  text-decoration: none;
+  color: #575E85; }
 
 button {
   cursor: pointer;
@@ -424,48 +523,166 @@ button {
   outline: none; }
 
 .wrapper {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: -0;
+  margin-right: -0;
+  min-width: 320px;
   max-width: 1400px;
   margin: 0 auto; }
+  [class*="no-gutter"] > .wrapper {
+    margin-left: 0 !important;
+    margin-right: 0 !important; }
+  .wrapper .wrapper {
+    margin-left: -0;
+    margin-right: -0; }
+  @media screen and (min-width: 320px) and (max-width: 480px) {
+    .wrapper .wrapper {
+      margin-left: -0;
+      margin-right: -0; } }
+  @media screen and (min-width: 481px) and (max-width: 1400px) {
+    .wrapper .wrapper {
+      margin-left: -0;
+      margin-right: -0; } }
 
-header h1 {
-  font-size: 28px;
-  margin: 0; }
+header.login {
+  background: white; }
 
 header .login-header {
-  background: white; }
-  header .login-header h1 {
-    height: 90px;
-    line-height: 90px;
-    text-indent: 175px;
-    background: url(../img/fp/header-logo.png) no-repeat 110px center;
-    color: #666666; }
+  width: 92.85714%;
+  left: 3.57143%;
+  right: auto; }
+
+header.admin, header.user {
+  background: #DF3A5E; }
+
+header .admin-header {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: -0;
+  margin-right: -0;
+  height: 60px; }
+  [class*="no-gutter"] > header .admin-header {
+    margin-left: 0 !important;
+    margin-right: 0 !important; }
+  header .admin-header header .admin-header {
+    margin-left: -0;
+    margin-right: -0; }
+  @media screen and (min-width: 320px) and (max-width: 480px) {
+    header .admin-header header .admin-header {
+      margin-left: -0;
+      margin-right: -0; } }
+  @media screen and (min-width: 481px) and (max-width: 1400px) {
+    header .admin-header header .admin-header {
+      margin-left: -0;
+      margin-right: -0; } }
+  header .admin-header h1 {
+    width: 78.57143%;
+    left: 3.57143%;
+    right: auto;
+    height: 60px;
+    line-height: 60px;
+    color: #fff; }
+
+header h1 {
+  font-size: 20px;
+  margin: 0;
+  text-indent: 65px;
+  height: 90px;
+  line-height: 90px;
+  background: url(../img/fp/header-logo.png) no-repeat left center;
+  color: #666666; }
+  @media screen and (min-width: 320px) and (max-width: 480px) {
+    header h1 {
+      font-size: 16px; } }
+
+header userinfo {
+  width: 10.71429%;
+  right: 3.57143%;
+  left: auto;
+  float: right; }
+  header userinfo .username {
+    min-width: 100px;
+    position: relative; }
+    header userinfo .username a {
+      margin-top: 10px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      display: block;
+      font-size: 16px;
+      color: #fff; }
+      header userinfo .username a.active {
+        border-radius: 5px;
+        box-shadow: 0 1px 2px #b01d3d inset;
+        background-color: #db244c; }
+    header userinfo .username .menu {
+      display: none;
+      width: 100%;
+      position: absolute;
+      top: 25px;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 0 2px 3px #999999;
+      background: white; }
+      header userinfo .username .menu.active {
+        display: block; }
+      header userinfo .username .menu dd {
+        margin: 0;
+        border-bottom: 1px solid #DCDCDC; }
+        header userinfo .username .menu dd a {
+          margin: 0;
+          width: 100%;
+          font-size: 14px;
+          color: #222; }
+          header userinfo .username .menu dd a:hover {
+            background: none;
+            box-shadow: none;
+            color: #575E85; }
 
 footer {
   height: 90px; }
   footer .info {
-    margin: 29px auto 29px 110px;
+    width: 85.71429%;
+    left: 7.14286%;
+    right: auto;
     line-height: 150%;
     font-size: 13px;
     color: #999; }
 
 .body {
-  padding: 0;
-  margin: 0;
   overflow: hidden;
   background: white; }
 
 .body.fp-login {
-  box-shadow: 0 2px 4px #DCDCDC inset;
+  box-shadow: 0 2px 4px #c3c3c3 inset;
   background: #F2EDEF; }
 
+.body.admin {
+  box-shadow: 0 2px 4px #c3c3c3 inset;
+  background: #fff; }
+
 .login-from {
-  width: 350px;
+  width: 25%;
+  right: 10%;
+  left: auto;
+  float: right;
+  max-width: 350px;
+  min-width: 350px;
   height: 320px;
   border-radius: 5px;
   box-shadow: 0 0 5px #DCDCDC;
   background: white;
-  float: right;
-  margin: 140px 140px 140px 0; }
+  margin: 140px 0; }
+  @media screen and (min-width: 320px) and (max-width: 480px) {
+    .login-from {
+      margin: 80px 0; } }
+
+@media screen and (min-width: 320px) and (max-width: 480px) and (min-width: 320px) and (max-width: 480px) and (min-width: 320px) and (max-width: 480px) {
+  .login-from {
+    width: 100%;
+    right: 0%;
+    left: auto; } }
   .login-from input {
     margin: 10px 0 0 25px;
     width: 290px;
@@ -474,6 +691,7 @@ footer {
     border-radius: 5px;
     border: 1px solid #e3e3e3; }
     .login-from input:focus {
+      background-color: rgba(250, 255, 189, 0.8);
       border-radius: 5px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.6) inset; }
   .login-from .pwd-show, .login-from .pwd-hide {
@@ -509,8 +727,7 @@ footer {
     display: inline-block;
     margin: 15px 0 0 270px; }
     .login-from .btn-line a:hover {
-      color: #4d5376;
-      border-bottom: 1px dotted #575E85; }
+      color: #4d5376; }
   .login-from .tab-line {
     height: 50px;
     margin: 0; }
