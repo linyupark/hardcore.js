@@ -16,10 +16,56 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   'use strict';
 
   /**
-   * 是否某版本ie
-   * @param  {number} ver 版本号
-   * @param  {string} op 操作符
-   * @return {[boolean]}
+   * php的time()
+   * @return {int} 时间戳
+   */
+
+  var mkphptime = function mkphptime() {
+    return Number(Math.floor(Date.now() / 1000));
+  };
+
+  /**
+   * [phpstr2time 将时间字符串转换成php时间戳]
+   * @param  {string} str 时间字符串
+   * @return {int}     时间戳
+   */
+  var phpstr2time = function phpstr2time(str) {
+    var new_str = str.replace(/:/g, '-'),
+        arr = void 0,
+        datum = void 0;
+    new_str = new_str.replace(/ /g, '-');
+    arr = new_str.split("-");
+    datum = new Date(Date.UTC(arr[0], arr[1] - 1, arr[2], arr[3] - 8, arr[4], arr[5]));
+    return datum.getTime() / 1000;
+  };
+
+  /**
+   * PHP给的时间戳转成字符
+   * @param  {int} time     时间戳
+   * @param  {bool} showtime 是否显示分时
+   * @return {str}          时间字符串
+   */
+  var phptime2str = function phptime2str(time, showtime) {
+    var dt = new Date(time * 1000),
+        y = dt.getFullYear(),
+        m = dt.getMonth() + 1,
+        d = dt.getDate(),
+        h = dt.getHours(),
+        min = dt.getMinutes(),
+        sec = dt.getSeconds();
+    m = m < 10 ? "0" + m : m;
+    d = d < 10 ? "0" + d : d;
+    h = h < 10 ? "0" + h : h;
+    min = min < 10 ? "0" + min : min;
+    sec = sec < 10 ? "0" + sec : sec;
+    if (showtime) {
+      return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec;
+    }
+    return y + "-" + m + "-" + d;
+  };
+
+  /**
+   * 是否是IE
    */
 
   /**
@@ -34,7 +80,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @param  {object} ext 扩充对象
    * @return {object}
    */
-
   var assign = function assign() {
     var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var ext = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -698,9 +743,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
-  if ("Promise" in window) {
-    Promise = window.Promise;
-  }
 
   var Loader = function () {
     function Loader() {
@@ -3761,7 +3803,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.route = route;
         this.xhr = xhr;
         this.utils = {
-          cookie: cookie
+          cookie: cookie,
+          str2time: phpstr2time,
+          time2str: phptime2str,
+          time: mkphptime,
+          serialize: serialize
         };
         // 初始化操作
         this.init();
@@ -3802,6 +3848,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                   pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js',
                   tagName = cf.id + '-' + page;
               _this13.route.params = params;
+              _this13.route.path = '';
+              _this13.route.query = {};
+              for (var i in params) {
+                if (_typeof(params[i]) === 'object') _this13.route.query = params[i];else _this13.route.path += params[i] + '/';
+              }
+              _this13.route.path = _this13.route.path.slice(0, -1);
               Loader.batch(pageFile).then(function () {
                 try {
                   (function () {
@@ -3919,6 +3971,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.__api = this.__api || [];
         for (var i in this.__api) {
           if (this.__api[i] === url) {
+            this.emit('api::fail', {
+              code: '',
+              errmsg: 'api busy:' + url
+            });
             return this.Promise.reject('api busy:' + url);
           }
         }
@@ -3933,14 +3989,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             headers: opts.headers || {},
             cache: opts.cache || false
           }).done(function (resp) {
-            if (resp.errno == 0) resolve(resp.data);else reject({
-              code: resp.errno,
-              errmsg: resp.errmsg
-            });
+            if (resp.errno == 0) resolve(resp.data);else {
+              _this15.emit('api::fail', {
+                code: resp.errno,
+                errmsg: resp.errmsg
+              });
+              reject({
+                code: resp.errno,
+                errmsg: resp.errmsg,
+                url: url
+              });
+            }
           }).fail(function (status) {
+            _this15.emit('api::fail', {
+              code: status,
+              errmsg: '',
+              url: url
+            });
             reject({
               code: status,
-              errmsg: ''
+              errmsg: '',
+              url: url
             });
           }).complete(function () {
             _this15.__api.splice(_this15.__api.indexOf(url), 1);

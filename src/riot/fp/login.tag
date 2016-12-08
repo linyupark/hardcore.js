@@ -65,7 +65,7 @@
           }
           else{
             // admin-index || user-index
-            // _this.app.route(_this.role+'-'+_this.app.config.indexPage);
+            _this.app.route(_this.role+'-'+_this.app.config.indexPage);
           }
         })
         .catch(function(msg){

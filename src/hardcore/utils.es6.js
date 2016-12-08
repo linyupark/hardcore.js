@@ -1,15 +1,66 @@
 
+/**
+ * php的time()
+ * @return {int} 时间戳
+ */
+export const mkphptime = () => {
+  return Number(Math.floor(Date.now() / 1000));
+};
 
 /**
- * 是否某版本ie
- * @param  {number} ver 版本号
- * @param  {string} op 操作符
- * @return {[boolean]}
+ * [phpstr2time 将时间字符串转换成php时间戳]
+ * @param  {string} str 时间字符串
+ * @return {int}     时间戳
  */
-export const isIE = (ver="", op="") => {
-    let b = document.createElement('b');
-    b.innerHTML = `<!--[if ${op?op+' ':''}IE${ver?' '+ver:''}]><i></i><![endif]-->`;
-    return b.getElementsByTagName('i').length === 1;
+export const phpstr2time = (str) => {
+  let
+    new_str = str.replace(/:/g,'-'), arr, datum;
+  new_str = new_str.replace(/ /g,'-');
+  arr = new_str.split("-");
+  datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+  return datum.getTime() / 1000;
+};
+
+/**
+ * PHP给的时间戳转成字符
+ * @param  {int} time     时间戳
+ * @param  {bool} showtime 是否显示分时
+ * @return {str}          时间字符串
+ */
+export const phptime2str = (time, showtime) => {
+  let
+    dt = new Date(time * 1000),
+    y = dt.getFullYear(),
+    m = dt.getMonth()+1,
+    d = dt.getDate(),
+    h = dt.getHours(),
+    min = dt.getMinutes(),
+    sec = dt.getSeconds();
+  m = m < 10 ? "0" + m : m;
+  d = d < 10 ? "0" + d : d;
+  h = h < 10 ? "0" + h : h;
+  min = min < 10 ? "0" + min : min;
+  sec = sec < 10 ? "0" + sec : sec;
+  if(showtime){
+    return y+"-"+m+"-"+d+" "+h+":"+min+":"+sec;
+  }
+  return y+"-"+m+"-"+d;
+};
+
+
+
+/**
+ * 是否是IE
+ */
+export const isIE = () => {
+  let
+    UA = window.navigator.userAgent,
+    oldIE = UA.indexOf('MSIE '),
+    newIE = UA.indexOf('Trident/');
+  if(oldIE > -1 || newIE > -1){
+    return true;
+  }
+  return false;
 };
 
 

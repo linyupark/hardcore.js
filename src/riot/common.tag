@@ -1,3 +1,40 @@
+<!-- table筛选过滤 -->
+<table-filter>
+  <div if={opts.for=='agreement'}>
+    {app.lang.admin.search.condition}:
+    <select ref="agreement">
+      <option each={app.lang.admin.search.agreement} value={key} selected={type==key}>{name}</option>
+    </select>
+    <input type="text" ref="keyword" value={keyword}>
+    <button class="gray-btn" onclick={fn.search}>
+      <i class="icon-search"></i>
+    </button>
+  </div>
+  <yield from="addon"></yield>
+  <script>
+  var _this = this;
+  _this.q = _this.app.route.query;
+  _this.path = _this.app.route.path;
+  _this.fn = {
+    search: function(){
+      if(opts.for === 'agreement'){
+        _this.q.type = _this.refs.agreement.value;
+        _this.q.keyword = _this.refs.keyword.value;
+        _this.app.route(_this.path+'?'+_this.app.utils.serialize(_this.q));
+      }
+    }
+  };
+  _this.on('mount', function(){
+    if(opts.for === 'agreement'){
+      _this.type = _this.app.route.query.type;
+      _this.keyword = _this.app.route.query.keyword;
+    }
+    _this.update();
+  });
+  </script>
+</table-filter>
+
+
 <!-- 用户信息 -->
 <userinfo>
   <div class="username" onmouseenter={fn.active}
@@ -51,11 +88,6 @@
     else{
       // 获取资料信息
       _this.app.api('GET', 'login/default/user-info')
-      // _this.app.api('GET', 'agreement/default/price', {
-      //   data: {
-      //     id: 144
-      //   }
-      // })
       .then(function(data){
         _this.user_name = data.user_name;
         _this.user_id = data.user_id;
@@ -131,9 +163,45 @@
       <userinfo></userinfo>
     </div>
 
+    <!-- 顶部信息框 -->
+    <div show={message} class="top-message {active: message}">{message}</div>
+
   </div>
 
   <script>
+  var _this = this;
+  _this.fn = {
+    message: function(msg){
+      clearTimeout(_this.timer);
+      _this.message = msg;
+      _this.timer = setTimeout(function(){
+        _this.message = null;
+        _this.update();
+      }, 2000);
+      _this.update();
+    }
+  };
+  // 监听api报错信息
+  _this.app.on('api::fail', function(data){
+    _this.app.err('api failed', data);
+    _this.fn.message(data.url+' '+data.code+' '+data.errmsg);
+  });
+  // 自定义信息
+  _this.app.on('message::header', function(msg){
+    _this.fn.message(msg);
+  });
+  // 对象动画
+  _this.app.on('animation', function(target, name){
+    target.setAttribute('class',
+    target.getAttribute('class') + ' animation-'+name);
+    setTimeout(function(){
+      target.setAttribute('class',
+      target.getAttribute('class').replace('animation-'+name, ''));
+    }, 500);
+  });
+  _this.on('mount', function(){
+    document.body.setAttribute('class', opts.for);
+  });
   </script>
 
 </header>

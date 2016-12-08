@@ -1,4 +1,159 @@
 
+<!-- 弹出框 -->
+<modal show={open}>
+  <style scoped>
+  #modal-mask{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #000;
+    opacity: .4;
+  }
+  .modal-container{
+    position: fixed;
+    left: 50%;
+    box-shadow: 0 0 10px #666;
+    background: #fff;
+    border-radius: 5px;
+  }
+  .header{
+    height: 40px;
+    border-bottom: 1px solid #ebebeb;
+    position: relative;
+  }
+  .header h3{
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+  }
+  .header a{
+    position: absolute;
+    right: 15px;
+    top: 6px;
+    font-size: 22px;
+    color: #ccc;
+  }
+  .content{
+    text-align: center;
+    padding: 20px;
+    min-height: 60px;
+  }
+  .btn-group{
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+  }
+  .btn-group button{
+    height: 30px;
+    width: 90px;
+    margin: 0 15px;
+  }
+  .animation{
+    animation: fadeInDown .3s;
+  }
+  </style>
+
+  <!-- 弹窗主体 -->
+  <div class="modal-container {animation: open}"
+    style="width: {opts.w||360}px; height: {opts.h||200}px; z-index: {opts.z?Number(opts.z)+11:22}; top: {opts.top||'30%'}; margin-left: {opts.w?'-'+Number(opts.w/2):-180}px">
+    <div class="header">
+      <h3><yield from="title"/></h3>
+      <a href="javascript:;" onclick={fn.close} class="close">x</a>
+    </div>
+    <div class="content">
+      <yield from="content"/>
+    </div>
+    <div class="btn-group">
+      <yield from="button"/>
+      <button class="gray-btn" onclick={fn.close}>
+        <yield from="close"/>
+      </button>
+    </div>
+  </div>
+
+  <!-- 遮罩层 -->
+  <div onclick={fn.close}
+    show={open}
+    style="opacity: {opts.mask}; z-index: {opts.z||11}"
+    id="modal-mask"></div>
+
+  <script>
+  var _this = this;
+  _this.open = false;
+  _this.fn = {
+    close: function(){
+      _this.update({
+        open: false
+      });
+    }
+  };
+  _this.on('open', function(){
+    _this.open = true;
+    document.addEventListener('keydown', function(e){
+      if(e.keyCode == 27) _this.fn.close();
+    }, {once: true});
+  });
+  _this.on('close', function(){
+    _this.fn.close();
+  });
+  </script>
+</modal>
+
+<!-- ...loading 效果  -->
+<spinner-dot>
+  <style scoped>
+  .spinner {
+    width: 100%;
+    text-align: center;
+    }
+    .spinner > div {
+      width: 14px;
+      height: 14px;
+      background-color: #666;
+      border-radius: 100%;
+      display: inline-block;
+      -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    }
+
+    .spinner .bounce1 {
+      -webkit-animation-delay: -0.32s;
+      animation-delay: -0.32s;
+    }
+
+    .spinner .bounce2 {
+      -webkit-animation-delay: -0.16s;
+      animation-delay: -0.16s;
+    }
+
+    @-webkit-keyframes sk-bouncedelay {
+      0%, 80%, 100% { -webkit-transform: scale(0) }
+      40% { -webkit-transform: scale(1.0) }
+    }
+
+    @keyframes sk-bouncedelay {
+      0%, 80%, 100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+      } 40% {
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0);
+      }
+    }
+  </style>
+  <div class="spinner">
+    <div class="bounce1"></div>
+    <div class="bounce2"></div>
+    <div class="bounce3"></div>
+  </div>
+</spinner-dot>
+
 <input-valid>
 
   <span show={message}>{message}</span>
@@ -186,12 +341,11 @@
     <li show={hasNextPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>{pages}</a>
     </li>
-    <li show={opts.select=='y'}>
-      第
+    <li class="select" show={opts.select=='y'}>
+      跳转至
       <select onchange={fn.jumpPage} value="{page}">
         <option each={p in pageList} value="{p}">{p}</option>
-      </select>
-      页
+      </select> / {pages}页
     </li>
   </ul>
   <script>

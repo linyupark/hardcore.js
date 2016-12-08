@@ -17,6 +17,10 @@ class FP extends RiotApp{
     this.__api = this.__api || [];
     for(let i in this.__api){
       if(this.__api[i] === url){
+        this.emit('api::fail', {
+          code: '',
+          errmsg: 'api busy:'+url
+        });
         return this.Promise.reject('api busy:'+url);
       }
     }
@@ -32,14 +36,27 @@ class FP extends RiotApp{
         cache: opts.cache || false
       }).done(resp => {
         if(resp.errno == 0) resolve(resp.data);
-        else reject({
-          code: resp.errno,
-          errmsg: resp.errmsg
-        });
+        else {
+          this.emit('api::fail', {
+            code: resp.errno,
+            errmsg: resp.errmsg
+          });
+          reject({
+            code: resp.errno,
+            errmsg: resp.errmsg,
+            url: url
+          });
+        }
       }).fail(status => {
+        this.emit('api::fail', {
+          code: status,
+          errmsg: '',
+          url: url
+        });
         reject({
           code: status,
-          errmsg: ''
+          errmsg: '',
+          url: url
         });
       }).complete(() => {
         this.__api.splice(this.__api.indexOf(url), 1);

@@ -5,10 +5,57 @@
 }(this, (function (exports) { 'use strict';
 
 /**
- * 是否某版本ie
- * @param  {number} ver 版本号
- * @param  {string} op 操作符
- * @return {[boolean]}
+ * php的time()
+ * @return {int} 时间戳
+ */
+const mkphptime = () => {
+  return Number(Math.floor(Date.now() / 1000));
+};
+
+/**
+ * [phpstr2time 将时间字符串转换成php时间戳]
+ * @param  {string} str 时间字符串
+ * @return {int}     时间戳
+ */
+const phpstr2time = (str) => {
+  let
+    new_str = str.replace(/:/g,'-'), arr, datum;
+  new_str = new_str.replace(/ /g,'-');
+  arr = new_str.split("-");
+  datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+  return datum.getTime() / 1000;
+};
+
+/**
+ * PHP给的时间戳转成字符
+ * @param  {int} time     时间戳
+ * @param  {bool} showtime 是否显示分时
+ * @return {str}          时间字符串
+ */
+const phptime2str = (time, showtime) => {
+  let
+    dt = new Date(time * 1000),
+    y = dt.getFullYear(),
+    m = dt.getMonth()+1,
+    d = dt.getDate(),
+    h = dt.getHours(),
+    min = dt.getMinutes(),
+    sec = dt.getSeconds();
+  m = m < 10 ? "0" + m : m;
+  d = d < 10 ? "0" + d : d;
+  h = h < 10 ? "0" + h : h;
+  min = min < 10 ? "0" + min : min;
+  sec = sec < 10 ? "0" + sec : sec;
+  if(showtime){
+    return y+"-"+m+"-"+d+" "+h+":"+min+":"+sec;
+  }
+  return y+"-"+m+"-"+d;
+};
+
+
+
+/**
+ * 是否是IE
  */
 
 
@@ -584,9 +631,6 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if ("Promise" in window) {
-  Promise = window.Promise;
-}
 
 class Loader {
 
@@ -3610,7 +3654,11 @@ class RiotApp {
       this.route = route;
       this.xhr = xhr;
       this.utils = {
-        cookie: cookie
+        cookie: cookie,
+        str2time: phpstr2time,
+        time2str: phptime2str,
+        time: mkphptime,
+        serialize: serialize
       };
       // 初始化操作
       this.init();
@@ -3650,6 +3698,15 @@ class RiotApp {
             pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js`,
             tagName = `${cf.id}-${page}`;
           this.route.params = params;
+          this.route.path = '';
+          this.route.query = {};
+          for(let i in params){
+            if(typeof params[i] === 'object')
+              this.route.query = params[i];
+            else
+              this.route.path += params[i] + '/';
+          }
+          this.route.path = this.route.path.slice(0, -1);
           Loader.batch(pageFile).then(() => {
             try{
               let tag$$1 = riot$1.mount(cf.mountPage, tagName)[0],
@@ -3739,6 +3796,10 @@ class FP extends RiotApp{
     this.__api = this.__api || [];
     for(let i in this.__api){
       if(this.__api[i] === url){
+        this.emit('api::fail', {
+          code: '',
+          errmsg: 'api busy:'+url
+        });
         return this.Promise.reject('api busy:'+url);
       }
     }
@@ -3754,14 +3815,27 @@ class FP extends RiotApp{
         cache: opts.cache || false
       }).done(resp => {
         if(resp.errno == 0) resolve(resp.data);
-        else reject({
-          code: resp.errno,
-          errmsg: resp.errmsg
-        });
+        else {
+          this.emit('api::fail', {
+            code: resp.errno,
+            errmsg: resp.errmsg
+          });
+          reject({
+            code: resp.errno,
+            errmsg: resp.errmsg,
+            url: url
+          });
+        }
       }).fail(status => {
+        this.emit('api::fail', {
+          code: status,
+          errmsg: '',
+          url: url
+        });
         reject({
           code: status,
-          errmsg: ''
+          errmsg: '',
+          url: url
         });
       }).complete(() => {
         this.__api.splice(this.__api.indexOf(url), 1);

@@ -1,5 +1,6 @@
 @import "normalize"
 @import "fontello"
+@import "animation"
 
 @import "gridle/settings"
 @import "gridle/gridle"
@@ -12,8 +13,8 @@ $tablet-max-width: 1400px
 $tablet-min-width: 481px
 $mobile-max-width: 480px
 $mobile-min-width: 320px
-$header-logo: (w: 50px, h: 50)
 $border-radius: 5px
+$gutter-width: 15px
 
 +gridle_setup((context: 14, gutter-width: 0, gutter-left: 0, gutter-right: 0))
 +gridle_register_state(mobile, (min-width: $mobile-min-width, max-width: $mobile-max-width))
@@ -24,6 +25,12 @@ $border-radius: 5px
 a
   text-decoration: none
   color: getColor(text, link)
+body
+  font-size: $font-s
+  font-family: $font-primary
+  color: getColor(text, primary)
+  &.user, &.admin
+    background: getColor(background, light)
 button
   cursor: pointer
   border: none
@@ -43,13 +50,13 @@ button
   background-color: lighten($color, 5%)
 =focus-text($color)
   color: lighten($color, 5%)
-=button-primary
-  background: getColor(base, primary)
-  color: getColor(text, primary-invert)
+=button($bgcolor: getColor(base, primary), $fcolor: getColor(text, primary-invert))
+  background: $bgcolor
+  color: $fcolor
   &:hover
-    +hover-bg(getColor(base, primary))
+    +hover-bg($bgcolor)
   &[disabled]
-    background: rgba(getColor(base, primary), .3)
+    background: rgba($bgcolor, .3)
 =input-text-primary($height: 34px, $padding: 5px 0 5px 10px)
   height: $height
   padding: $padding
@@ -88,19 +95,6 @@ button
       margin-top: -$size
       border-left-color: $color
 
-@-webkit-keyframes fadeInDown
-  from
-    opacity: 0
-    -webkit-transform: translate3d(0, -30%, 0)
-    transform: translate3d(0, -30%, 0)
-  to
-    opacity: 1
-    -webkit-transform: none
-    transform: none
-
-
-
-
 
 .wrapper
   +gridle(row)
@@ -109,6 +103,27 @@ button
   margin: 0 auto
 
 header
+  // 顶部提示
+  .top-message
+    font-size: $font-xs
+    text-align: center
+    position: fixed
+    top: 0
+    left: 50%
+    padding: 8px 0
+    background: rgba(getColor(background, body), .8)
+    border-bottom-left-radius: $border-radius
+    border-bottom-right-radius: $border-radius
+    box-shadow: 0 0 5px getColor(base, lines)
+    width: 30%
+    margin-left: -15%
+    z-index: 33
+    color: getColor(state, error)
+    +gridle_state(mobile)
+      width: 80%
+      margin-left: -40%
+    &.active
+      animation: fadeInDown .5s
   // 登录页的header
   &.login
     background: getColor(background, body)
@@ -133,7 +148,10 @@ header
     text-indent: 65px
     height: 90px
     line-height: 90px
-    background: url(../img/fp/header-logo.png) no-repeat left center
+    background-image: url(../img/fp/header-logo.jpg)
+    background-position: left center
+    background-repeat: no-repeat
+    background-size: 50px 50px
     color: getColor(gray, base)
   userinfo
     +gridle(1.5 pull 0.5 float right)
@@ -163,6 +181,7 @@ header
         box-shadow: 0 1px 3px getColor(gray, lighter)
         background: getColor(background, body)
         animation: fadeInDown .3s
+        z-index: 1
         &.active
           display: block
         +css-arrow('top')
@@ -182,12 +201,18 @@ header
               color: getColor(text, link)
 
 footer
-  height: 90px
   .info
     +gridle(12 push 1)
     line-height: 150%
     font-size: $font-xs
     color: getColor(text, secondary)
+  &.admin
+    background: getColor(background, light)
+    .info
+      +gridle(14 push 0)
+      padding: 33px 0
+      text-align: center
+      border-top: 1px solid getColor(border, input)
 
 .body
   overflow: hidden
@@ -200,10 +225,24 @@ footer
 // 管理页
 .body.admin
   box-shadow: 0 2px 4px darken(getColor(base, lines), 10%) inset
-  background: #fff
+  background: getColor(background, light)
+  min-height: 700px
+  side-nav
+    +gridle(2)
+  section
+    +gridle(11.5 push 0.5)
+    h2
+      font-size: $font-l
+      margin: 25px 0
+    .pagination
+      margin: 20px 0
+      float: right
+      clear: both
 
 
 // classes
+.animation-shake
+  animation: shake .3s
 .login-from
   +gridle(3.5 pull 1.4 float right)
   max-width: 350px
@@ -238,7 +277,7 @@ footer
     text-align: center
   .btn-line
     button
-      +button-primary()
+      +button()
       margin: 10px 0 0 25px
       width: 300px
       height: 44px
@@ -267,10 +306,103 @@ footer
         color: getColor(text, primary)
         border-color: getColor(base, primary)
 
+.icon-btn
+  cursor: pointer
+  height: 40px
+  width: 30px
+  display: inline-block
+  line-height: 40px
+  color: getColor(text, secondary)
+  &:hover
+    color: getColor(text, primary)
+
+table.base
+  border-spacing: 0
+  width: 100%
+  box-shadow: 0 2px 2px getColor(border, table)
+  background: getColor(background, body)
+  border-bottom-left-radius: $border-radius
+  border-bottom-right-radius: $border-radius
+  thead
+    background: getColor(background, light)
+    th
+      height: 40px
+  tbody
+    tr
+      &:nth-child(even)
+        background: #F5F7F8
+    td
+      text-align: center
+      height: 40px
+      border-right: 1px solid getColor(border, table)
+      &.left
+        text-align: left
+        text-indent: 15px
+
+.primary-btn
+  +button()
+.gray-btn
+  +button(getColor(border, input), getColor(gray, base))
+
+.pagination
+  list-style: none
+  height: 30px
+  li
+    display: inline-block
+    height: 30px
+    width: 30px
+    float: left
+    margin-right: 10px
+    text-align: center
+    line-height: 30px
+    &.select
+      width: auto
+      select
+        height: 30px
+        border: none
+        border-radius: $border-radius
+        box-shadow: 1px 1px 2px getColor(border, table)
+    &.active
+      a
+        color: getColor(base, primary)
+        border: 1px solid getColor(base, primary)
+    a
+      height: 30px
+      width: 30px
+      display: block
+      text-align: center
+      line-height: 30px
+      color: getColor(gray, base)
+      border: 1px solid #fff
+      border-radius: $border-radius
+      box-shadow: 1px 1px 2px getColor(border, table)
+      background: getColor(background, body)
+      &:hover
+        color: getColor(base, primary)
 
 
 
 // component
+table-filter
+  display: block
+  background: getColor(background, body)
+  padding: 8px 15px
+  border-top-left-radius: $border-radius
+  border-top-right-radius: $border-radius
+  box-shadow: 0 -2px 2px getColor(border, table)
+  input[type=text], select
+    text-indent: 10px
+    margin-right: 10px
+    height: 30px
+    border: 1px solid getColor(border, input)
+    border-radius: $border-radius
+  select
+    height: 34px
+    text-indent: 0
+  button
+    height: 34px
+    margin-left: -20px
+
 header-nav
   ul
     padding: 0

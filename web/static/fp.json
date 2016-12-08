@@ -53,6 +53,36 @@
         "btn:ok": "登录成功",
         "relogin": "访问失败: 需要重新登录"
       },
+      "admin": {
+        "search": {
+          "condition": "按条件搜索",
+          "agreement": [
+            {"name": "协议编号", "key": "agreement_number"},
+            {"name": "协议名称", "key": "agreement_name"},
+            {"name": "捐赠方ID", "key": "donor_id"}
+          ]
+        },
+        "handle": "操作",
+        "deny": "没有相关权限",
+        "empty": "没有查询到相关记录",
+        "confirm": {
+          "tips": "提示",
+          "delete": "确定要删除此条记录吗？"
+        },
+        "btn": {
+          "ok": "确定",
+          "cancel": "取消",
+          "close": "关闭"
+        },
+        "agreement": {
+          "title": "协议管理",
+          "id": "序号",
+          "number": "项目编号",
+          "name": "协议名称",
+          "contract": "签约时间",
+          "due": "截止时间"
+        }
+      },
       "footer": {
         "icp": "浙ICP备1202106号-2",
         "copyright": "2016-2017 usho",
