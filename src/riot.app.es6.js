@@ -1,4 +1,4 @@
-import { xhr, assign, cacheJSON, search2obj, cookie } from './utils.es6.js';
+import { xhr, assign, cacheJSON, search2obj, serialize, cookie, phpstr2time, phptime2str, mkphptime } from './utils.es6.js';
 import { Loader } from './loader.es6.js';
 import { emitter } from './emitter.es6.js';
 import { Promise } from './promise.es6.js';
@@ -36,7 +36,11 @@ export class RiotApp {
       this.route = route;
       this.xhr = xhr;
       this.utils = {
-        cookie: cookie
+        cookie: cookie,
+        str2time: phpstr2time,
+        time2str: phptime2str,
+        time: mkphptime,
+        serialize: serialize
       };
       // 初始化操作
       this.init();
@@ -76,6 +80,15 @@ export class RiotApp {
             pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js`,
             tagName = `${cf.id}-${page}`;
           this.route.params = params;
+          this.route.path = '';
+          this.route.query = {};
+          for(let i in params){
+            if(typeof params[i] === 'object')
+              this.route.query = params[i];
+            else
+              this.route.path += params[i] + '/';
+          }
+          this.route.path = this.route.path.slice(0, -1);
           Loader.batch(pageFile).then(() => {
             try{
               let tag = riot.mount(cf.mountPage, tagName)[0],
