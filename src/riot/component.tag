@@ -343,8 +343,8 @@
     </li>
     <li class="select" show={opts.select=='y'}>
       跳转至
-      <select onchange={fn.jumpPage} value="{page}">
-        <option each={p in pageList} value="{p}">{p}</option>
+      <select onchange={fn.jumpPage}>
+        <option each={p in pageList} value="{p}" selected={page==p}>{p}</option>
       </select> / {pages}页
     </li>
   </ul>
@@ -398,13 +398,13 @@
       _this.fn.page(_this.page + 1);
     },
     // 切换页面
-    page: function(n) {
+    page: function(n, first) {
       _this.page = n;
       _this.hasNextPage = _this.pages > _this.page;
       _this.hasPrevPage = _this.page > 1;
       _this.fn.prevPages();
       _this.fn.nextPages();
-      _this.emit('page', n);
+      if(!first) _this.emit('page', n);
     }
   };
 
@@ -412,7 +412,7 @@
     _this.page = Number(opts.page || 1);
     _this.pages = Number(opts.pages);
     _this.fn.pageList();
-    _this.fn.page(_this.page);
+    _this.fn.page(_this.page, true);
     _this.update();
   });
   </script>

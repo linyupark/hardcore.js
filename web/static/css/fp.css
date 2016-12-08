@@ -532,10 +532,10 @@ header .login-header, header .admin-header h1, header userinfo, footer .info, fo
   box-sizing: border-box;
   vertical-align: top; }
 
-header .login-header, header .admin-header h1, footer .info, footer.admin .info, .body.admin section {
+header .login-header, header .admin-header h1, footer .info, footer.admin .info {
   position: relative; }
 
-header userinfo, .login-from {
+header userinfo, .body.admin section, .login-from {
   position: relative; }
 
 @media screen and (min-width: 320px) and (max-width: 480px) {
@@ -761,19 +761,20 @@ footer.admin {
   background: white; }
 
 .body.fp-login {
-  box-shadow: 0 2px 4px #c3c3c3 inset;
+  box-shadow: 0 4px 4px -2px darkgray inset;
   background: #F2EDEF; }
 
 .body.admin {
-  box-shadow: 0 2px 4px #c3c3c3 inset;
+  box-shadow: 0 4px 4px -2px darkgray inset;
   background: #f3f3f3;
   min-height: 700px; }
   .body.admin side-nav {
-    width: 14.28571%; }
+    width: 17.85714%; }
   .body.admin section {
-    width: 82.14286%;
-    left: 3.57143%;
-    right: auto; }
+    width: 78.57143%;
+    right: 3.57143%;
+    left: auto;
+    float: right; }
     .body.admin section h2 {
       font-size: 20px;
       margin: 25px 0; }
@@ -953,16 +954,23 @@ table.base {
 table-filter {
   display: block;
   background: white;
-  padding: 8px 15px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  box-shadow: 0 -2px 2px #eee; }
+  box-shadow: 0 -2px 2px #eee;
+  overflow: hidden; }
+  table-filter div {
+    margin: 8px 15px; }
+  table-filter input, table-filter select, table-filter button {
+    display: inline-block;
+    vertical-align: middle; }
   table-filter input[type=text], table-filter select {
-    text-indent: 10px;
-    margin-right: 10px;
+    text-indent: 5px;
+    margin-left: 10px;
     height: 30px;
     border: 1px solid #e3e3e3;
     border-radius: 5px; }
+  table-filter input[type=text]:focus {
+    background-color: rgba(252, 255, 215, 0.8); }
   table-filter select {
     height: 34px;
     text-indent: 0; }

@@ -12,12 +12,12 @@
         <table class="base">
           <thead>
             <tr>
-              <th width="5%">{app.lang.admin.agreement.id}</th>
+              <th width="10%">{app.lang.admin.agreement.id}</th>
               <th width="10%">{app.lang.admin.agreement.number}</th>
-              <th width="55%">{app.lang.admin.agreement.name}</th>
+              <th width="50%">{app.lang.admin.agreement.name}</th>
               <th width="10%">{app.lang.admin.agreement.contract}</th>
               <th width="10%">{app.lang.admin.agreement.due}</th>
-              <th width="15%">{app.lang.admin.handle}</th>
+              <th width="10%">{app.lang.admin.handle}</th>
             </tr>
           </thead>
           <tbody>
@@ -64,7 +64,7 @@
   var _this = this;
   _this.q = _this.app.route.query;
   _this.page = _this.q.page || 1;
-  _this.pages = 1;
+  _this.pages = 10;
   _this.fn = {
     edit: function(e){
       _this.app.emit('animation', e.target, 'shake');
@@ -90,14 +90,19 @@
         _this.update({
           tableList: data.items,
           page: data.counts.page,
-          pages: data.counts.total_page
+          pages: data.counts.total_page+10
         });
       });
     }
   };
   _this.on('mount', function(){
-    _this.app.log('admin-agreement mounted');
     _this.fn.getList();
+    _this.tags['pagination-number'].on('page', function(page){
+      _this.q.page = page;
+      _this.app.query();
+      // _this.app.log('admin-agreement page ', page);
+    });
+    // _this.app.log('admin-agreement tag mounted');
   });
   </script>
 

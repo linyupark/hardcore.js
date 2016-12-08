@@ -3897,6 +3897,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
 
       /**
+       * 对当前路由进行查询
+       */
+
+    }, {
+      key: 'query',
+      value: function query() {
+        route(this.route.path + '?' + serialize(this.route.query));
+      }
+
+      /**
        * 信息打印
        */
 

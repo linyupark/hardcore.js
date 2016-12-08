@@ -5,22 +5,24 @@
     <select ref="agreement">
       <option each={app.lang.admin.search.agreement} value={key} selected={type==key}>{name}</option>
     </select>
-    <input type="text" ref="keyword" value={keyword}>
-    <button class="gray-btn" onclick={fn.search}>
-      <i class="icon-search"></i>
-    </button>
+    <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter}>
+    <button class="gray-btn" onclick={fn.search}><i class="icon-search"></i></button>
   </div>
   <yield from="addon"></yield>
   <script>
   var _this = this;
   _this.q = _this.app.route.query;
-  _this.path = _this.app.route.path;
   _this.fn = {
+    enter: function(e){
+      if(e.keyCode == 13){
+        _this.fn.search();
+      }
+    },
     search: function(){
       if(opts.for === 'agreement'){
         _this.q.type = _this.refs.agreement.value;
         _this.q.keyword = _this.refs.keyword.value;
-        _this.app.route(_this.path+'?'+_this.app.utils.serialize(_this.q));
+        _this.app.query();
       }
     }
   };

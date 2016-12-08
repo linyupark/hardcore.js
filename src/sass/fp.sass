@@ -220,17 +220,17 @@ footer
 
 // 登录页
 .body.fp-login
-  box-shadow: 0 2px 4px darken(getColor(base, lines), 10%) inset
+  box-shadow: 0 4px 4px -2px darken(getColor(base, lines), 20%) inset
   background: #F2EDEF
 // 管理页
 .body.admin
-  box-shadow: 0 2px 4px darken(getColor(base, lines), 10%) inset
+  box-shadow: 0 4px 4px -2px darken(getColor(base, lines), 20%) inset
   background: getColor(background, light)
   min-height: 700px
   side-nav
-    +gridle(2)
+    +gridle(2.5)
   section
-    +gridle(11.5 push 0.5)
+    +gridle(11 pull 0.5 float right)
     h2
       font-size: $font-l
       margin: 25px 0
@@ -383,19 +383,28 @@ table.base
 
 
 // component
+// 表单过滤条
 table-filter
   display: block
   background: getColor(background, body)
-  padding: 8px 15px
   border-top-left-radius: $border-radius
   border-top-right-radius: $border-radius
   box-shadow: 0 -2px 2px getColor(border, table)
+  overflow: hidden
+  div
+    margin: 8px 15px
+  input, select, button
+    display: inline-block
+    vertical-align: middle
   input[type=text], select
-    text-indent: 10px
-    margin-right: 10px
+    text-indent: 5px
+    margin-left: 10px
     height: 30px
     border: 1px solid getColor(border, input)
     border-radius: $border-radius
+  input[type=text]
+    &:focus
+      +focus-bg(getColor(background, focus))
   select
     height: 34px
     text-indent: 0
