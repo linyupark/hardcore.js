@@ -131,6 +131,13 @@ export class RiotApp {
 
 
   /**
+   * 对当前路由进行查询
+   */
+  query(){
+    route(this.route.path+'?'+serialize(this.route.query));
+  }
+
+  /**
    * 信息打印
    */
   log(...args){
