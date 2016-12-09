@@ -32,7 +32,7 @@ const phpstr2time = (str) => {
  * @param  {bool} showtime 是否显示分时
  * @return {str}          时间字符串
  */
-const phptime2str = (time, showtime) => {
+const phptime2str = (time, opts={}) => {
   let
     dt = new Date(time * 1000),
     y = dt.getFullYear(),
@@ -40,16 +40,17 @@ const phptime2str = (time, showtime) => {
     d = dt.getDate(),
     h = dt.getHours(),
     min = dt.getMinutes(),
-    sec = dt.getSeconds();
+    sec = dt.getSeconds(),
+    sp = opts.sp || '.';
   m = m < 10 ? "0" + m : m;
   d = d < 10 ? "0" + d : d;
   h = h < 10 ? "0" + h : h;
   min = min < 10 ? "0" + min : min;
   sec = sec < 10 ? "0" + sec : sec;
-  if(showtime){
-    return y+"-"+m+"-"+d+" "+h+":"+min+":"+sec;
+  if(opts.showtime){
+    return y+sp+m+sp+d+" "+h+":"+min+":"+sec;
   }
-  return y+"-"+m+"-"+d;
+  return y+sp+m+sp+d;
 };
 
 
@@ -3701,8 +3702,10 @@ class RiotApp {
           this.route.path = '';
           this.route.query = {};
           for(let i in params){
-            if(typeof params[i] === 'object')
+            if(typeof params[i] === 'object'){
               this.route.query = params[i];
+              this.route.params.splice(i, 1);
+            }
             else
               this.route.path += params[i] + '/';
           }

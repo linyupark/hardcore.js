@@ -83,8 +83,10 @@ export class RiotApp {
           this.route.path = '';
           this.route.query = {};
           for(let i in params){
-            if(typeof params[i] === 'object')
+            if(typeof params[i] === 'object'){
               this.route.query = params[i];
+              this.route.params.splice(i, 1);
+            }
             else
               this.route.path += params[i] + '/';
           }

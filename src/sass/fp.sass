@@ -1,6 +1,6 @@
-@import "normalize"
-@import "fontello"
-@import "animation"
+@import "globals/normalize"
+@import "globals/fontello"
+@import "globals/animation"
 
 @import "gridle/settings"
 @import "gridle/gridle"
@@ -57,13 +57,13 @@ button
     +hover-bg($bgcolor)
   &[disabled]
     background: rgba($bgcolor, .3)
-=input-text-primary($height: 34px, $padding: 5px 0 5px 10px)
+=input-text-primary($height: 34px, $padding: 5px 0 5px 10px, $focus-bg: getColor(background, focus))
   height: $height
   padding: $padding
   border-radius: $border-radius
   border: 1px solid getColor(border, input)
   &:focus
-    background-color: getColor(background, focus)
+    background-color: $focus-bg
     +focus-border()
 =css-arrow($pos: 'top', $size: 5px, $color: #fff)
   &:after
@@ -110,20 +110,27 @@ header
     position: fixed
     top: 0
     left: 50%
-    padding: 8px 0
-    background: rgba(getColor(background, body), .8)
+    background: #fff
     border-bottom-left-radius: $border-radius
     border-bottom-right-radius: $border-radius
-    box-shadow: 0 0 5px getColor(base, lines)
     width: 30%
     margin-left: -15%
     z-index: 33
-    color: getColor(state, error)
     +gridle_state(mobile)
       width: 80%
       margin-left: -40%
     &.active
       animation: fadeInDown .5s
+    p
+      padding: 8px 0
+      margin: 0
+      background: getColor(alert, bg)
+      color: getColor(alert, text)
+      border: 1px solid getColor(alert, border)
+      &.error
+        background: getColor(alert, error-bg)
+        color: getColor(alert, error-text)
+        border: 1px solid getColor(alert, error-border)
   // 登录页的header
   &.login
     background: getColor(background, body)
@@ -134,11 +141,11 @@ header
     background: getColor(base, primary)
   .admin-header
     +gridle(row)
-    height: 60px
+    height: 80px
     h1
       +gridle(11 push 0.5)
-      height: 60px
-      line-height: 60px
+      height: 80px
+      line-height: 80px
       color: getColor(text, primary-invert)
   h1
     +gridle_state(mobile)
@@ -160,7 +167,7 @@ header
       min-width: 100px
       position: relative
       a
-        margin-top: 10px
+        margin-top: 20px
         height: 40px
         line-height: 40px
         text-align: center
@@ -233,7 +240,8 @@ footer
     +gridle(11 pull 0.5 float right)
     h2
       font-size: $font-l
-      margin: 25px 0
+      margin: 25px 0 25px
+      font-weight: normal
     .pagination
       margin: 20px 0
       float: right
@@ -338,11 +346,37 @@ table.base
       &.left
         text-align: left
         text-indent: 15px
+  tfoot
+    td
+      height: 40px
+      text-indent: 15px
+      b
+        color: getColor(base, primary)
+
+
+
+
+
+
+// 表单相关
+@import "fp/form"
+
+
+
+
+
+
+
+
+// component
 
 .primary-btn
   +button()
 .gray-btn
   +button(getColor(border, input), getColor(gray, base))
+
+
+
 
 .pagination
   list-style: none
@@ -380,9 +414,28 @@ table.base
       &:hover
         color: getColor(base, primary)
 
+// 输入下拉框
+input-select
+  ul
+    max-height: 200px
+    overflow: auto
+    background: getColor(background, body)
+    width: 100%
+    top: 18px
+    left: 0
+    +focus-border()
+    border-top-left-radius: 0
+    border-top-right-radius: 0
+    li
+      padding: 8px
+      border-top: 1px solid getColor(border, input)
+      &.active, &:hover
+        background: rgba(#F44C4C, .1)
+        color: getColor(base, primary)
 
 
-// component
+
+
 // 表单过滤条
 table-filter
   display: block
@@ -392,8 +445,12 @@ table-filter
   box-shadow: 0 -2px 2px getColor(border, table)
   overflow: hidden
   div
+    display: inline-block
     margin: 8px 15px
-  input, select, button
+    // 附加按钮靠右
+    &.addon
+      float: right
+  input, select, button, a
     display: inline-block
     vertical-align: middle
   input[type=text], select
@@ -411,6 +468,8 @@ table-filter
   button
     height: 34px
     margin-left: -20px
+  a
+    margin-left: 10px
 
 header-nav
   ul
@@ -434,4 +493,4 @@ header-nav
 
 input-valid
   span
-    color: getColor(state, error)
+    color: getColor(alert, error-text)

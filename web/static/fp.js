@@ -45,23 +45,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @param  {bool} showtime 是否显示分时
    * @return {str}          时间字符串
    */
-  var phptime2str = function phptime2str(time, showtime) {
+  var phptime2str = function phptime2str(time) {
+    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
     var dt = new Date(time * 1000),
         y = dt.getFullYear(),
         m = dt.getMonth() + 1,
         d = dt.getDate(),
         h = dt.getHours(),
         min = dt.getMinutes(),
-        sec = dt.getSeconds();
+        sec = dt.getSeconds(),
+        sp = opts.sp || '.';
     m = m < 10 ? "0" + m : m;
     d = d < 10 ? "0" + d : d;
     h = h < 10 ? "0" + h : h;
     min = min < 10 ? "0" + min : min;
     sec = sec < 10 ? "0" + sec : sec;
-    if (showtime) {
-      return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec;
+    if (opts.showtime) {
+      return y + sp + m + sp + d + " " + h + ":" + min + ":" + sec;
     }
-    return y + "-" + m + "-" + d;
+    return y + sp + m + sp + d;
   };
 
   /**
@@ -3851,7 +3854,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _this13.route.path = '';
               _this13.route.query = {};
               for (var i in params) {
-                if (_typeof(params[i]) === 'object') _this13.route.query = params[i];else _this13.route.path += params[i] + '/';
+                if (_typeof(params[i]) === 'object') {
+                  _this13.route.query = params[i];
+                  _this13.route.params.splice(i, 1);
+                } else _this13.route.path += params[i] + '/';
               }
               _this13.route.path = _this13.route.path.slice(0, -1);
               Loader.batch(pageFile).then(function () {

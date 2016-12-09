@@ -33,42 +33,26 @@ $colors: (
     "link": #575E85
   ),
 
+  alert: (
+    "success-text": #29AE39,
+    "success-border": rgba(#87D068, .4),
+    "success-bg": rgba(#87D068, .3),
+    "warning-text": #EB9D00,
+    "warning-border": rgba(#FFAA01, .3),
+    "warning-bg": rgba(#FFD501, .2),
+    "error-text": #F44C4C,
+    "error-border": rgba(#F34C4C, .2),
+    "error-bg": rgba(#F34C4C, .16),
+    "text": #3198CC,
+    "border": rgba(#37ABE6, .3),
+    "bg": rgba(#37ACE6, .2)
+  ),
+
   background: (
     "dark":  #32373d,
     "light": #f3f3f3,
     "body":  white,
     "focus": rgba(#FAFFBD, .8)
-  ),
-
-  state: (
-    "muted":   #eee,
-    "success": #10a887,
-    "warning": #F17F42,
-    "error":   #DF3A5E
-  ),
-
-  blue: (
-    "darker":  #1573b6,
-    "dark":    #1e80c6,
-    "base":    #2b90d9,
-    "light":   #3fa2e9,
-    "lighter": #4eb1f9
-  ),
-
-  green: (
-    "darker":  #089073,
-    "dark":    #0b9d7d,
-    "base":    #10a887,
-    "light":   #1eb896,
-    "lighter": #28ceaa
-  ),
-
-  red: (
-    "darker":  #653131,
-    "dark":    #b73333,
-    "base":    #da3c3c,
-    "light":   #f25a5a,
-    "lighter": #fa8181
   ),
 
   gray: (

@@ -1,4 +1,7 @@
 {
+  "my97": [
+    "./static/My97DatePicker/WdatePicker.js"
+  ],
   "pro": ["/static/css/fp.min.css?v=2e35f4de1b64e0b5ed2791280a9c9e44", "/static/riot/common+component.min.js?v=3f0667bcedfe62f1050f853d2b815d36"],
   "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
   "dev": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
@@ -31,6 +34,9 @@
   }],
   "lang": {
     "cn": {
+      "year:number": "几年(阿拉伯数字)",
+      "yes": "是",
+      "no": "否",
       "header": {
         "sitename": "浙江大学教育基金会管理后台",
         "userinfo": {
@@ -54,8 +60,16 @@
         "relogin": "访问失败: 需要重新登录"
       },
       "admin": {
+        "reset": "清空",
+        "counts": {
+          "items": "找到记录共: ",
+          "unit": "条"
+        },
         "search": {
           "condition": "按条件搜索",
+          "keyword": {
+            "placehoder": "查询关键字"
+          },
           "agreement": [
             {"name": "协议编号", "key": "agreement_number"},
             {"name": "协议名称", "key": "agreement_name"},
@@ -69,18 +83,53 @@
           "tips": "提示",
           "delete": "确定要删除此条记录吗？"
         },
+        "form": {
+          "req": "必填"
+        },
         "btn": {
+          "save": "保存",
           "ok": "确定",
           "cancel": "取消",
           "close": "关闭"
         },
         "agreement": {
+          "add": "添加协议",
+          "edit": "修改协议",
           "title": "协议管理",
           "id": "序号",
-          "number": "项目编号",
+          "number": "协议编号",
           "name": "协议名称",
           "contract": "签约时间",
-          "due": "截止时间"
+          "deadline": "执行期限",
+          "due": "截止时间",
+          "donations": "来自校友捐赠",
+          "donor": "捐赠方",
+          "donor:select": "查询选择",
+          "donor:nature": "捐赠方性质",
+          "donor:nature:list": [
+            {"name": "个人", "key": 0},
+            {"name": "企业", "key": 1},
+            {"name": "基金会", "key": 2}
+          ],
+          "sources:funding": "资金来源",
+          "sources:funding:list": [
+            {"name": "国内", "key": 0},
+            {"name": "港澳台", "key": 1},
+            {"name": "海外", "key": 2}
+          ],
+          "Project:type": "项目类型",
+          "project:type:list": [
+            {"name": "奖学金", "key": 0},
+            {"name": "助学金", "key": 1},
+            {"name": "奖教金", "key": 2},
+            {"name": "国际交流奖学金", "key": 3},
+            {"name": "基础建设", "key": 4},
+            {"name": "学科建设", "key": 5},
+            {"name": "人才培养", "key": 6},
+            {"name": "教育发展基金", "key": 7},
+            {"name": "学生活动与创业", "key": 8},
+            {"name": "其他", "key": 99}
+          ]
         }
       },
       "footer": {

@@ -1,18 +1,25 @@
 <!-- table筛选过滤 -->
 <table-filter>
+  <!-- 协议管理 -->
   <div if={opts.for=='agreement'}>
     {app.lang.admin.search.condition}:
     <select ref="agreement">
       <option each={app.lang.admin.search.agreement} value={key} selected={type==key}>{name}</option>
     </select>
-    <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter}>
+    <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="{app.lang.admin.search.keyword.placehoder}">
     <button class="gray-btn" onclick={fn.search}><i class="icon-search"></i></button>
+    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.reset}>{app.lang.admin.reset}</a>
   </div>
-  <yield from="addon"></yield>
+  <div class="addon">
+    <yield from="addon"></yield>
+  </div>
   <script>
   var _this = this;
-  _this.q = _this.app.route.query;
   _this.fn = {
+    reset: function(){
+      _this.app.route.query = {};
+      _this.app.query();
+    },
     enter: function(e){
       if(e.keyCode == 13){
         _this.fn.search();
@@ -20,8 +27,8 @@
     },
     search: function(){
       if(opts.for === 'agreement'){
-        _this.q.type = _this.refs.agreement.value;
-        _this.q.keyword = _this.refs.keyword.value;
+        _this.app.route.query.type = _this.refs.agreement.value || '';
+        _this.app.route.query.keyword = _this.refs.keyword.value || '';
         _this.app.query();
       }
     }
@@ -166,7 +173,9 @@
     </div>
 
     <!-- 顶部信息框 -->
-    <div show={message} class="top-message {active: message}">{message}</div>
+    <div show={message} class="top-message {active: message}">
+      <p class="{type}">{message}</p>
+    </div>
 
   </div>
 
@@ -186,10 +195,11 @@
   // 监听api报错信息
   _this.app.on('api::fail', function(data){
     _this.app.err('api failed', data);
-    _this.fn.message(data.url+' '+data.code+' '+data.errmsg);
+    _this.fn.message(data.url+' '+data.code+' '+data.errmsg, 'error');
   });
   // 自定义信息
-  _this.app.on('message::header', function(msg){
+  _this.app.on('message::header', function(msg, type){
+    _this.type = type || '';
     _this.fn.message(msg);
   });
   // 对象动画

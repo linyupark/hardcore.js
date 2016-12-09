@@ -1,3 +1,91 @@
+<!-- 输入下拉框 -->
+<input-select>
+  <style scoped>
+  .input-select{
+    display: inline-block;
+    position: relative;
+  }
+  .input-select ul{
+    padding: 0;
+    position: absolute;
+    list-style: none;
+  }
+  </style>
+  <div class="input-select">
+    <input ref="keyword" type="text"
+      value="{opts.value}"
+      placeholder="{opts.placehoder}"
+      onclick={fn.pull}
+      onkeyup={fn.keyup}
+      onblur={fn.blur}>
+    <ul show={items&&items.length > 0}>
+      <li each={item, i in items} class="{active: i==selectIndex-1}" onclick={fn.select}>
+        {item[parent.opts.name]}
+      </li>
+    </ul>
+  </div>
+
+  <script>
+  var _this = this;
+  _this.selected = {};
+  _this.selectIndex = 0;
+  _this.fn = {
+    blur: function(e){
+      setTimeout(function(){
+        // 失去焦点时候如果输入框内的数据不是下拉框中的，则清空数据
+        if(Object.keys(_this.selected).length === 0){
+          clearTimeout(_this.timer);
+          _this.selected = {};
+          _this.selectIndex = 0;
+          e.target.value = '';
+          delete _this.items;
+          _this.update();
+        }
+      }, 100);
+    },
+    pull: function(e){
+      _this.emit('pull', e.target.value);
+    },
+    select: function(e){
+      _this.selected = e.item.item;
+      _this.refs.keyword.value = _this.selected[opts.name];
+      _this.selectIndex = 0;
+      delete _this.items;
+      _this.emit("select", _this.selected);
+    },
+    keyup: function(e){
+      clearTimeout(_this.timer);
+      // 上
+      if(e.keyCode == 38 && _this.selectIndex > 0){
+        return _this.selectIndex--;
+      }
+      // 下
+      if(e.keyCode == 40 && _this.items && _this.selectIndex < _this.items.length){
+        return _this.selectIndex++;
+      }
+      // 回车
+      if(e.keyCode == 13 && _this.selectIndex > 0){
+        _this.selected = _this.items[_this.selectIndex-1];
+        _this.refs.keyword.value = _this.selected[opts.name];
+        _this.selectIndex = 0;
+        delete _this.items;
+        return _this.emit("select", _this.selected);
+      }
+      _this.timer = setTimeout(function(){
+        _this.emit('pull', e.target.value);
+      }, 500);
+    }
+  };
+  _this.on('mount', function(){});
+  _this.on('push', function(items){
+    // 查询到数据渲染到下拉表中
+    _this.update({
+      items: items,
+      selected: {}
+    });
+  });
+  </script>
+</input-select>
 
 <!-- 弹出框 -->
 <modal show={open}>

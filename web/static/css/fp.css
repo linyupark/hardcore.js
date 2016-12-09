@@ -405,8 +405,8 @@ template {
 
 @font-face {
   font-family: 'fontello';
-  src: url("../font/fontello.eot?89634915");
-  src: url("../font/fontello.eot?89634915#iefix") format("embedded-opentype"), url("../font/fontello.woff2?89634915") format("woff2"), url("../font/fontello.woff?89634915") format("woff"), url("../font/fontello.ttf?89634915") format("truetype"), url("../font/fontello.svg?89634915#fontello") format("svg");
+  src: url("../font/fontello.eot?90224038");
+  src: url("../font/fontello.eot?90224038#iefix") format("embedded-opentype"), url("../font/fontello.woff2?90224038") format("woff2"), url("../font/fontello.woff?90224038") format("woff"), url("../font/fontello.ttf?90224038") format("truetype"), url("../font/fontello.svg?90224038#fontello") format("svg");
   font-weight: normal;
   font-style: normal; }
 
@@ -416,7 +416,7 @@ template {
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../font/fontello.svg?89634915#fontello') format('svg');
+    src: url('../font/fontello.svg?90224038#fontello') format('svg');
   }
 }
 */
@@ -467,10 +467,10 @@ template {
   content: '\e804'; }
 
 /* '' */
-.icon-spin1:before {
-  content: '\e830'; }
+.icon-calendar:before {
+  content: '\e805'; }
 
-/* '' */
+/* '' */
 @-webkit-keyframes fadeInDown {
   from {
     opacity: 0;
@@ -513,17 +513,17 @@ template {
     -webkit-transform: translate3d(5px, 0, 0);
     transform: translate3d(5px, 0, 0); } }
 
-.wrapper:before, header .admin-header:before, .wrapper:after, header .admin-header:after {
+.wrapper:before, header .admin-header:before, form.agreement .row:before, form.agreement .c1:before, .wrapper:after, header .admin-header:after, form.agreement .row:after, form.agreement .c1:after {
   content: "";
   display: table; }
 
-.wrapper:after, header .admin-header:after {
+.wrapper:after, header .admin-header:after, form.agreement .row:after, form.agreement .c1:after {
   clear: both; }
 
-.wrapper, header .admin-header {
+.wrapper, header .admin-header, form.agreement .row, form.agreement .c1 {
   zoom: 1; }
 
-header .login-header, header .admin-header h1, header userinfo, footer .info, footer.admin .info, .body.admin side-nav, .body.admin section, .login-from {
+header .login-header, header .admin-header h1, header userinfo, footer .info, footer.admin .info, .body.admin side-nav, .body.admin section, .login-from, form.agreement .c2 p, form.agreement .c1 .line {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -608,21 +608,28 @@ header .top-message {
   position: fixed;
   top: 0;
   left: 50%;
-  padding: 8px 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: #fff;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  box-shadow: 0 0 5px #DCDCDC;
   width: 30%;
   margin-left: -15%;
-  z-index: 33;
-  color: #DF3A5E; }
+  z-index: 33; }
   @media screen and (min-width: 320px) and (max-width: 480px) {
     header .top-message {
       width: 80%;
       margin-left: -40%; } }
   header .top-message.active {
     animation: fadeInDown .5s; }
+  header .top-message p {
+    padding: 8px 0;
+    margin: 0;
+    background: rgba(55, 172, 230, 0.2);
+    color: #3198CC;
+    border: 1px solid rgba(55, 171, 230, 0.3); }
+    header .top-message p.error {
+      background: rgba(243, 76, 76, 0.16);
+      color: #F44C4C;
+      border: 1px solid rgba(243, 76, 76, 0.2); }
 
 header.login {
   background: white; }
@@ -640,7 +647,7 @@ header .admin-header {
   padding-right: 0 !important;
   margin-left: -0;
   margin-right: -0;
-  height: 60px; }
+  height: 80px; }
   [class*="no-gutter"] > header .admin-header {
     margin-left: 0 !important;
     margin-right: 0 !important; }
@@ -659,8 +666,8 @@ header .admin-header {
     width: 78.57143%;
     left: 3.57143%;
     right: auto;
-    height: 60px;
-    line-height: 60px;
+    height: 80px;
+    line-height: 80px;
     color: #fff; }
 
 header h1 {
@@ -687,7 +694,7 @@ header userinfo {
     min-width: 100px;
     position: relative; }
     header userinfo .username a {
-      margin-top: 10px;
+      margin-top: 20px;
       height: 40px;
       line-height: 40px;
       text-align: center;
@@ -777,7 +784,8 @@ footer.admin {
     float: right; }
     .body.admin section h2 {
       font-size: 20px;
-      margin: 25px 0; }
+      margin: 25px 0 25px;
+      font-weight: normal; }
     .body.admin section .pagination {
       margin: 20px 0;
       float: right;
@@ -899,6 +907,102 @@ table.base {
     table.base tbody td.left {
       text-align: left;
       text-indent: 15px; }
+  table.base tfoot td {
+    height: 40px;
+    text-indent: 15px; }
+    table.base tfoot td b {
+      color: #DF3A5E; }
+
+hr {
+  border: none;
+  border-bottom: 2px solid #eee;
+  margin: 20px 0 30px 0; }
+
+form.agreement {
+  background: white;
+  padding: 30px;
+  box-shadow: 0 2px 4px #e3e3e3;
+  border-radius: 5px; }
+  form.agreement h4 {
+    margin: 0 0 15px 0;
+    padding: 0 15px;
+    font-size: 16px;
+    border-left: 2px solid #DF3A5E; }
+  form.agreement .row {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: -0;
+    margin-right: -0; }
+    [class*="no-gutter"] > form.agreement .row {
+      margin-left: 0 !important;
+      margin-right: 0 !important; }
+    form.agreement .row form.agreement .row {
+      margin-left: -0;
+      margin-right: -0; }
+    @media screen and (min-width: 320px) and (max-width: 480px) {
+      form.agreement .row form.agreement .row {
+        margin-left: -0;
+        margin-right: -0; } }
+    @media screen and (min-width: 481px) and (max-width: 1400px) {
+      form.agreement .row form.agreement .row {
+        margin-left: -0;
+        margin-right: -0; } }
+  form.agreement input[type=text], form.agreement select {
+    height: 36px;
+    padding: 0 5px;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px; }
+    form.agreement input[type=text]:focus, form.agreement select:focus {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.6) inset; }
+  form.agreement label {
+    width: 60px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px; }
+    form.agreement label.center {
+      text-align: center; }
+    form.agreement label.radio, form.agreement label.checkbox {
+      height: 38px;
+      margin-left: 20px;
+      line-height: 38px; }
+  form.agreement p {
+    position: relative; }
+    form.agreement p input[type=text], form.agreement p select {
+      min-width: 260px; }
+    form.agreement p i[class^="icon-"] {
+      color: #999;
+      margin-left: -30px; }
+  form.agreement .c2 p {
+    width: 46.42857%;
+    margin-right: 3.57143%; }
+  form.agreement .c1 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: -0;
+    margin-right: -0; }
+    [class*="no-gutter"] > form.agreement .c1 {
+      margin-left: 0 !important;
+      margin-right: 0 !important; }
+    form.agreement .c1 form.agreement .c1 {
+      margin-left: -0;
+      margin-right: -0; }
+    @media screen and (min-width: 320px) and (max-width: 480px) {
+      form.agreement .c1 form.agreement .c1 {
+        margin-left: -0;
+        margin-right: -0; } }
+    @media screen and (min-width: 481px) and (max-width: 1400px) {
+      form.agreement .c1 form.agreement .c1 {
+        margin-left: -0;
+        margin-right: -0; } }
+    form.agreement .c1 .top {
+      width: 66px;
+      float: left;
+      line-height: 36px; }
+    form.agreement .c1 .line {
+      width: 85.71429%; }
 
 .primary-btn {
   background: #DF3A5E;
@@ -951,6 +1055,24 @@ table.base {
       .pagination li a:hover {
         color: #DF3A5E; }
 
+input-select ul {
+  max-height: 200px;
+  overflow: auto;
+  background: white;
+  width: 100%;
+  top: 18px;
+  left: 0;
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.6) inset;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0; }
+  input-select ul li {
+    padding: 8px;
+    border-top: 1px solid #e3e3e3; }
+    input-select ul li.active, input-select ul li:hover {
+      background: rgba(244, 76, 76, 0.1);
+      color: #DF3A5E; }
+
 table-filter {
   display: block;
   background: white;
@@ -959,8 +1081,11 @@ table-filter {
   box-shadow: 0 -2px 2px #eee;
   overflow: hidden; }
   table-filter div {
+    display: inline-block;
     margin: 8px 15px; }
-  table-filter input, table-filter select, table-filter button {
+    table-filter div.addon {
+      float: right; }
+  table-filter input, table-filter select, table-filter button, table-filter a {
     display: inline-block;
     vertical-align: middle; }
   table-filter input[type=text], table-filter select {
@@ -977,6 +1102,8 @@ table-filter {
   table-filter button {
     height: 34px;
     margin-left: -20px; }
+  table-filter a {
+    margin-left: 10px; }
 
 header-nav ul {
   padding: 0;
@@ -998,4 +1125,4 @@ header-nav ul {
         display: block; }
 
 input-valid span {
-  color: #DF3A5E; }
+  color: #F44C4C; }
