@@ -136,6 +136,8 @@ export const search2obj = (hash = "") => {
  */
 export const xhr = (url, options = {}) => {
   let opts = assign({
+      payload: false,
+      formdata: false,
       method: "GET",
       data: {},
       headers: {},
@@ -157,14 +159,17 @@ export const xhr = (url, options = {}) => {
     has_q = true;
   }
   // 整理发送数据
-  if(serialize(opts.data) !== ""){
+  if(opts.formdata){
+    send_data = opts.data;
+  }
+  else if(serialize(opts.data) !== ""){
     send_data.push(serialize(opts.data));
   }
   // 如果是put /post 则用formdata
-  if (/^put$|^post$/i.test(opts.method)) {
+  if (/^put$|^post$/i.test(opts.method) && !opts.payload) {
     opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   } else if(send_data.length > 0) {
-    url += (has_q ? "&" : "?") + send_data;
+    if(!opts.formdata) url += (has_q ? "&" : "?") + send_data;
   }
   xhr = new XMLHttpRequest();
   xhr.open(opts.method, url, true);
