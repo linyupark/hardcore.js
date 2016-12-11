@@ -1,496 +1,228 @@
-@import "globals/normalize"
-@import "globals/fontello"
-@import "globals/animation"
-
-@import "gridle/settings"
-@import "gridle/gridle"
-@import "globals/color"
-@import "globals/font"
+@import "elements/base"
 
 
-// 项目变量
-$tablet-max-width: 1400px
-$tablet-min-width: 481px
-$mobile-max-width: 480px
-$mobile-min-width: 320px
-$border-radius: 5px
-$gutter-width: 15px
+// font-size
+$font-xs: 13px
+$font-s: 14px
+$font-m: 16px
+$font-l: 20px
+$font-xl: 22px
 
-+gridle_setup((context: 14, gutter-width: 0, gutter-left: 0, gutter-right: 0))
-+gridle_register_state(mobile, (min-width: $mobile-min-width, max-width: $mobile-max-width))
-+gridle_register_state(tablet, (min-width: $tablet-min-width, max-width: $tablet-max-width))
-+gridle_init()
+// color
+$color-main: #DF3A5E
+$color-txt1: #666
+$color-txt2: #999
+$color-hover1: #f8f8f8
+$color-line1: #ebebeb
+$color-line2: #e3e3e3
+$color-link: #575E85
+$color-info: #3198CC
+$color-warning: #EB9D00
+$color-error: #F44C4C
+$color-success: #29AE39
+
+// font-family
+$font-primary: "Arial", "SimHei", "STHeiti"
+
+// box shadow
+=shadow-block()
+  box-shadow: 0 2px 4px rgba(#000, 0.08)
+=shadow-main()
+  box-shadow: 0 4px 4px -2px rgba(#000, .2) inset
 
 // global
-a
-  text-decoration: none
-  color: getColor(text, link)
-body
-  font-size: $font-s
-  font-family: $font-primary
-  color: getColor(text, primary)
-  &.user, &.admin
-    background: getColor(background, light)
-button
-  cursor: pointer
-  border: none
-  border-radius: $border-radius
-:focus
+*:focus
   outline: none
 
-// mixin
-=focus-border($radius: $border-radius)
-  border-radius: $radius
-  box-shadow: 0 0 0 1px rgba(getColor(base, primary), .6) inset
-=hover-bg($color)
-  background-color: darken($color, 5%)
-=hover-text($color)
-  color: darken($color, 5%)
-=focus-bg($color)
-  background-color: lighten($color, 5%)
-=focus-text($color)
-  color: lighten($color, 5%)
-=button($bgcolor: getColor(base, primary), $fcolor: getColor(text, primary-invert))
-  background: $bgcolor
-  color: $fcolor
+body
+  color: #222
+  font-family: $font-primary
+  font-size: $font-s
+  &.admin
+    background: #F3F3F3
+
+a
+  text-decoration: none
+  color: $color-link
   &:hover
-    +hover-bg($bgcolor)
-  &[disabled]
-    background: rgba($bgcolor, .3)
-=input-text-primary($height: 34px, $padding: 5px 0 5px 10px, $focus-bg: getColor(background, focus))
-  height: $height
-  padding: $padding
-  border-radius: $border-radius
-  border: 1px solid getColor(border, input)
-  &:focus
-    background-color: $focus-bg
-    +focus-border()
-=css-arrow($pos: 'top', $size: 5px, $color: #fff)
-  &:after
-    border: solid transparent
-    content: " "
-    height: 0
-    width: 0
-    position: absolute
-    pointer-events: none
-    border-width: $size
-    @if $pos == 'top'
-      bottom: 100%
-      left: 50%
-      margin-left: -$size
-      border-bottom-color: $color
-    @if $pos == 'bottom'
-      top: 100%
-      left: 50%
-      margin-left: -$size
-      border-top-color: $color
-    @if $pos == 'left'
-      top: 50%
-      right: 100%
-      margin-top: -$size
-      border-right-color: $color
-    @if $pos == 'right'
-      top: 50%
-      left: 100%
-      margin-top: -$size
-      border-left-color: $color
+    color: lighten($color-link, 10%)
 
+hr
+  border: none
+  border-bottom: 1px solid $color-line1
+  margin: 20px 0
 
-.wrapper
+h1
+  margin: 0
+  font-size: $font-xl
+
+.container
+  +layout-container()
+  position: relative
+
+.row
   +gridle(row)
-  min-width: $mobile-min-width
-  max-width: $tablet-max-width
-  margin: 0 auto
 
+.btn-icon
+  display: inline-block
+  min-width: 30px
+  cursor: pointer
+  &:hover
+    color: $color-main
+
+.btn-main
+  +btn-1()
+
+.btn-yellow
+  +btn-2()
+
+.btn-gray
+  +btn-3()
+
+
+//
+// header
+//
+@import "fp/header"
 header
-  // 顶部提示
-  .top-message
-    font-size: $font-xs
-    text-align: center
-    position: fixed
-    top: 0
-    left: 50%
-    background: #fff
-    border-bottom-left-radius: $border-radius
-    border-bottom-right-radius: $border-radius
-    width: 30%
-    margin-left: -15%
-    z-index: 33
-    +gridle_state(mobile)
-      width: 80%
-      margin-left: -40%
-    &.active
-      animation: fadeInDown .5s
-    p
-      padding: 8px 0
-      margin: 0
-      background: getColor(alert, bg)
-      color: getColor(alert, text)
-      border: 1px solid getColor(alert, border)
-      &.error
-        background: getColor(alert, error-bg)
-        color: getColor(alert, error-text)
-        border: 1px solid getColor(alert, error-border)
-  // 登录页的header
-  &.login
-    background: getColor(background, body)
-  .login-header
-    +gridle(13 push 0.5)
-  // 管理页的heander
-  &.admin, &.user
-    background: getColor(base, primary)
-  .admin-header
-    +gridle(row)
-    height: 80px
+  // 登录成功后
+  &.user, &.admin
+    background: #E01B46
     h1
-      +gridle(11 push 0.5)
-      height: 80px
-      line-height: 80px
-      color: getColor(text, primary-invert)
+      +gridle(9.5 prefix 0.5)
+      color: #fff
+  // 登录界面
+  &.login
+    background: #fff
   h1
-    +gridle_state(mobile)
-      font-size: $font-m
-    font-size: $font-l
-    margin: 0
-    text-indent: 65px
-    height: 90px
-    line-height: 90px
+    +gridle(11 prefix 0.5)
+    color: $color-txt1
     background-image: url(../img/fp/header-logo.jpg)
     background-position: left center
     background-repeat: no-repeat
     background-size: 50px 50px
-    color: getColor(gray, base)
-  userinfo
-    +gridle(1.5 pull 0.5 float right)
-    // 用户信息
-    .username
-      min-width: 100px
-      position: relative
-      a
-        margin-top: 20px
-        height: 40px
-        line-height: 40px
-        text-align: center
-        display: block
-        font-size: $font-m
-        color: getColor(text, primary-invert)
-        &.active
-          border-radius: $border-radius
-          box-shadow: 0 1px 2px darken(getColor(base, primary), 15%) inset
-          +hover-bg(getColor(base, primary))
-      .menu
-        display: none
-        width: 100%
-        position: absolute
-        top: 30px
-        text-align: center
-        border-radius: $border-radius
-        box-shadow: 0 1px 3px getColor(gray, lighter)
-        background: getColor(background, body)
-        animation: fadeInDown .3s
-        z-index: 1
-        &.active
-          display: block
-        +css-arrow('top')
-        dd
-          margin: 0
-          border-bottom: 1px solid getColor(base, lines)
-          &:last-child
-            border: none
-          a
-            margin: 0
-            width: 100%
-            font-size: $font-s
-            color: getColor(text, primary)
-            &:hover
-              background: none
-              box-shadow: none
-              color: getColor(text, link)
+    height: 80px
+    line-height: 80px
+    text-indent: 60px
 
+
+
+//
+// main
+//
+@import "fp/form"
+@import "fp/table"
+main
+  overflow: hidden
+  +shadow-main()
+  // 登录后
+  &.admin
+    min-height: 600px
+  &.user
+    min-height: 600px
+    h1
+      +gridle(10 prefix 1)
+  // 登录页
+  &.login
+    background: #F2EDEF
+    form
+      +form-login()
+
+
+
+//
+// section
+//
+section
+  +gridle(prefix 2.5 suffix 0.5)
+  overflow: hidden
+  h2
+    margin: 0
+    padding: 40px 0 20px
+
+//
+// footer
+//
 footer
   .info
-    +gridle(12 push 1)
-    line-height: 150%
+    padding: 35px
+    text-align: center
+    line-height: 16px
+    color: $color-txt2
     font-size: $font-xs
-    color: getColor(text, secondary)
+    margin-top: 30px
   &.admin
-    background: getColor(background, light)
     .info
-      +gridle(14 push 0)
-      padding: 33px 0
-      text-align: center
-      border-top: 1px solid getColor(border, input)
+      +gridle(9 push 2.5 prefix 0)
+      border-top: 1px solid $color-line1
 
-.body
-  overflow: hidden
-  background: getColor(background, body)
-
-// 登录页
-.body.fp-login
-  box-shadow: 0 4px 4px -2px darken(getColor(base, lines), 20%) inset
-  background: #F2EDEF
-// 管理页
-.body.admin
-  box-shadow: 0 4px 4px -2px darken(getColor(base, lines), 20%) inset
-  background: getColor(background, light)
-  min-height: 700px
-  side-nav
-    +gridle(2.5)
-  section
-    +gridle(11 pull 0.5 float right)
-    h2
-      font-size: $font-l
-      margin: 25px 0 25px
-      font-weight: normal
-    .pagination
-      margin: 20px 0
-      float: right
-      clear: both
-
-
-// classes
-.animation-shake
-  animation: shake .3s
-.login-from
-  +gridle(3.5 pull 1.4 float right)
-  max-width: 350px
-  min-width: 350px
-  height: 320px
-  border-radius: $border-radius
-  box-shadow: 0 0 5px getColor(base, lines)
-  background: getColor(background, body)
-  margin: 140px 0
-  +gridle_state(mobile)
-    +gridle(14 pull 0 grid-centered)
-    margin: 80px 0
-  input
-    margin: 10px 0 0 25px
-    width: 290px
-    +input-text-primary()
-  .pwd-show, .pwd-hide
-    width: 25px
-    height: 25px
-    position: absolute
-    right: 35px
-    top: 20px
-    background-size: 25px 25px
-    background-image: url(../img/fp/icon-close-eye.png)
-    background-repeat: no-repeat
-    background-position: center
-  .pwd-show
-    background-image: url(../img/fp/icon-eye.png)
-  .msg-space
-    font-size: $font-xs
-    height: 1px
-    text-align: center
-  .btn-line
-    button
-      +button()
-      margin: 10px 0 0 25px
-      width: 300px
-      height: 44px
-      line-height: 44px
-    a
-      color: getColor(text, link)
-      font-size: $font-xs
-      display: inline-block
-      margin: 15px 0 0 270px
-      &:hover
-        +hover-text(getColor(text, link))
-  .tab-line
-    height: 50px
-    margin: 0
-    a
-      float: left
-      display: block
-      width: 50%
-      height: 48px
-      line-height: 48px
-      font-size: $font-m
-      text-align: center
-      color: getColor(text, secondary)
-      border-bottom: 2px solid getColor(background, light)
-      &.active
-        color: getColor(text, primary)
-        border-color: getColor(base, primary)
-
-.icon-btn
-  cursor: pointer
-  height: 40px
-  width: 30px
-  display: inline-block
-  line-height: 40px
-  color: getColor(text, secondary)
-  &:hover
-    color: getColor(text, primary)
-
-table.base
-  border-spacing: 0
-  width: 100%
-  box-shadow: 0 2px 2px getColor(border, table)
-  background: getColor(background, body)
-  border-bottom-left-radius: $border-radius
-  border-bottom-right-radius: $border-radius
-  thead
-    background: getColor(background, light)
-    th
-      height: 40px
-  tbody
-    tr
-      &:nth-child(even)
-        background: #F5F7F8
-    td
-      text-align: center
-      height: 40px
-      border-right: 1px solid getColor(border, table)
-      &.left
-        text-align: left
-        text-indent: 15px
-  tfoot
-    td
-      height: 40px
-      text-indent: 15px
-      b
-        color: getColor(base, primary)
-
-
-
-
-
-
-// 表单相关
-@import "fp/form"
-
-
-
-
-
-
-
-
-// component
-
-.primary-btn
-  +button()
-.gray-btn
-  +button(getColor(border, input), getColor(gray, base))
-
-
-
-
+//
+// pagination
+//
 .pagination
-  list-style: none
-  height: 30px
-  li
-    display: inline-block
-    height: 30px
-    width: 30px
-    float: left
-    margin-right: 10px
-    text-align: center
-    line-height: 30px
-    &.select
-      width: auto
-      select
-        height: 30px
-        border: none
-        border-radius: $border-radius
-        box-shadow: 1px 1px 2px getColor(border, table)
-    &.active
-      a
-        color: getColor(base, primary)
-        border: 1px solid getColor(base, primary)
-    a
-      height: 30px
-      width: 30px
-      display: block
-      text-align: center
-      line-height: 30px
-      color: getColor(gray, base)
-      border: 1px solid #fff
-      border-radius: $border-radius
-      box-shadow: 1px 1px 2px getColor(border, table)
-      background: getColor(background, body)
-      &:hover
-        color: getColor(base, primary)
+  +gridle(float right)
+  +pagination-ul-select(#fff, #222, $color-main)
+  a, select
+    +shadow-block()
 
-// 输入下拉框
+//
+// sidenav
+//
+admin-sidenav
+  +gridle(2)
+  position: absolute
+  top: 0
+  left: 0
+  height: 100%
+  background: #212329
+  z-index: 2
+  ul
+    list-style: none
+    margin: 30px 0 0
+    padding: 0
+    &.child
+      margin-top: 0
+      margin-left: 20px
+      li
+        &:first-child
+          a
+            // border-top: none
+  li
+    height: 38px
+    &:first-child
+      a
+        // border-top: 1px solid rgba(#fff, 0.1)
+  a
+    border-bottom: 1px solid rgba(#fff, 0.1)
+    display: block
+    color: rgba(#fff, 0.5)
+    height: 38px
+    margin-left: 20px
+    padding-left: 20px
+    line-height: 38px
+    &:hover
+      color: rgba(#fff, 0.9)
+    &.active
+      color: rgba(#fff, 0.9)
+      background: #333
+
+//
+// input-select
+//
 input-select
   ul
     max-height: 200px
     overflow: auto
-    background: getColor(background, body)
-    width: 100%
+    background: #fff
+    width: 99.5%
     top: 18px
     left: 0
-    +focus-border()
-    border-top-left-radius: 0
-    border-top-right-radius: 0
+    border-radius: 3px
+    border: 1px solid $color-line1
+    border-bottom: none
     li
       padding: 8px
-      border-top: 1px solid getColor(border, input)
+      border-bottom: 1px solid $color-line1
       &.active, &:hover
         background: rgba(#F44C4C, .1)
-        color: getColor(base, primary)
-
-
-
-
-// 表单过滤条
-table-filter
-  display: block
-  background: getColor(background, body)
-  border-top-left-radius: $border-radius
-  border-top-right-radius: $border-radius
-  box-shadow: 0 -2px 2px getColor(border, table)
-  overflow: hidden
-  div
-    display: inline-block
-    margin: 8px 15px
-    // 附加按钮靠右
-    &.addon
-      float: right
-  input, select, button, a
-    display: inline-block
-    vertical-align: middle
-  input[type=text], select
-    text-indent: 5px
-    margin-left: 10px
-    height: 30px
-    border: 1px solid getColor(border, input)
-    border-radius: $border-radius
-  input[type=text]
-    &:focus
-      +focus-bg(getColor(background, focus))
-  select
-    height: 34px
-    text-indent: 0
-  button
-    height: 34px
-    margin-left: -20px
-  a
-    margin-left: 10px
-
-header-nav
-  ul
-    padding: 0
-    margin: 0
-    height: 40px
-    line-height: 40px
-    li
-      display: inline-block
-      margin: 0 15px
-      position: relative
-      .sub
-        background: #fff
-        position: absolute
-        border: 1px solid #ccc
-        left: 0
-        width: 100px
-        height: auto
-        li
-          display: block
-
-input-valid
-  span
-    color: getColor(alert, error-text)
+        color: $color-main

@@ -1,13 +1,76 @@
+<!-- 侧栏导航 -->
+<admin-sidenav>
+  <style scoped>
+  .child{display: none}
+  .unfold{display: block}
+  .icon-angle-down,
+  .icon-menu{float: right; margin-right: 20px; color: #666;}
+  </style>
+  <ul>
+    <li each={m in data}>
+      <a href="{m.url?'#!'+m.url:'javascript:;'}"
+        onclick={fn.toggle}
+        class={active: parent.url==m.url}>
+        <i class="icon-{m.icon}"></i>
+        {m.name}
+        <i class="{
+        'icon-menu': m.child==parent.child,
+        'icon-angle-down': m.child&&parent.child!=m.child
+        }" if={m.child}></i>
+      </a>
+      <ul if={m.child} class="child {unfold: parent.child==m.child}">
+        <li each={s in m.child}>
+          <a href="#!{s.url}">
+            <i class="icon-{s.icon}"></i>
+            {s.name}
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <script>
+  var _this = this;
+  _this.data = _this.app.data.admin_sidenav;
+  _this.fn = {
+    toggle: function(e){
+      if(e.item.m.child){
+        if(e.item.m.child == _this.child){
+          // 关闭
+          delete _this.child;
+        }
+        else{
+          _this.child = e.item.m.child;
+        }
+      }
+    }
+  };
+  _this.on('mount', function(){
+    setTimeout(function(){
+      // 计算高度，最长化
+      var main = document.getElementsByTagName('main')[0];
+      var footer = document.getElementsByTagName('footer')[0];
+      var h = main.clientHeight + footer.clientHeight;
+      _this.root.style.height = h+'px';
+    }, 500);
+    // 展开，高亮对应的tab
+    _this.url = _this.app.route.params[0] || 'index';
+    _this.update();
+  });
+
+  </script>
+</admin-sidenav>
+
+
 <!-- table筛选过滤 -->
 <table-filter>
   <!-- 协议管理 -->
   <div if={opts.for=='agreement'}>
     {app.lang.admin.search.condition}:
     <select ref="agreement">
-      <option each={app.lang.admin.search.agreement} value={key} selected={type==key}>{name}</option>
+      <option each={app.data.agreement_search_types} value={key} selected={type==key}>{name}</option>
     </select>
     <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="{app.lang.admin.search.keyword.placehoder}">
-    <button class="gray-btn" onclick={fn.search}><i class="icon-search"></i></button>
+    <button style="margin-left: -5px" class="gray" onclick={fn.search}><i class="icon-search"></i></button>
     <a show={app.route.query.keyword} href="javascript:;" onclick={fn.reset}>{app.lang.admin.reset}</a>
   </div>
   <div class="addon">
@@ -49,12 +112,12 @@
   <div class="username" onmouseenter={fn.active}
     onmouseover={fn.active} onmouseleave={fn.hidden}>
     <a href="javascript:;" class="{active: active}">
-      {user_name} <i class="{'icon-down-open-big': !active, 'icon-menu': active}"></i>
+      {user_name} <i class="{'icon-angle-down': !active, 'icon-menu': active}"></i>
     </a>
     <dl class="menu {active: active}" onmouseenter={fn.active}
       onmouseover={fn.active} onmouseleave={fn.hidden}>
       <dd><a href="javascript:;">{app.lang.header.userinfo.account}</a></dd>
-      <dd><a href="javascript:;">{app.lang.header.userinfo.logout}</a></dd>
+      <dd><a href="javascript:;" onclick={fn.logout}>{app.lang.header.userinfo.logout}</a></dd>
     </dl>
   </div>
 
@@ -65,6 +128,13 @@
   _this.active = false;
 
   _this.fn = {
+    logout: function(){
+      _this.app.api('GET', 'login/default/logout')
+      .on('done', function(data){
+        _this.app.alert(_this.app.lang.login.out, 'success');
+        _this.app.route(_this.app.config.loginPage);
+      });
+    },
     relogin: function(){
       _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
     },
@@ -97,18 +167,14 @@
     else{
       // 获取资料信息
       _this.app.api('GET', 'login/default/user-info')
-      .then(function(data){
+      .on('done', function(data){
         _this.user_name = data.user_name;
         _this.user_id = data.user_id;
         _this.app.utils.cookie.set('user_name', data.user_name);
         _this.app.utils.cookie.set('user_id', data.user_id);
       })
-      .catch(function(){
-        if(_this.app.config.env === 'dev'){
-          _this.app.utils.cookie.set('user_name', '张三');
-          _this.app.utils.cookie.set('user_id', 1);
-          return;
-        }
+      .on('fail', function(){
+        _this.app.alert(_this.app.lang.login.relogin, 'warning');
         _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
       });
     }
@@ -127,13 +193,13 @@
 
 
 <footer>
-  <div class="wrapper">
+  <div class="container">
     <!-- 底部信息 -->
     <p class="info">
       {app.lang.footer.icp} &copy; {app.lang.footer.copyright}
-      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       {app.lang.footer.address}
-      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;
       {app.lang.footer.tel}
     </p>
   </div>
@@ -147,17 +213,20 @@
 
 <header class="{opts.for}">
 
-  <div class="wrapper">
+  <!-- 顶部信息框 -->
+  <alert message={alert.message} type={alert.type}></alert>
+
+  <div class="container {center: opts.for!=='admin'}">
 
     <!-- 登录页header -->
-    <div if={opts.for==='login'} class="login-header">
+    <div class="row" if={opts.for==='login'}>
       <h1>
         {app.lang.header.sitename}
       </h1>
     </div>
 
     <!-- 捐赠人header -->
-    <div if={opts.for==='user'} class="user-header">
+    <div class="row" if={opts.for==='user'}>
       <h1>
         {app.lang.header.sitename}
       </h1>
@@ -165,43 +234,36 @@
     </div>
 
     <!-- 管理员header -->
-    <div if={opts.for==='admin'} class="admin-header">
+    <div class="row" if={opts.for==='admin'}>
       <h1>
         {app.lang.header.sitename}
       </h1>
       <userinfo></userinfo>
     </div>
 
-    <!-- 顶部信息框 -->
-    <div show={message} class="top-message {active: message}">
-      <p class="{type}">{message}</p>
-    </div>
-
   </div>
 
   <script>
   var _this = this;
-  _this.fn = {
-    message: function(msg){
-      clearTimeout(_this.timer);
-      _this.message = msg;
-      _this.timer = setTimeout(function(){
-        _this.message = null;
-        _this.update();
-      }, 2000);
-      _this.update();
-    }
-  };
-  // 监听api报错信息
-  _this.app.on('api::fail', function(data){
-    _this.app.err('api failed', data);
-    _this.fn.message(data.url+' '+data.code+' '+data.errmsg, 'error');
+  _this.alert = {};
+  _this.on('mount', function(){
+    document.body.setAttribute('class', opts.for);
   });
+
   // 自定义信息
-  _this.app.on('message::header', function(msg, type){
-    _this.type = type || '';
-    _this.fn.message(msg);
+  _this.app.on('alert', function(msg, type){
+    // 加载后
+    (_this.tags['alert'] &&
+    _this.tags['alert'].emit(
+      'message', msg, type
+    )) || _this.update({
+      alert: {
+        message: msg,
+        type: type
+      }
+    });
   });
+
   // 对象动画
   _this.app.on('animation', function(target, name){
     target.setAttribute('class',
@@ -211,55 +273,6 @@
       target.getAttribute('class').replace('animation-'+name, ''));
     }, 500);
   });
-  _this.on('mount', function(){
-    document.body.setAttribute('class', opts.for);
-  });
   </script>
 
 </header>
-
-
-
-
-
-
-<header-nav>
-
-  <ul>
-    <li each={nav in data}
-      onmouseenter={fn.showSubNav}
-      onmouseleave={fn.hideSubNav}>
-      <a href="javascript:;" onclick={fn.navTo}>{nav.name}</a>
-      <ul class="sub" if={nav.sub && nav.subShow}>
-        <li each={sub in nav.sub}>
-        <a href="javascript:;" onclick={fn.subNavTo}>{sub.name}</a>
-        </li>
-      </ul>
-    </li>
-  </ul>
-
-  <script>
-
-  var _this = this;
-  // 导航数据
-  _this.data = _this.app.data['header-nav'];
-  _this.fn = {
-    navTo: function(e){
-      if(e.item.nav.sub) return;
-      else _this.app.route(e.item.nav.url);
-    },
-    subNavTo: function(e){
-      _this.app.route(_this._base_url+e.item.sub.url);
-    },
-    showSubNav: function(e){
-      _this._base_url = e.item.nav.url;
-      e.item.nav.subShow = true;
-    },
-    hideSubNav: function(e){
-      delete _this._base_url;
-      e.item.nav.subShow = false;
-    }
-  };
-  </script>
-
-</header-nav>

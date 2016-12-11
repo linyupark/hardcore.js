@@ -2,9 +2,8 @@
 
   <header for="login"></header>
 
-  <div class="body fp-login">
-
-    <div class="wrapper">
+  <main class="login">
+    <div class="container">
       <form class="login-from" onsubmit="return false">
         <p class="tab-line">
           <a href="javascript:;" class="{active: role=='admin'}" onclick={fn.loginAdmin}>{app.lang.login.admin}</a>
@@ -22,14 +21,13 @@
           <input-valid for="username,password" rule="required" msg="{app.lang.login.invalid}"></input-valid>
         </div>
         <p class="btn-line">
-          <button onclick={fn.login}>{app.lang.login.btn}</button>
+          <button ref="login" onclick={fn.login}>{app.lang.login.btn}</button>
           <br>
           <a href="#!findpass">{app.lang.login.findpass}</a>
         </p>
-      </div>
-    </form>
-
-  </div>
+      </form>
+    </div>
+  </main>
 
   <footer></footer>
 
@@ -38,46 +36,10 @@
   var _this = this;
   _this.role = 'admin';
   _this.pwd = 'hide';
-  _this.ref = _this.app.route.params[1] && _this.app.route.params[1].ref;
+  _this.ref = _this.app.route.query.ref;
 
   _this.fn = {
     login: function(e){
-      _this.tags['input-valid'].once('valid', function(target){
-        e.target.innerText = _this.app.lang.login['btn:loading'];
-        // 尝试登录
-        _this.app.api('POST', 'login/default/index', {
-          withCredentials: true,
-          data: {
-            'LoginForm[username]': target[0].value,
-            'LoginForm[password]': target[1].value
-          },
-          trigger: e.target
-        })
-        .then(function(){
-          e.target.innerText = _this.app.lang.login['btn:ok'];
-          // 登录成功
-          _this.app.utils.cookie.set('role', _this.role, {
-            'max-age': 3600*24*7
-          });
-          // 如果有来源页
-          if(_this.ref){
-            location.href = (_this.app.route.params[1].ref);
-          }
-          else{
-            // admin-index || user-index
-            _this.app.route(_this.role+'-'+_this.app.config.indexPage);
-          }
-        })
-        .catch(function(msg){
-          // 接口失败错误信息提示
-          _this.tags['input-valid'].emit(
-            'msg', _this.app.lang.login.fail
-          );
-        });
-        _this.app.on('api::complete', function(){
-          e.target.innerText = _this.app.lang.login.btn;
-        });
-      });
       _this.tags['input-valid'].emit('check');
     },
     loginAdmin: function(){
@@ -106,7 +68,48 @@
       );
       _this.refs.username.focus();
     }
+
+    _this.tags['input-valid'].on('valid', function(target){
+      _this.refs.login.innerText = _this.app.lang.login['btn:loading'];
+      // 尝试登录
+      _this.app.api('POST', 'login/default/index', {
+        withCredentials: true,
+        data: {
+          'LoginForm[username]': target[0].value,
+          'LoginForm[password]': target[1].value
+        },
+        trigger: _this.refs.login
+      })
+      .on('done', function(){
+        _this.refs.login.innerText = _this.app.lang.login['btn:ok'];
+        // 登录成功
+        _this.app.utils.cookie.set('role', _this.role, {
+          'max-age': 3600*24*7
+        });
+        // 如果有来源页
+        if(_this.ref){
+          location.href = _this.ref;
+        }
+        else{
+          // admin-index || user-index
+          _this.app.route(_this.role+'-'+_this.app.config.indexPage);
+          window.scrollTo(0, 0);
+        }
+      })
+      .on('fail', function(msg){
+        // 接口失败错误信息提示
+        _this.tags['input-valid'].emit(
+          'msg', _this.app.lang.login.fail
+        );
+      })
+      .on('complete', function(){
+        _this.refs.login.innerText = _this.app.lang.login.btn;
+      });
+    });
+
   });
+
+
 
   </script>
 

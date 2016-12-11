@@ -1,3 +1,31 @@
+
+
+<!-- 警示信息 -->
+<alert show={message} class="{type}">
+  <p>{message}</p>
+  <script>
+  var _this = this;
+  _this.message = opts.message;
+  _this.type = opts.type;
+  _this.on('mount', function(){
+    // console.log('alert mounted');
+  });
+  _this.on('message', function(msg, type){
+    clearTimeout(_this.timer);
+    _this.timer = setTimeout(function(){
+      _this.update({
+        message: null,
+        type: null
+      });
+    }, 2900);
+    _this.update({
+      message: msg,
+      type: type ||'info'
+    });
+  });
+  </script>
+</alert>
+
 <!-- 输入下拉框 -->
 <input-select>
   <style scoped>
@@ -121,10 +149,10 @@
   .header a{
     position: absolute;
     right: 15px;
-    top: 6px;
-    font-size: 22px;
+    top: 13px;
+    font-size: 14px;
     color: #ccc;
-  }
+  }.header a:hover{ border: none }
   .content{
     text-align: center;
     padding: 20px;
@@ -138,7 +166,6 @@
     bottom: 0;
   }
   .btn-group button{
-    height: 30px;
     width: 90px;
     margin: 0 15px;
   }
@@ -152,14 +179,14 @@
     style="width: {opts.w||360}px; height: {opts.h||200}px; z-index: {opts.z?Number(opts.z)+11:22}; top: {opts.top||'30%'}; margin-left: {opts.w?'-'+Number(opts.w/2):-180}px">
     <div class="header">
       <h3><yield from="title"/></h3>
-      <a href="javascript:;" onclick={fn.close} class="close">x</a>
+      <a href="javascript:;" onclick={fn.close}><i class="icon-cancel"></i></a>
     </div>
     <div class="content">
       <yield from="content"/>
     </div>
     <div class="btn-group">
       <yield from="button"/>
-      <button class="gray-btn" onclick={fn.close}>
+      <button class="btn-gray" onclick={fn.close}>
         <yield from="close"/>
       </button>
     </div>
@@ -242,6 +269,10 @@
   </div>
 </spinner-dot>
 
+
+
+
+<!-- 输入内容校验 -->
 <input-valid>
 
   <span show={message}>{message}</span>
@@ -330,6 +361,39 @@
 </input-valid>
 
 
+<!-- 利用FormData上传数据流 -->
+<upload-formdata>
+  <input type="file" name={name} ref="fileInput" multiple>
+  <button onclick={fn.upload}>上传</button>
+  <script>
+    var _this = this;
+    _this.name = opts.name || 'file';
+    _this.uploadFiles = [];
+    _this.fn = {
+      upload: function(e) {
+        _this.uploadFiles = _this.refs.fileInput.files;
+        _this.progressList = [];
+        if(!_this.uploadFiles.length){
+          e.target.innerText = '请选择文件';
+          return setTimeout(function(){
+            e.target.innerText = '上传';
+          } ,1000);
+        }
+        _this.fd = new FormData();
+        for(var i=0; i < _this.uploadFiles.length; i++){
+          _this.fd.append(_this.name, _this.uploadFiles[i]);
+        }
+        _this.emit('post', _this.fd);
+      }
+    };
+    _this.on('mount', function(){
+      // 浏览器支持检测
+      if('FormData' in window === false){
+        alert('Your browser not support FormData!');
+      }
+    });
+  </script>
+</upload-formdata>
 
 <!-- <upload-base64>
 
@@ -485,87 +549,31 @@
       if(_this.hasNextPage)
       _this.fn.page(_this.page + 1);
     },
-    // 切换页面
-    page: function(n, first) {
-      _this.page = n;
+    pageCount: function(){
       _this.hasNextPage = _this.pages > _this.page;
       _this.hasPrevPage = _this.page > 1;
       _this.fn.prevPages();
       _this.fn.nextPages();
-      if(!first) _this.emit('page', n);
-    }
-  };
-
-  _this.on('mount', function() {
-    _this.page = Number(opts.page || 1);
-    _this.pages = Number(opts.pages);
-    _this.fn.pageList();
-    _this.fn.page(_this.page, true);
-    _this.update();
-  });
-  </script>
-
-</pagination-number>
-
-<!-- <pagination-select>
-
-  <ul class="pagination">
-    <li>
-      <a href="javascript:;" class="{'disabled': !hasPrevPage}" onclick={fn.prevPage}>
-        上页
-      </a>
-    </li>
-    <li>
-      <select onchange={fn.jumpPage} value="{page}">
-        <option each={p in pageList} value="{p}">{p}</option>
-      </select>
-    </li>
-    <li>
-      <a href="javascript:;" class="{'disabled': !hasNextPage}" onclick={fn.nextPage}>
-        下页
-      </a>
-    </li>
-  </ul>
-  <script>
-  var _this = this;
-  _this.fn = {
-    // 循环总页数生成option选项
-    pageList: function() {
-      _this.pageList = [];
-      for(var page = 1; page <= _this.pages; page++){
-        _this.pageList.push(page);
-      }
-    },
-    // 跳转页
-    jumpPage: function(e) {
-      _this.fn.page(Number(e.target.value));
-    },
-    // 上一页
-    prevPage: function() {
-      if(_this.hasPrevPage)
-      _this.fn.page(_this.page - 1);
-    },
-    // 下一页
-    nextPage: function() {
-      if(_this.hasNextPage)
-      _this.fn.page(_this.page + 1);
     },
     // 切换页面
     page: function(n) {
       _this.page = n;
-      _this.hasNextPage = _this.pages > _this.page;
-      _this.hasPrevPage = _this.page > 1;
-      _this.emit('page', n);
+      _this.fn.pageCount();
+      _this.emit('change', n);
+    },
+    // 渲染
+    render: function(){
+      _this.page = Number(opts.page || 1);
+      _this.pages = Number(opts.pages || 1);
+      _this.fn.pageList();
+      _this.fn.pageCount();
+      _this.update();
     }
   };
-
-  _this.on('mount', function() {
-    _this.page = Number(opts.page);
-    _this.pages = Number(opts.pages);
-    _this.fn.pageList();
-    _this.fn.page(_this.page);
-    _this.update();
+  _this.on('mount', function(){
+    _this.fn.render();
   });
+  _this.on('render', _this.fn.render);
   </script>
 
-</pagination-select> -->
+</pagination-number>

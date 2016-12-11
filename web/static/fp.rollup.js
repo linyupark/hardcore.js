@@ -131,6 +131,8 @@ const search2obj = (hash = "") => {
  */
 const xhr = (url, options = {}) => {
   let opts = assign({
+      payload: false,
+      formdata: false,
       method: "GET",
       data: {},
       headers: {},
@@ -152,14 +154,17 @@ const xhr = (url, options = {}) => {
     has_q = true;
   }
   // 整理发送数据
-  if(serialize(opts.data) !== ""){
+  if(opts.formdata){
+    send_data = opts.data;
+  }
+  else if(serialize(opts.data) !== ""){
     send_data.push(serialize(opts.data));
   }
   // 如果是put /post 则用formdata
-  if (/^put$|^post$/i.test(opts.method)) {
+  if (/^put$|^post$/i.test(opts.method) && !opts.payload) {
     opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   } else if(send_data.length > 0) {
-    url += (has_q ? "&" : "?") + send_data;
+    if(!opts.formdata) url += (has_q ? "&" : "?") + send_data;
   }
   xhr = new XMLHttpRequest();
   xhr.open(opts.method, url, true);
@@ -632,6 +637,9 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
+if ("Promise" in window) {
+  Promise = window.Promise;
+}
 
 class Loader {
 
@@ -3652,6 +3660,7 @@ class RiotApp {
       this.tagMounted = {};
       // 合并组件
       this.Promise = Promise;
+      this.emitter = emitter;
       this.route = route;
       this.xhr = xhr;
       this.utils = {
@@ -3790,76 +3799,95 @@ class RiotApp {
 
 }
 
-class FP extends RiotApp{
+class FP extends RiotApp {
 
   /**
    * 适配项目接口
    * @return {[type]} [description]
    */
-  api(method, url, opts={}){
+  api(method, url, opts = {}) {
+
     const prefix = {
       dev: 'dev.',
       test: 'test.',
       pro: 'www.'
     }[this.config.env];
+
+    let api = this.emitter();
+
     // 如果设定了发起请求的元素，则在请求完毕前禁用
     this.__api = this.__api || [];
-    for(let i in this.__api){
-      if(this.__api[i] === url){
-        this.emit('api::fail', {
-          code: '',
-          errmsg: 'api busy:'+url
+    for (let i in this.__api) {
+      if (this.__api[i] === url) {
+        return api.emit('fail', {
+          code: '500-13',
+          errmsg: '接口繁忙',
+          url: url
         });
-        return this.Promise.reject('api busy:'+url);
       }
     }
     this.__api.push(url);
-    if(opts.trigger){
+
+    if (opts.trigger) {
       opts.trigger.disabled = true;
     }
-    return new this.Promise((resolve, reject) => {
-      this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
-        method: method,
-        data: opts.data || {},
-        headers: opts.headers || {},
-        cache: opts.cache || false
-      }).done(resp => {
-        if(resp.errno == 0) resolve(resp.data);
-        else {
-          this.emit('api::fail', {
-            code: resp.errno,
-            errmsg: resp.errmsg
-          });
-          reject({
-            code: resp.errno,
-            errmsg: resp.errmsg,
-            url: url
-          });
-        }
-      }).fail(status => {
-        this.emit('api::fail', {
-          code: status,
-          errmsg: '',
-          url: url
+
+    this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
+      formdata: opts.formdata || false,
+      showProgress: opts.showProgress || false,
+      method: method,
+      data: opts.data || {},
+      headers: opts.headers || {},
+      cache: opts.cache || false
+    }).done(resp => {
+      if (resp.errno == 0){
+        // this.log('api done');
+        api.emit('done', resp.data || {});
+      }
+      else {
+        // this.log('api fail');
+        api.emit('fail', {
+          code: resp.errno || '',
+          errmsg: resp.errmsg,
+          url: url || ''
         });
-        reject({
-          code: status,
-          errmsg: '',
-          url: url
-        });
-      }).complete(() => {
-        this.__api.splice(this.__api.indexOf(url), 1);
-        if(opts.trigger){
-          opts.trigger.disabled = false;
-        }
-        this.emit('api::complete', url);
+      }
+    }).progress(p => {
+      api.emit('progress', p);
+    }).fail(status => {
+      // this.log('api fail');
+      api.emit('fail', {
+        code: status,
+        errmsg: '',
+        url: url
       });
+    }).complete(() => {
+      // this.log('api complete');
+      this.__api.splice(this.__api.indexOf(url), 1);
+      if (opts.trigger) {
+        opts.trigger.disabled = false;
+      }
+      api.emit('complete', url);
     });
+
+    api.on('fail', e => {
+      this.alert('接口错误:'+e.code+' '+e.errmsg+' '+e.url, 'error');
+    });
+
+    return api;
   }
 
-  static detectEnv(env){
-    if(env) return env;
-    if(/localhost|127\.0|192\.168/.test(window.location.href)){
+  // 要略有延迟，确保mount
+  alert(msg, type='info') {
+    clearTimeout(this.__timer);
+    this.__timer = setTimeout(() => {
+      this.emit('alert', msg, type);
+    }, 500);
+  }
+
+  static detectEnv(env) {
+    if (env) return env;
+    if (/localhost|127\.0|192\.168/.test(window.location.href)) {
       return 'dev';
     }
     return 'pro';

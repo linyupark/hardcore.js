@@ -1,0 +1,38 @@
+// 基础mixin
+=btn($bg, $text)
+  cursor: pointer
+  background: $bg
+  border: 1px solid darken($bg, 10%)
+  text-align: center
+  color: $text
+  &:hover
+    background: darken($bg, 10%)
+  &:active
+    background: lighten($bg, 10%)
+  &[disabled], &:disabled
+    background: rbga($bg, 8%)
+    border-color: rgba($bg, 26%)
+    color: rgba($bg, 40%)
+
+// 自定义高度，字体大小跟随高度改变
+=btn-height($h)
+  font-size: $h/3+1.5
+  height: $h
+  line-height: $h - 2
+
+
+// 项目级别mixin ~~~~~~~~~~~~~~~~~~~
+=btn-1($h: 35px)
+  +btn(#DF3A5E, #fff)
+  +btn-height($h)
+  border-radius: 3px
+
+=btn-2($h: 35px, $radius: 3px)
+  +btn(#FEAD50, #FFF)
+  +btn-height($h)
+  border-radius: 3px
+
+=btn-3($h: 35px, $radius: 3px)
+  +btn(#E1E1E1, #999999)
+  +btn-height($h)
+  border-radius: 3px

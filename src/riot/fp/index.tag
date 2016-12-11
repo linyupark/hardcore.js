@@ -1,20 +1,33 @@
 <fp-index>
 
-  <header-nav></header-nav>
+  <header for="user"></header>
 
   <h1>FP index</h1>
 
   <p>
     <a href="#!login">login</a>
+    <a href="#!user-index">user</a>
   </p>
 
-  <pagination-number pages="10" page="1" select="y"></pagination-number>
+  <upload-formdata></upload-formdata>
 
   <script>
-  // this.app.xhr('http://dev.h5.sosho.cn/server/test/login', {
-  //   method: 'POST',
-  //   withCredentials: true
-  // })
+  var _this = this;
+  _this.on('mount', function(){
+    // _this.tags['upload-formdata'].on('post', function(fd){
+    //   _this.app.on('api::progress', function(p){
+    //     console.log(p);
+    //   });
+    //   _this.app.api('POST', 'agreement/default/upload-file', {
+    //     showProgress: true,
+    //     formdata: true,
+    //     data: fd
+    //   }).then(function(data){
+    //     console.log(data);
+    //   });
+    // });
+  });
+
   </script>
 
 </fp-index>

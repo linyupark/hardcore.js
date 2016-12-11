@@ -1,0 +1,29 @@
+=css-arrow($pos: 'top', $size: 5px, $color: #fff)
+  &:after
+    border: solid transparent
+    content: " "
+    height: 0
+    width: 0
+    position: absolute
+    pointer-events: none
+    border-width: $size
+    @if $pos == 'top'
+      bottom: 100%
+      left: 50%
+      margin-left: -$size
+      border-bottom-color: $color
+    @if $pos == 'bottom'
+      top: 100%
+      left: 50%
+      margin-left: -$size
+      border-top-color: $color
+    @if $pos == 'left'
+      top: 50%
+      right: 100%
+      margin-top: -$size
+      border-right-color: $color
+    @if $pos == 'right'
+      top: 50%
+      left: 100%
+      margin-top: -$size
+      border-left-color: $color

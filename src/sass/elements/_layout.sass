@@ -1,0 +1,18 @@
+// 基于gridle
+@import "gridle/gridle"
+
+
++gridle_setup((context: 12, gutter-width: 0, gutter-left: 0, gutter-right: 0))
+
++gridle_register_state(tablet, (min-width: 960px))
++gridle_register_state(mobile, (max-width: 480px))
++gridle_init()
+
+
+=layout-container()
+  max-width: 1400px
+  min-width: 960px
+  +gridle_state(mobile)
+    min-width: 360px
+  &.center
+    margin: 0 auto

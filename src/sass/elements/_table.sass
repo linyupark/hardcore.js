@@ -1,0 +1,30 @@
+=table()
+  border-spacing: 0
+  background: #FFF
+  border: 1px solid #ebebeb
+  border-right: none
+  th, td
+    height: 40px
+    text-align: center
+    &.left
+      text-align: left
+      text-indent: 15px
+  thead
+    background: #F5F7F8
+    th
+      border-bottom: 1px solid #ebebeb
+      color: #222
+      &:last-child
+        border-right: 1px solid #ebebeb
+  tbody
+    tr
+      &:nth-child(even)
+        background: #F5F7F8
+    td
+      color: #666
+      border-right: 1px solid #EBEBEB
+  tfoot
+    td
+      border-top: 1px solid #ebebeb
+      &:last-child
+        border-right: 1px solid #ebebeb

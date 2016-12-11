@@ -1,37 +1,29 @@
 {
+  "jq": [
+    "//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"
+  ],
   "my97": [
     "./static/My97DatePicker/WdatePicker.js"
   ],
   "pro": ["/static/css/fp.min.css?v=2e35f4de1b64e0b5ed2791280a9c9e44", "/static/riot/common+component.min.js?v=3f0667bcedfe62f1050f853d2b815d36"],
   "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
   "dev": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
-  "header-nav": [{
-    "name": "首页",
-    "url": "/index"
-  }, {
-    "name": "协议",
-    "url": "/agreement"
-  }, {
-    "name": "设置",
-    "url": "/setting",
-    "sub": [{
-      "name": "日志",
-      "url": "/log"
-    }, {
-      "name": "密码",
-      "url": "/password"
-    }]
-  }, {
-    "name": "查询",
-    "url": "/search",
-    "sub": [{
-      "name": "日志",
-      "url": "/log"
-    }, {
-      "name": "密码",
-      "url": "/password"
-    }]
-  }],
+  "agreement_search_types": [
+    {"name": "协议编号", "key": "agreement_number"},
+    {"name": "协议名称", "key": "agreement_name"},
+    {"name": "捐赠方ID", "key": "donor_id"}
+  ],
+  "admin_sidenav": [
+    {"name": "总览", "url": "admin-index", "icon": "home"},
+    {"name": "协议", "url": "admin-agreement", "icon": "agreement"},
+    {"name": "项目", "url": "admin-project", "icon": "project"},
+    {"name": "捐赠方", "url": "admin-donor", "icon": "donor"},
+    {"name": "用户", "url": "admin-user", "icon": "user"},
+    {"name": "日志", "url": "admin-log", "icon": "log"},
+    {"name": "设置", "url": "", "icon": "setting", "child": [
+      {"name": "密码", "url": "admin-setting-password", "icon": "password"}
+    ]}
+  ],
   "lang": {
     "cn": {
       "year:number": "几年(阿拉伯数字)",
@@ -45,6 +37,7 @@
         }
       },
       "login": {
+        "out": "成功退出",
         "admin": "管理员登录",
         "user": "捐赠人登录",
         "placehoder": {
@@ -69,12 +62,7 @@
           "condition": "按条件搜索",
           "keyword": {
             "placehoder": "查询关键字"
-          },
-          "agreement": [
-            {"name": "协议编号", "key": "agreement_number"},
-            {"name": "协议名称", "key": "agreement_name"},
-            {"name": "捐赠方ID", "key": "donor_id"}
-          ]
+          }
         },
         "handle": "操作",
         "deny": "没有相关权限",

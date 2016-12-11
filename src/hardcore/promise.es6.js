@@ -135,8 +135,8 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-// if ("Promise" in window) {
-//   Promise = window.Promise;
-// }
+if ("Promise" in window) {
+  Promise = window.Promise;
+}
 
 export { Promise };

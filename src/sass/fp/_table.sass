@@ -1,0 +1,39 @@
+
+
+table.base
+  +shadow-block()
+  +table()
+  width: 99.9%
+  border-radius: 5px
+  b
+    color: $color-main
+
+
+// 表单过滤条
+table-filter
+  width: 99.9%
+  display: block
+  background: #fff
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  overflow: hidden
+  div
+    display: inline-block
+    margin: 8px 15px
+    // 附加按钮靠右
+    &.addon
+      float: right
+  input, select, button, a
+    display: inline-block
+    vertical-align: middle
+    margin-left: 10px
+  input[type=text], select
+    +input-text(34px, 0 0 0 10px, 3px)
+  button
+    &.main
+      +btn-1(36px)
+    &.gray
+      +btn-3(36px)
+    padding: 1px 10px
+  a
+    margin-left: 10px

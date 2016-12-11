@@ -141,6 +141,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var opts = assign({
+      payload: false,
+      formdata: false,
       method: "GET",
       data: {},
       headers: {},
@@ -163,14 +165,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       has_q = true;
     }
     // 整理发送数据
-    if (serialize(opts.data) !== "") {
+    if (opts.formdata) {
+      send_data = opts.data;
+    } else if (serialize(opts.data) !== "") {
       send_data.push(serialize(opts.data));
     }
     // 如果是put /post 则用formdata
-    if (/^put$|^post$/i.test(opts.method)) {
+    if (/^put$|^post$/i.test(opts.method) && !opts.payload) {
       opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
     } else if (send_data.length > 0) {
-      url += (has_q ? "&" : "?") + send_data;
+      if (!opts.formdata) url += (has_q ? "&" : "?") + send_data;
     }
     xhr = new XMLHttpRequest();
     xhr.open(opts.method, url, true);
@@ -746,6 +750,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
+  if ("Promise" in window) {
+    Promise = window.Promise;
+  }
 
   var Loader = function () {
     function Loader() {
@@ -3803,6 +3810,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.tagMounted = {};
         // 合并组件
         this.Promise = Promise;
+        this.emitter = emitter;
         this.route = route;
         this.xhr = xhr;
         this.utils = {
@@ -3978,63 +3986,89 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+
         var prefix = {
           dev: 'dev.',
           test: 'test.',
           pro: 'www.'
         }[this.config.env];
+
+        var api = this.emitter();
+
         // 如果设定了发起请求的元素，则在请求完毕前禁用
         this.__api = this.__api || [];
         for (var i in this.__api) {
           if (this.__api[i] === url) {
-            this.emit('api::fail', {
-              code: '',
-              errmsg: 'api busy:' + url
+            return api.emit('fail', {
+              code: '500-13',
+              errmsg: '接口繁忙',
+              url: url
             });
-            return this.Promise.reject('api busy:' + url);
           }
         }
         this.__api.push(url);
+
         if (opts.trigger) {
           opts.trigger.disabled = true;
         }
-        return new this.Promise(function (resolve, reject) {
-          _this15.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
-            method: method,
-            data: opts.data || {},
-            headers: opts.headers || {},
-            cache: opts.cache || false
-          }).done(function (resp) {
-            if (resp.errno == 0) resolve(resp.data);else {
-              _this15.emit('api::fail', {
-                code: resp.errno,
-                errmsg: resp.errmsg
-              });
-              reject({
-                code: resp.errno,
-                errmsg: resp.errmsg,
-                url: url
-              });
-            }
-          }).fail(function (status) {
-            _this15.emit('api::fail', {
-              code: status,
-              errmsg: '',
-              url: url
+
+        this.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
+          formdata: opts.formdata || false,
+          showProgress: opts.showProgress || false,
+          method: method,
+          data: opts.data || {},
+          headers: opts.headers || {},
+          cache: opts.cache || false
+        }).done(function (resp) {
+          if (resp.errno == 0) {
+            // this.log('api done');
+            api.emit('done', resp.data || {});
+          } else {
+            // this.log('api fail');
+            api.emit('fail', {
+              code: resp.errno || '',
+              errmsg: resp.errmsg,
+              url: url || ''
             });
-            reject({
-              code: status,
-              errmsg: '',
-              url: url
-            });
-          }).complete(function () {
-            _this15.__api.splice(_this15.__api.indexOf(url), 1);
-            if (opts.trigger) {
-              opts.trigger.disabled = false;
-            }
-            _this15.emit('api::complete', url);
+          }
+        }).progress(function (p) {
+          api.emit('progress', p);
+        }).fail(function (status) {
+          // this.log('api fail');
+          api.emit('fail', {
+            code: status,
+            errmsg: '',
+            url: url
           });
+        }).complete(function () {
+          // this.log('api complete');
+          _this15.__api.splice(_this15.__api.indexOf(url), 1);
+          if (opts.trigger) {
+            opts.trigger.disabled = false;
+          }
+          api.emit('complete', url);
         });
+
+        api.on('fail', function (e) {
+          _this15.alert('接口错误:' + e.code + ' ' + e.errmsg + ' ' + e.url, 'error');
+        });
+
+        return api;
+      }
+
+      // 要略有延迟，确保mount
+
+    }, {
+      key: 'alert',
+      value: function alert(msg) {
+        var _this16 = this;
+
+        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+
+        clearTimeout(this.__timer);
+        this.__timer = setTimeout(function () {
+          _this16.emit('alert', msg, type);
+        }, 500);
       }
     }], [{
       key: 'detectEnv',

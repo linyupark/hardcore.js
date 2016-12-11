@@ -1,0 +1,109 @@
+=form-login()
+  +gridle(10.5 pull 1.5 float right)
+  max-width: 350px
+  min-width: 350px
+  height: 320px
+  border-radius: 5px
+  background: #fff
+  margin: 140px 0
+  +gridle_state(mobile)
+    +gridle(12 pull 0 grid-centered)
+    margin: 80px 0
+  .msg-space
+    color: $color-error
+  input
+    margin: 10px 0 0 25px
+    width: 290px
+    +input-text(34px, 5px 0 5px 10px, 5px)
+  .pwd-show, .pwd-hide
+    width: 35px
+    height: 35px
+    position: absolute
+    right: 25px
+    top: 15px
+    background-color: #fff
+    background-size: 25px 25px
+    background-image: url(../img/fp/icon-close-eye.png)
+    background-repeat: no-repeat
+    background-position: center
+  .pwd-show
+    background-image: url(../img/fp/icon-eye.png)
+  .msg-space
+    font-size: $font-xs
+    height: 1px
+    text-align: center
+  .btn-line
+    button
+      +btn-1(44px)
+      margin: 10px 0 0 25px
+      width: 300px
+    a
+      color: $color-link
+      font-size: $font-xs
+      display: inline-block
+      margin: 15px 0 0 270px
+  .tab-line
+    height: 50px
+    margin: 0
+    a
+      float: left
+      display: block
+      width: 50%
+      height: 48px
+      line-height: 48px
+      font-size: $font-m
+      text-align: center
+      color: $color-txt2
+      border-bottom: 2px solid $color-line1
+      &.active
+        color: $color-main
+        border-color: $color-main
+
+form.agreement
+  +shadow-block()
+  background: #fff
+  padding: 30px
+  border-radius: 5px
+  h4
+    margin: 0 0 15px 0
+    padding: 0 15px
+    font-size: $font-m
+    border-left: 2px solid $color-main
+  .row
+    +gridle(row)
+  input[type=text], select
+    +input-text(36px, 0 5px)
+  label
+    width: 60px
+    display: inline-block
+    vertical-align: middle
+    margin-right: 5px
+    &.center
+      text-align: center
+    &.radio, &.checkbox
+      height: 38px
+      margin-left: 20px
+      line-height: 38px
+  p
+    padding-bottom: 10px
+    position: relative
+    input[type=text], select
+      min-width: 260px
+    i[class^="icon-"]
+      color: $color-txt1
+      margin-left: -30px
+    input-valid
+      position: absolute
+      color: $color-error
+      top: 44px
+      left: 70px
+  .c2 p
+    +gridle(5 suffix 0.5)
+  .c1
+    overflow: hidden
+    .top
+      width: 66px
+      float: left
+      line-height: 36px
+    .line
+      +gridle(11)

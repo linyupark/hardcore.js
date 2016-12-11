@@ -33,6 +33,7 @@ export class RiotApp {
       this.tagMounted = {};
       // 合并组件
       this.Promise = Promise;
+      this.emitter = emitter;
       this.route = route;
       this.xhr = xhr;
       this.utils = {

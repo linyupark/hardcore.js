@@ -9,10 +9,12 @@
           <p>
             <label>{app.lang.admin.agreement.number}</label>
             <input type="text" ref="number" placeholder="{app.lang.admin.form.req}">
+            <input-valid for="number" rule="required" msg="{app.lang.admin.agreement.number}{app.lang.admin.form.req}"/>
           </p>
           <p>
             <label>{app.lang.admin.agreement.name}</label>
             <input type="text" ref="agreement_name" placeholder="{app.lang.admin.form.req}">
+            <input-valid for="number" rule="required" msg="{app.lang.admin.agreement.name}{app.lang.admin.form.req}"/>
           </p>
         </div>
         <div class="row">
@@ -76,6 +78,9 @@
           </label>
         </div>
       </div>
+      <div class="c1">
+        <button onclick={fn.save} class="btn-yellow">保存</button>
+      </div>
     </form>
   </section>
   <script>
@@ -86,6 +91,12 @@
   _this.sourcesFunding =  _this.app.lang.admin.agreement['sources:funding:list'];
   _this.projectType =  _this.app.lang.admin.agreement['project:type:list'];
   _this.fn = {
+    save: function(e){
+      // 保存
+      for(var i in _this.tags['input-valid']){
+        _this.tags['input-valid'][i].emit('check');
+      }
+    },
     donorList: function(keyword){
       if(_this.cache[keyword]){
         return _this.tags['input-select'].emit('push', _this.cache[keyword]);
@@ -95,7 +106,7 @@
         data: {
           keyword: keyword
         }
-      }).then(function(data){
+      }).on('done', function(data){
         _this.cache[keyword] = data.items;
         _this.tags['input-select'].emit('push', data.items);
       });
@@ -122,10 +133,9 @@
 
   <header for="admin"></header>
 
-  <div class="body admin">
-
-    <div class="wrapper">
-      <side-nav></side-nav>
+  <main class="admin">
+    <div class="container">
+      <admin-sidenav></admin-sidenav>
       <agreement-form if={section=='add'}></agreement-form>
       <agreement-form if={section=='edit'}></agreement-form>
       <!-- 列表页面 -->
@@ -133,8 +143,8 @@
         <h2>{app.lang.admin.agreement.title}</h2>
         <table-filter for="agreement">
           <yield to="addon">
-            <button class="primary-btn" onclick={parent.fn.add}>
-              + {app.lang.admin.agreement.add}
+            <button class="main" onclick={parent.fn.add}>
+              <i class="icon-plus"></i> {app.lang.admin.agreement.add}
             </button>
           </yield>
         </table-filter>
@@ -157,8 +167,8 @@
               <td>{app.utils.time2str(contract_date)}</td>
               <td>{app.utils.time2str(due_date)}</td>
               <td>
-                <i onclick={fn.edit} class="icon-btn icon-pencil"></i>
-                <i onclick={fn.remove} class="icon-btn icon-trash-empty"></i>
+                <i onclick={fn.edit} class="btn-icon icon-pencil"></i>
+                <i onclick={fn.remove} class="btn-icon icon-trash"></i>
               </td>
             </tr>
             <tr if={!tableList}>
@@ -167,7 +177,7 @@
           </tbody>
           <tfoot if={tableList}>
             <tr>
-              <td colspan="6">
+              <td class="left" colspan="6">
                 {app.lang.admin.counts.items}
                 <b>{items}</b>
                 {app.lang.admin.counts.unit}
@@ -176,21 +186,20 @@
           </tfoot>
         </table>
 
-        <pagination-number show={pages>1} page={page} pages={pages} select="y"></pagination-number>
-
+        <pagination-number show={pages>1} page={page} pages={pages} select="y"/>
       </section>
+
+
+      <footer class="admin"></footer>
     </div>
-
-  </div>
-
-  <footer class="admin"></footer>
+  </main>
 
   <!-- 删除记录弹窗 -->
   <modal>
     <yield to="title">{app.lang.admin.confirm.tips}</yield>
     <yield to="content">{app.lang.admin.confirm.delete}</yield>
     <yield to="button">
-      <button class="primary-btn">{app.lang.admin.btn.ok}</button>
+      <button class="btn-main">{app.lang.admin.btn.ok}</button>
     </yield>
     <yield to="close">{app.lang.admin.btn.cancel}</yield>
   </modal>
@@ -204,8 +213,6 @@
       _this.app.route(_this.app.route.path + '/add');
     },
     edit: function(e){
-      _this.app.emit('animation', e.target, 'shake');
-      _this.app.emit('message::header', _this.app.lang.admin.deny, 'error');
     },
     remove: function(e){
       _this.tags['modal'].emit('open');
@@ -220,30 +227,30 @@
       _this.app.api('GET', 'agreement/default/index', {
         data: {
           page: _this.page,
-          search_type: _this.q.type,
-          search_keyword: _this.q.keyword
+          search_type: _this.q.type || '',
+          search_keyword: _this.q.keyword || ''
         }
-      }).then(function(data){
+      }).on('done', function(data){
+        _this.app.log('api agreement done');
         _this.update({
           tableList: data.items,
           page: data.counts.page,
           pages: data.counts.total_page,
           items: data.counts.total_items
         });
+        _this.tags['pagination-number'].emit('render');
       });
     }
   };
   _this.on('mount', function(){
     if(_this.section === 'index'){
       _this.page = _this.q.page || 1;
-      _this.pages = 10;
-      _this.tags['pagination-number'].on('page', function(page){
-        _this.q.page = page;
+      _this.fn.getList();
+      _this.tags['pagination-number'].on('change', function(n){
+        _this.q.page = n;
         _this.app.query();
       });
-      _this.fn.getList();
     }
-
   });
   </script>
 
