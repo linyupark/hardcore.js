@@ -25,6 +25,75 @@ var trick = Object.freeze({
 });
 
 /**
+ * php的time()
+ * @return {int} 时间戳
+ */
+const mkphptime = () => {
+  return Number(Math.floor(Date.now() / 1000));
+};
+
+/**
+ * [phpstr2time 将时间字符串转换成php时间戳]
+ * @param  {string} str 时间字符串
+ * @return {int}     时间戳
+ */
+const phpstr2time = (str) => {
+  let
+    new_str = str.replace(/:/g,'-'), arr, datum;
+  new_str = new_str.replace(/ /g,'-');
+  arr = new_str.split("-");
+  if(arr.length < 6){
+    arr[3] = arr[4] = arr[5] = '00';
+  }
+  datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+  return datum.getTime() / 1000;
+};
+
+/**
+ * PHP给的时间戳转成字符
+ * @param  {int} time     时间戳
+ * @param  {bool} showtime 是否显示分时
+ * @return {str}          时间字符串
+ */
+const phptime2str = (time, opts={}) => {
+  let
+    dt = new Date(time * 1000),
+    y = dt.getFullYear(),
+    m = dt.getMonth()+1,
+    d = dt.getDate(),
+    h = dt.getHours(),
+    min = dt.getMinutes(),
+    sec = dt.getSeconds(),
+    sp = opts.sp || '.';
+  m = m < 10 ? "0" + m : m;
+  d = d < 10 ? "0" + d : d;
+  h = h < 10 ? "0" + h : h;
+  min = min < 10 ? "0" + min : min;
+  sec = sec < 10 ? "0" + sec : sec;
+  if(opts.showtime){
+    return y+sp+m+sp+d+" "+h+":"+min+":"+sec;
+  }
+  return y+sp+m+sp+d;
+};
+
+
+
+/**
+ * 是否是IE
+ */
+const isIE = () => {
+  let
+    UA = window.navigator.userAgent,
+    oldIE = UA.indexOf('MSIE '),
+    newIE = UA.indexOf('Trident/');
+  if(oldIE > -1 || newIE > -1){
+    return true;
+  }
+  return false;
+};
+
+
+/**
  * 优化 typeof 获取未知对象类型
  * @param  {mixed} mixed
  * @return {string}       Number|String|Object|Array|Function
@@ -95,11 +164,15 @@ const search2obj = (hash = "") => {
  */
 const xhr = (url, options = {}) => {
   let opts = assign({
+      payload: false,
+      formdata: false,
       method: "GET",
       data: {},
       headers: {},
       cache: false,
       type: "json",
+      withCredentials: false,
+      showProgress: false,
       done() {},
       fail() {},
       progress() {},
@@ -114,27 +187,37 @@ const xhr = (url, options = {}) => {
     has_q = true;
   }
   // 整理发送数据
-  if(serialize(opts.data) !== ""){
+  if(opts.formdata){
+    send_data = opts.data;
+  }
+  else if(serialize(opts.data) !== ""){
     send_data.push(serialize(opts.data));
   }
   // 如果是put /post 则用formdata
-  if (/^put$|^post$/i.test(opts.method)) {
-    opts.headers["Content-type"] = "application/x-www-form-urlencoded";
+  if (/^put$|^post$/i.test(opts.method) && !opts.payload) {
+    opts.headers["Content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   } else if(send_data.length > 0) {
-    url += (has_q ? "&" : "?") + send_data;
+    if(!opts.formdata) url += (has_q ? "&" : "?") + send_data;
   }
   xhr = new XMLHttpRequest();
   xhr.open(opts.method, url, true);
   for (let k in opts.headers) {
     xhr.setRequestHeader(k, opts.headers[k]);
   }
+  xhr.withCredentials = opts.withCredentials;
   // 如果支持进度条
-  xhr.upload.onprogress = xhr.onprogress = (e) => {
-    if (e.lengthComputable) {
-      progress = Math.round(e.loaded * 100 / e.total);
-      opts.progress.call(e.target, progress);
+  if(opts.showProgress){
+    let progressFn = (e) => {
+      if (e.lengthComputable) {
+        progress = Math.round(e.loaded * 100 / e.total);
+        opts.progress.call(e.target, progress);
+      }
+    };
+    if(xhr.upload){
+      xhr.upload.addEventListener('progress', progressFn, false);
     }
-  };
+    xhr.addEventListener('progress', progressFn, false);
+  }
   xhr.addEventListener('load', (e) => {
     let res;
     if (e.target.status === 200 || e.target.status === 304) {
@@ -147,13 +230,13 @@ const xhr = (url, options = {}) => {
     else{
       opts.fail.call(e.target, e.target.status);
     }
-  }, false);
-  xhr.addEventListener('error', () => {
-    opts.fail();
-  }, false);
+  }, { once: true });
+  xhr.addEventListener('error', (e) => {
+    opts.fail.call(e.tartget, e.target.status);
+  }, { once: true });
   xhr.addEventListener('loadend', () => {
     opts.complete();
-  }, false);
+  }, { once: true });
   // done().fail().progress()
   xhr.done = fn => {
     opts.done = fn;
@@ -387,6 +470,10 @@ const cacheJSON = (url, options={}) => {
 
 
 var utils = Object.freeze({
+	mkphptime: mkphptime,
+	phpstr2time: phpstr2time,
+	phptime2str: phptime2str,
+	isIE: isIE,
 	typeOf: typeOf,
 	assign: assign,
 	serialize: serialize,
@@ -471,7 +558,22 @@ const emitter = (el = {}) => {
       for (let _fn of fns) {
         _fn.apply(el, args);
       }
-      el.__emited[name] = [name].concat(args);
+      if (_callbacks["*"] && event !== "*")
+        el.emit.apply(el, ["*", event].concat(args));
+      return el;
+    }
+  });
+
+  /**
+   * 设置陷阱（先于on的emit）
+   */
+  Object.defineProperty(el, "trap", {
+    value(event, ...args) {
+      const fns = (_callbacks[event] || []).slice(0);
+      for (let _fn of fns) {
+        _fn.apply(el, args);
+      }
+      el.__emited[event] = [event].concat(args);
       if (_callbacks["*"] && event !== "*")
         el.emit.apply(el, ["*", event].concat(args));
       return el;
@@ -707,7 +809,7 @@ class Loader {
       let load = () => {
           for (const file of load_files) {
             let name = file.split("/").pop(),
-              ext = name.split(".").pop(),
+              ext = name.split(".").pop().split("?")[0],
               attrs = { rel: file },
               type = this.types[ext];
             if (ext === "js") attrs.defer = true;
@@ -768,402 +870,6 @@ class Loader {
   }
 
 }
-
-/**
- * Simple client-side router
- * @module riot-route
- */
-
-const RE_ORIGIN = /^.+?\/\/+[^\/]+/;
-const EVENT_LISTENER = 'EventListener';
-const REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER;
-const ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER;
-const HAS_ATTRIBUTE = 'hasAttribute';
-const REPLACE = 'replace';
-const POPSTATE = 'popstate';
-const HASHCHANGE = 'hashchange';
-const TRIGGER = 'emit';
-const MAX_EMIT_STACK_LEVEL = 3;
-const win = typeof window != 'undefined' && window;
-const doc = typeof document != 'undefined' && document;
-const hist = win && history;
-const loc = win && (hist.location || win.location);
-const prot = Router.prototype;
-const clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click';
-const central = emitter();
-
-let started = false;
-let routeFound = false;
-let debouncedEmit;
-let base;
-let current;
-let parser;
-let secondParser;
-let emitStack = [];
-let emitStackLevel = 0;
-
-/**
- * Default parser. You can replace it via router.parser method.
- * @param {string} path - current path (normalized)
- * @returns {array} array
- */
-function DEFAULT_PARSER(path) {
-  return path.split(/[/?#]/);
-}
-
-/**
- * Default parser (second). You can replace it via router.parser method.
- * @param {string} path - current path (normalized)
- * @param {string} filter - filter string (normalized)
- * @returns {array} array
- */
-function DEFAULT_SECOND_PARSER(path, filter) {
-  const re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
-    args = path.match(re);
-
-  if (args) return args.slice(1);
-}
-
-/**
- * Simple/cheap debounce implementation
- * @param   {function} fn - callback
- * @param   {number} delay - delay in seconds
- * @returns {function} debounced function
- */
-function debounce(fn, delay) {
-  let t;
-  return function() {
-    clearTimeout(t);
-    t = setTimeout(fn, delay);
-  };
-}
-
-/**
- * Set the window listeners to trigger the routes
- * @param {boolean} autoExec - see route.start
- */
-function start(autoExec) {
-  debouncedEmit = debounce(emit, 1);
-  win[ADD_EVENT_LISTENER](POPSTATE, debouncedEmit);
-  win[ADD_EVENT_LISTENER](HASHCHANGE, debouncedEmit);
-  doc[ADD_EVENT_LISTENER](clickEvent, click);
-  if (autoExec) emit(true);
-}
-
-/**
- * Router class
- */
-function Router() {
-  this.$ = [];
-  emitter(this); // make it observable
-  central.on('stop', this.s.bind(this));
-  central.on('emit', this.e.bind(this));
-}
-
-function normalize(path) {
-  return path[REPLACE](/^\/|\/$/, '');
-}
-
-function isString(str) {
-  return typeof str == 'string';
-}
-
-/**
- * Get the part after domain name
- * @param {string} href - fullpath
- * @returns {string} path from root
- */
-function getPathFromRoot(href) {
-  return (href || loc.href)[REPLACE](RE_ORIGIN, '');
-}
-
-/**
- * Get the part after base
- * @param {string} href - fullpath
- * @returns {string} path from base
- */
-function getPathFromBase(href) {
-  return base[0] === '#' ?
-    (href || loc.href || '').split(base)[1] || '' :
-    (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '');
-}
-
-function emit(force) {
-  // the stack is needed for redirections
-  const isRoot = emitStackLevel === 0;
-  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return;
-
-  emitStackLevel++;
-  emitStack.push(function() {
-    const path = getPathFromBase();
-    if (force || path !== current) {
-      central[TRIGGER]('emit', path);
-      current = path;
-    }
-  });
-  if (isRoot) {
-    let first, loop = function() {
-      first = emitStack.shift();
-      if (first) {
-        first();
-        loop();
-      }
-    };
-    loop();
-    emitStackLevel = 0;
-  }
-}
-
-function click(e) {
-  if (
-    e.which !== 1 // not left click
-    ||
-    e.metaKey || e.ctrlKey || e.shiftKey // or meta keys
-    ||
-    e.defaultPrevented // or default prevented
-  ) return;
-
-  let el = e.target;
-  while (el && el.nodeName !== 'A') el = el.parentNode;
-
-  if (!el || el.nodeName !== 'A' // not A tag
-    ||
-    el[HAS_ATTRIBUTE]('download') // has download attr
-    ||
-    !el[HAS_ATTRIBUTE]('href') // has no href attr
-    ||
-    el.target && el.target !== '_self' // another window or frame
-    ||
-    el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) === -1 // cross origin
-  ) return;
-
-  if (el.href !== loc.href &&
-    (
-      el.href.split('#')[0] === loc.href.split('#')[0] // internal jump
-      ||
-      base[0] !== '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
-      ||
-      base[0] === '#' && el.href.split(base)[0] !== loc.href.split(base)[0] // outside of #base
-      ||
-      !go(getPathFromBase(el.href), el.title || doc.title) // route not found
-    )) return;
-
-  e.preventDefault();
-}
-
-/**
- * Go to the path
- * @param {string} path - destination path
- * @param {string} title - page title
- * @param {boolean} shouldReplace - use replaceState or pushState
- * @returns {boolean} - route not found flag
- */
-function go(path, title, shouldReplace) {
-  // Server-side usage: directly execute handlers for the path
-  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path));
-
-  path = base + normalize(path);
-  title = title || doc.title;
-  // browsers ignores the second parameter `title`
-  shouldReplace
-    ?
-    hist.replaceState(null, title, path) :
-    hist.pushState(null, title, path);
-  // so we need to set it manually
-  doc.title = title;
-  routeFound = false;
-  emit();
-  return routeFound;
-}
-
-/**
- * Go to path or set action
- * a single string:                go there
- * two strings:                    go there with setting a title
- * two strings and boolean:        replace history with setting a title
- * a single function:              set an action on the default route
- * a string/RegExp and a function: set an action on the route
- * @param {(string|function)} first - path / action / filter
- * @param {(string|RegExp|function)} second - title / action
- * @param {boolean} third - replace flag
- */
-prot.m = function(first, second, third) {
-  if (isString(first) && (!second || isString(second))) go(first, second, third || false);
-  else if (second) this.r(first, second);
-  else this.r('@', first);
-};
-
-/**
- * Stop routing
- */
-prot.s = function() {
-  this.off('*');
-  this.$ = [];
-};
-
-/**
- * Emit
- * @param {string} path - path
- */
-prot.e = function(path) {
-  this.$.concat('@').some(function(filter) {
-    const args = (filter === '@' ? parser : secondParser)(normalize(path), normalize(filter));
-    if (typeof args != 'undefined') {
-      this[TRIGGER].apply(null, [filter].concat(args));
-      return routeFound = true; // exit from loop
-    }
-  }, this);
-};
-
-/**
- * Register route
- * @param {string} filter - filter for matching to url
- * @param {function} action - action to register
- */
-prot.r = function(filter, action) {
-  if (filter !== '@') {
-    filter = '/' + normalize(filter);
-    this.$.push(filter);
-  }
-  this.on(filter, action);
-};
-
-const mainRouter = new Router();
-const route = mainRouter.m.bind(mainRouter);
-
-/**
- * Create a sub router
- * @returns {function} the method of a new Router object
- */
-route.create = function() {
-  const newSubRouter = new Router();
-  // assign sub-router's main method
-  const router = newSubRouter.m.bind(newSubRouter);
-  // stop only this sub-router
-  router.stop = newSubRouter.s.bind(newSubRouter);
-  return router;
-};
-
-/**
- * Set the base of url
- * @param {(str|RegExp)} arg - a new base or '#' or '#!'
- */
-route.base = function(arg) {
-  base = arg || '#';
-  current = getPathFromBase(); // recalculate current path
-};
-
-/** Exec routing right now **/
-route.exec = function() {
-  emit(true);
-};
-
-/**
- * Replace the default router to yours
- * @param {function} fn - your parser function
- * @param {function} fn2 - your secondParser function
- */
-route.parser = function(fn, fn2) {
-  if (!fn && !fn2) {
-    // reset parser for testing...
-    parser = DEFAULT_PARSER;
-    secondParser = DEFAULT_SECOND_PARSER;
-  }
-  if (fn) parser = fn;
-  if (fn2) secondParser = fn2;
-};
-
-/**
- * Helper function to get url query as an object
- * @returns {object} parsed query
- */
-route.query = function() {
-  const q = {};
-  const href = loc.href || current;
-  href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v; });
-  return q;
-};
-
-/** Stop routing **/
-route.stop = function() {
-  if (started) {
-    if (win) {
-      win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit);
-      win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit);
-      doc[REMOVE_EVENT_LISTENER](clickEvent, click);
-    }
-    central[TRIGGER]('stop');
-    started = false;
-  }
-};
-
-/**
- * Start routing
- * @param {boolean} autoExec - automatically exec after starting if true
- */
-route.start = function(autoExec) {
-  if (!started) {
-    if (win) {
-      if (document.readyState === 'complete') start(autoExec);
-      // the timeout is needed to solve
-      // a weird safari bug https://github.com/riot/route/issues/33
-      else win[ADD_EVENT_LISTENER]('load', function() {
-        setTimeout(function() { start(autoExec); }, 1);
-      });
-    }
-    started = true;
-  }
-};
-
-/** Prepare the router **/
-route.base();
-route.parser();
-
-let __riot_subRoute;
-
-
-const riotjs = class {
-
-  static get router() {
-    return route;
-  }
-
-  static subRoute(...args) {
-    if (!__riot_subRoute)
-      __riot_subRoute = this.router.create();
-    return __riot_subRoute.apply(this, args);
-  }
-
-  // 浏览器编译
-  static complie(url = []) {
-    let promise_list = [];
-    for (const _url of url) {
-      promise_list.push(new Promise(resolve => {
-        window.riot.compile(_url, () => resolve(_url));
-      }));
-    }
-    return Promise.all(promise_list);
-  }
-
-  // route
-  static route(base = "#!") {
-    let em = emitter();
-    this.router.base(base);
-    this.router.parser(path => {
-      const raw = path.split("?"),
-        uri = raw[0].split("/"),
-        qs = raw[1];
-      if (qs) uri.push(search2obj(qs));
-      return uri;
-    });
-    this.router((...args) => {
-      em.emit("change", args);
-    });
-    this.router.start(true);
-    return em;
-  }
-
-};
 
 const HC = class {
 
@@ -1244,7 +950,6 @@ HC.utils = utils;
 HC.Loader = Loader;
 HC.emitter = emitter;
 HC.Promise = Promise;
-HC.riot = riotjs;
 
 exports.HC = HC;
 
