@@ -35,6 +35,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         datum = void 0;
     new_str = new_str.replace(/ /g, '-');
     arr = new_str.split("-");
+    if (arr.length < 6) {
+      arr[3] = arr[4] = arr[5] = '00';
+    }
     datum = new Date(Date.UTC(arr[0], arr[1] - 1, arr[2], arr[3] - 8, arr[4], arr[5]));
     return datum.getTime() / 1000;
   };
@@ -207,8 +210,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         opts.fail.call(e.target, e.target.status);
       }
     }, { once: true });
-    xhr.addEventListener('error', function () {
-      opts.fail();
+    xhr.addEventListener('error', function (e) {
+      opts.fail.call(e.tartget, e.target.status);
     }, { once: true });
     xhr.addEventListener('loadend', function () {
       opts.complete();
@@ -4013,6 +4016,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
 
         this.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
+          payload: opts.payload || false,
           formdata: opts.formdata || false,
           showProgress: opts.showProgress || false,
           method: method,
@@ -4034,7 +4038,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }).progress(function (p) {
           api.emit('progress', p);
         }).fail(function (status) {
-          // this.log('api fail');
+          // this.log('api fail', status);
           api.emit('fail', {
             code: status,
             errmsg: '',

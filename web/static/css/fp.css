@@ -881,11 +881,17 @@ form.agreement {
       text-align: center; }
     form.agreement label.radio, form.agreement label.checkbox {
       height: 38px;
-      margin-left: 20px;
+      margin-right: 20px;
       line-height: 38px; }
   form.agreement p {
     padding-bottom: 10px;
     position: relative; }
+    form.agreement p textarea {
+      width: 77%;
+      border-color: #ebebeb;
+      border-radius: 5px;
+      min-height: 100px;
+      padding: 5px; }
     form.agreement p input[type=text], form.agreement p select {
       min-width: 260px; }
     form.agreement p i[class^="icon-"] {
@@ -895,18 +901,39 @@ form.agreement {
       position: absolute;
       color: #F44C4C;
       top: 44px;
-      left: 70px; }
+      left: 70px;
+      font-size: 13px; }
+    form.agreement p .files {
+      margin-left: 70px;
+      display: inline-block;
+      padding: 5px 0;
+      color: #999; }
   form.agreement .c2 p {
     width: 41.66667%;
     margin-right: 4.16667%; }
   form.agreement .c1 {
-    overflow: hidden; }
+    overflow: hidden;
+    padding-bottom: 20px; }
+    form.agreement .c1.btn-line {
+      text-indent: 70px; }
+      form.agreement .c1.btn-line button {
+        width: 100px;
+        margin-right: 20px; }
     form.agreement .c1 .top {
       width: 66px;
       float: left;
-      line-height: 36px; }
+      padding-top: 16px; }
     form.agreement .c1 .line {
       width: 91.66667%; }
+    form.agreement .c1 .price-group {
+      display: inline-block;
+      margin-top: 10px; }
+      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select {
+        min-width: 160px;
+        max-width: 160px;
+        margin-right: 8px; }
+      form.agreement .c1 .price-group i[class^="icon-"] {
+        margin: 0 8px 0 0; }
 
 table.base {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -1008,15 +1035,11 @@ table-filter {
     margin-left: 10px; }
 
 main {
-  overflow: hidden;
-  box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2) inset; }
-  main.admin {
-    min-height: 600px; }
-  main.user {
-    min-height: 600px; }
-    main.user h1 {
-      width: 83.33333%;
-      margin-left: 8.33333%; }
+  box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2) inset;
+  overflow: hidden; }
+  main.user h1 {
+    width: 83.33333%;
+    margin-left: 8.33333%; }
   main.login {
     background: #F2EDEF; }
     main.login form {
@@ -1114,25 +1137,27 @@ main {
 section {
   margin-left: 20.83333%;
   margin-right: 4.16667%;
-  overflow: hidden; }
+  overflow: hidden;
+  min-height: 80h0px; }
   section h2 {
     margin: 0;
     padding: 40px 0 20px; }
 
-footer .info {
-  padding: 35px;
-  text-align: center;
-  line-height: 16px;
-  color: #999;
-  font-size: 13px;
-  margin-top: 30px; }
-
-footer.admin .info {
-  width: 75%;
-  left: 20.83333%;
-  right: auto;
-  margin-left: 0%;
-  border-top: 1px solid #ebebeb; }
+footer {
+  overflow: hidden; }
+  footer .info {
+    padding: 35px;
+    text-align: center;
+    line-height: 16px;
+    color: #999;
+    font-size: 13px;
+    margin-top: 30px; }
+  footer.admin .info {
+    width: 75%;
+    left: 20.83333%;
+    right: auto;
+    margin-left: 0%;
+    border-top: 1px solid #ebebeb; }
 
 .pagination {
   float: right;

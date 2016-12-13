@@ -45,13 +45,7 @@
     }
   };
   _this.on('mount', function(){
-    setTimeout(function(){
-      // 计算高度，最长化
-      var main = document.getElementsByTagName('main')[0];
-      var footer = document.getElementsByTagName('footer')[0];
-      var h = main.clientHeight + footer.clientHeight;
-      _this.root.style.height = h+'px';
-    }, 500);
+    window.scrollTo(0, 0);
     // 展开，高亮对应的tab
     _this.url = _this.app.route.params[0] || 'index';
     _this.update();
@@ -112,7 +106,7 @@
   <div class="username" onmouseenter={fn.active}
     onmouseover={fn.active} onmouseleave={fn.hidden}>
     <a href="javascript:;" class="{active: active}">
-      {user_name} <i class="{'icon-angle-down': !active, 'icon-menu': active}"></i>
+      {app.data.user_name} <i class="{'icon-angle-down': !active, 'icon-menu': active}"></i>
     </a>
     <dl class="menu {active: active}" onmouseenter={fn.active}
       onmouseover={fn.active} onmouseleave={fn.hidden}>
@@ -156,26 +150,27 @@
     // 没有身份信息，要求重新登录
     _this.role = _this.app.utils.cookie.get('role');
     if(!_this.role){
-      _this.fn.relogin();
+      return _this.fn.relogin();
     }
 
     // 能从cookie获取到的就不读接口
     if(_this.app.utils.cookie.get('user_name')){
-      _this.user_name = _this.app.utils.cookie.get('user_name');
-      _this.user_id = _this.app.utils.cookie.get('user_id');
+      _this.app.data.user_name = _this.app.utils.cookie.get('user_name');
+      _this.app.data.user_id = _this.app.utils.cookie.get('user_id');
     }
     else{
       // 获取资料信息
       _this.app.api('GET', 'login/default/user-info')
       .on('done', function(data){
-        _this.user_name = data.user_name;
-        _this.user_id = data.user_id;
+        _this.app.data.user_name = data.user_name;
+        _this.app.data.user_id = data.user_id;
         _this.app.utils.cookie.set('user_name', data.user_name);
         _this.app.utils.cookie.set('user_id', data.user_id);
+        _this.update();
       })
       .on('fail', function(){
         _this.app.alert(_this.app.lang.login.relogin, 'warning');
-        _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
+        _this.fn.relogin();
       });
     }
     _this.update();

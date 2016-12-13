@@ -82,11 +82,17 @@ form.agreement
       text-align: center
     &.radio, &.checkbox
       height: 38px
-      margin-left: 20px
+      margin-right: 20px
       line-height: 38px
   p
     padding-bottom: 10px
     position: relative
+    textarea
+      width: 77%
+      border-color: $color-line1
+      border-radius: 5px
+      min-height: 100px
+      padding: 5px
     input[type=text], select
       min-width: 260px
     i[class^="icon-"]
@@ -97,13 +103,34 @@ form.agreement
       color: $color-error
       top: 44px
       left: 70px
+      font-size: $font-xs
+    .files
+      margin-left: 70px
+      display: inline-block
+      padding: 5px 0
+      color: $color-txt2
   .c2 p
     +gridle(5 suffix 0.5)
   .c1
+    &.btn-line
+      text-indent: 70px
+      button
+        width: 100px
+        margin-right: 20px
     overflow: hidden
+    padding-bottom: 20px
     .top
       width: 66px
       float: left
-      line-height: 36px
+      padding-top: 16px
     .line
       +gridle(11)
+    .price-group
+      display: inline-block
+      margin-top: 10px
+      input[type=text], select
+        min-width: 160px
+        max-width: 160px
+        margin-right: 8px
+      i[class^="icon-"]
+        margin: 0 8px 0 0

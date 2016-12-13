@@ -61,11 +61,8 @@
   };
 
   _this.on('mount', function(){
+
     if(_this.ref){
-      // 告诉用户需要重新登录
-      _this.tags['input-valid'].emit(
-        'msg', _this.app.lang.login.relogin
-      );
       _this.refs.username.focus();
     }
 

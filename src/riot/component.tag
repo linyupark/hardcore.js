@@ -41,7 +41,7 @@
   </style>
   <div class="input-select">
     <input ref="keyword" type="text"
-      value="{opts.value}"
+      value="{inputValue}"
       placeholder="{opts.placehoder}"
       onclick={fn.pull}
       onkeyup={fn.keyup}
@@ -57,6 +57,7 @@
   var _this = this;
   _this.selected = {};
   _this.selectIndex = 0;
+  _this.inputValue = opts.value;
   _this.fn = {
     blur: function(e){
       setTimeout(function(){
@@ -110,6 +111,12 @@
     _this.update({
       items: items,
       selected: {}
+    });
+  });
+  _this.on('value', function(value){
+    // 更新value显示数据
+    _this.update({
+      inputValue: value
     });
   });
   </script>
@@ -330,8 +337,23 @@
   _this.on('check', function(){
     // 必填
     if(opts.rule.split(',').indexOf('required') !== -1){
+      // console.log('check required');
       for(var i in target){
         invalid = target[i].value.replace(/\s/g, '') === '';
+      }
+    }
+    // 数字
+    if(!invalid && opts.rule.split(',').indexOf('number') !== -1){
+      // console.log('check number');
+      for(var i in target){
+        invalid = Number(target[i].value) != target[i].value;
+      }
+    }
+    // 正整数
+    if(!invalid && opts.rule.split(',').indexOf('+int') !== -1){
+      // console.log('check +int');
+      for(var i in target){
+        invalid = parseInt(target[i].value, 10) < 1;
       }
     }
     // 正则
@@ -343,7 +365,7 @@
     }
     if(invalid){
       _this.emit('invalid', target);
-      return _this.update({
+      _this.update({
         message: opts.msg
       });
     }
@@ -379,7 +401,10 @@
             e.target.innerText = '上传';
           } ,1000);
         }
-        _this.fd = new FormData();
+        var f = document.createElement('form');
+        f.name = 'file';
+        f.enctype = 'multipart/form-data';
+        _this.fd = new FormData(f);
         for(var i=0; i < _this.uploadFiles.length; i++){
           _this.fd.append(_this.name, _this.uploadFiles[i]);
         }

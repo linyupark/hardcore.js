@@ -35,6 +35,7 @@ class FP extends RiotApp {
     }
 
     this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
+      payload: opts.payload || false,
       formdata: opts.formdata || false,
       showProgress: opts.showProgress || false,
       method: method,
@@ -57,7 +58,7 @@ class FP extends RiotApp {
     }).progress(p => {
       api.emit('progress', p);
     }).fail(status => {
-      // this.log('api fail');
+      // this.log('api fail', status);
       api.emit('fail', {
         code: status,
         errmsg: '',

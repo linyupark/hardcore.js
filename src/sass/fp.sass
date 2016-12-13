@@ -113,13 +113,11 @@ header
 @import "fp/form"
 @import "fp/table"
 main
-  overflow: hidden
   +shadow-main()
+  overflow: hidden
   // 登录后
   &.admin
-    min-height: 600px
   &.user
-    min-height: 600px
     h1
       +gridle(10 prefix 1)
   // 登录页
@@ -136,6 +134,7 @@ main
 section
   +gridle(prefix 2.5 suffix 0.5)
   overflow: hidden
+  min-height: 80h0px
   h2
     margin: 0
     padding: 40px 0 20px
@@ -144,6 +143,7 @@ section
 // footer
 //
 footer
+  overflow: hidden
   .info
     padding: 35px
     text-align: center

@@ -18,30 +18,28 @@
 
     <script>
     var
-      ms_ie = false,
-      ua = window.navigator.userAgent,
-      old_ie = ua.indexOf('MSIE '),
-      new_ie = ua.indexOf('Trident/'),
-      app_init = function(){
+      ie = navigator.appName=="Microsoft Internet Explorer" ?             Number(navigator.appVersion.split(";")[1].replace(/[ ]/g,"").replace("MSIE","")) :
+      0,
+      init_app = function(){
         new RiotApp.FP({
           id: 'fp',
           lang: 'cn',
           env: RiotApp.FP.detectEnv('dev'),
           mountPage: '#main',
-          resource: []
+          resource: ['jq']
         });
       };
-    if(old_ie > -1 || new_ie > -1){
-      ms_ie = true;
+    if(ie == 0){
+      init_app();
     }
-    if(ms_ie){
+    else if(ie < 10){
+      location.href = './upgrade.html';
+    }
+    else{
       var el = document.createElement('script');
       el.src = "./static/polyfill.min.js";
       el.onload = app_init;
       document.head.appendChild(el);
-    }
-    else{
-      app_init();
     }
     </script>
   </body>

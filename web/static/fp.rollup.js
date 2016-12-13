@@ -22,6 +22,9 @@ const phpstr2time = (str) => {
     new_str = str.replace(/:/g,'-'), arr, datum;
   new_str = new_str.replace(/ /g,'-');
   arr = new_str.split("-");
+  if(arr.length < 6){
+    arr[3] = arr[4] = arr[5] = '00';
+  }
   datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
   return datum.getTime() / 1000;
 };
@@ -198,8 +201,8 @@ const xhr = (url, options = {}) => {
       opts.fail.call(e.target, e.target.status);
     }
   }, { once: true });
-  xhr.addEventListener('error', () => {
-    opts.fail();
+  xhr.addEventListener('error', (e) => {
+    opts.fail.call(e.tartget, e.target.status);
   }, { once: true });
   xhr.addEventListener('loadend', () => {
     opts.complete();
@@ -3833,6 +3836,7 @@ class FP extends RiotApp {
     }
 
     this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
+      payload: opts.payload || false,
       formdata: opts.formdata || false,
       showProgress: opts.showProgress || false,
       method: method,
@@ -3855,7 +3859,7 @@ class FP extends RiotApp {
     }).progress(p => {
       api.emit('progress', p);
     }).fail(status => {
-      // this.log('api fail');
+      // this.log('api fail', status);
       api.emit('fail', {
         code: status,
         errmsg: '',

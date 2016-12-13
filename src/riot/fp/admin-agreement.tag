@@ -1,103 +1,266 @@
 <!-- 协议表单内页 -->
 <agreement-form>
   <section>
-    <h2>{app.lang.admin.agreement.add}</h2>
+    <h2>{app.lang.admin.agreement[app.route.params[1]]}</h2>
     <form class="agreement" onsubmit="return false;">
       <h4>帐号信息</h4>
       <div class="c2">
         <div class="row">
           <p>
             <label>{app.lang.admin.agreement.number}</label>
-            <input type="text" ref="number" placeholder="{app.lang.admin.form.req}">
-            <input-valid for="number" rule="required" msg="{app.lang.admin.agreement.number}{app.lang.admin.form.req}"/>
+            <input type="text" ref="agreement_number" value="{form.agreement_number}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="agreement_number" rule="required" msg="{app.lang.admin.agreement.number}{app.lang.admin.form.req}"/>
           </p>
           <p>
             <label>{app.lang.admin.agreement.name}</label>
-            <input type="text" ref="agreement_name" placeholder="{app.lang.admin.form.req}">
-            <input-valid for="number" rule="required" msg="{app.lang.admin.agreement.name}{app.lang.admin.form.req}"/>
+            <input type="text" ref="agreement_name" value="{form.agreement_name}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="agreement_name" rule="required" msg="{app.lang.admin.agreement.name}{app.lang.admin.form.req}"/>
           </p>
         </div>
         <div class="row">
+          <!-- 捐赠方 -->
           <p>
             <label class="center">{app.lang.admin.agreement.donor}</label>
-            <input-select name="donor_name" placehoder={app.lang.admin.agreement['donor:select']} value="{form.donor_name}"></input-select>
+            <input-select name="donor_name" ref="donor_name" placehoder={app.lang.admin.agreement['donor:select']} value="{form.donor.donor_name}"></input-select>
+            <input type="hidden" ref="donor_id" value="{form.donor.id}">
+            <input-valid ref="validOnSave" for="donor_id" rule="required" msg="请选择捐赠方"/>
           </p>
+          <!-- 捐赠方性质 -->
           <p>
             <label>{app.lang.admin.agreement['donor:nature']}</label>
             <select ref="donor_nature">
-              <option each={donorNature} value={key} selected={key==form.donor_nature}>{name}</option>
+              <option each={donorNature} selected={key==form.donor_nature}>{name}</option>
             </select>
           </p>
         </div>
         <div class="row">
+          <!-- 是否校友捐赠 -->
           <p>
             <label>{app.lang.admin.agreement.donations}</label>
             <label class="radio">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <input type="radio" name="alumni_donations" ref="alumni_donations" checked={form.alumni_donations==1}> {app.lang.yes}
             </label>
             <label class="radio">
               <input type="radio" name="alumni_donations" ref="alumni_donations" checked={form.alumni_donations==0}> {app.lang.no}
             <label>
           </p>
+          <!-- 资金来源 -->
           <p>
             <label>{app.lang.admin.agreement['sources:funding']}</label>
             <select ref="sources_funding">
-              <option each={sourcesFunding} value={key} selected={key==form.sources_funding}>{name}</option>
+              <option each={sourcesFunding} value="{key}" selected={key==form.sources_funding}>{name}</option>
             </select>
           </p>
         </div>
         <div class="row">
+          <!-- 签约日期 -->
           <p>
             <label>{app.lang.admin.agreement.contract}</label>
-            <input ref="contract_date" class="date" type="text" onclick="WdatePicker()" placeholder="{app.lang.admin.form.req}">
+            <input ref="contract_date" class="date" type="text" onclick="WdatePicker()" placeholder="{app.lang.admin.form.req}"
+            value="{form.contract_date && app.utils.time2str(form.contract_date, {sp:'-'})}">
             <i class="icon-calendar"></i>
+            <input-valid ref="validOnSave" for="contract_date" rule="required" msg="请选择日期"/>
           </p>
+          <!-- 期限 -->
           <p>
             <label>{app.lang.admin.agreement.deadline}</label>
-            <input ref="deadline" type="text" placeholder="{app.lang['year:number']}">
+            <input ref="deadline" type="text" value="{form.deadline}" placeholder="{app.lang['year:number']}">
+            <input-valid ref="validOnSave" for="deadline" rule="+int" msg="格式错误"/>
           </p>
         </div>
         <div class="row">
+          <!-- 截止日期 -->
           <p>
             <label>{app.lang.admin.agreement.due}</label>
-            <input ref="due_date" class="date" type="text" onclick="WdatePicker()" placeholder="">
+            <input ref="due_date" class="date" type="text" onclick="WdatePicker()" placeholder="{app.lang.admin.form.req}"
+            value="{form.due_date && app.utils.time2str(form.due_date, {sp:'-'})}">
             <i class="icon-calendar"></i>
+            <input-valid ref="validOnSave" for="due_date" rule="required" msg="请选择日期"/>
           </p>
           <p>
           </p>
         </div>
       </div>
       <hr>
+      <br>
       <h4>捐赠信息</h4>
+      <br>
+      <!-- 项目类型 -->
       <div class="c1">
         <label class="top">项目类型</label>
         <div class="line">
           <label style="width: 120px" each={projectType} class="checkbox">
-            <input type="checkbox" value="{key}">
+            <input type="checkbox" value="{key}" checked="{key==form.project_type}">
             {name}
           </label>
         </div>
       </div>
+      <!-- 货币捐赠 -->
       <div class="c1">
-        <button onclick={fn.save} class="btn-yellow">保存</button>
+        <label class="top">货币捐赠</label>
+        <div class="line">
+          <p each={p in form.price} class="price-group">
+            <select placehoder="货币种类" disabled>
+              <option each={c in currencyList} value="{c[0]}" selected="{p.currency_sign==c[0]}">{c[1]}</option>
+            </select>
+            <input type="text" placeholder="金额" value={p.amount} disabled>
+            <a href="javascript:;" onclick="{fn.removePrice}">
+              <i class="icon-cancel"/>
+            </a>
+          </p>
+          <p class="price-group">
+            <select ref="addPriceType" placehoder="货币种类">
+              <option each={c in currencyList} value="{c[0]}">{c[1]}</option>
+            </select>
+            <input type="text" ref="addPriceNumber" placeholder="金额">
+            <a href="javascript:;" onclick="{fn.addPrice}">
+              <i class="icon-plus"/>
+            </a>
+            <input-valid ref="validPrice" for="addPriceNumber" rule="required,number" msg="金额必须为数字"></input-valid>
+          </p>
+        </div>
+      </div>
+      <!-- 获奖条件说明 -->
+      <div class="c1">
+        <label class="top">获奖条件说明</label>
+        <p>
+          <textarea ref="award_condition">{form.award_condition}</textarea>
+        </p>
+      </div>
+      <hr>
+      <br>
+      <h4>附属信息</h4>
+      <br>
+      <div class="c1">
+        <label class="top">附件上传</label>
+        <p>
+          <upload-formdata name="file[]"></upload-formdata>
+          <span>{fileUploadPercent}</span>
+          <br>
+          <span class="files" each={form.file}>
+            {file_name}
+            <a href="javascript:;" onclick="{fn.removeFile}">
+              <i style="margin-left: 0" class="icon-cancel"></i>
+            </a>
+          </span>
+        </p>
+      </div>
+      <div class="c1">
+        <label class="top">协议录入人</label>
+        <p>
+          <input type="text" ref="user_name" value="{form.user_name||app.data.user_name}">
+        </p>
+      </div>
+      <div class="c1">
+        <label class="top">协议备注</label>
+        <p>
+          <textarea ref="remark">{form.remark}</textarea>
+        </p>
+      </div>
+      <hr>
+      <div class="c1 btn-line">
+        <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.cancel}</button>
       </div>
     </form>
   </section>
   <script>
   var _this = this;
-  _this.form = {};
+  _this.form = {
+    price: [],
+    file: [],
+    donor: {}
+  };
   _this.cache = {};
-  _this.donorNature =  _this.app.lang.admin.agreement['donor:nature:list'];
-  _this.sourcesFunding =  _this.app.lang.admin.agreement['sources:funding:list'];
-  _this.projectType =  _this.app.lang.admin.agreement['project:type:list'];
+  _this.donorNature = _this.app.lang.admin.agreement['donor:nature:list'];
+  _this.sourcesFunding = _this.app.lang.admin.agreement['sources:funding:list'];
+  _this.projectType = _this.app.lang.admin.agreement['project:type:list'];
   _this.fn = {
     save: function(e){
-      // 保存
-      for(var i in _this.tags['input-valid']){
-        _this.tags['input-valid'][i].emit('check');
+      // 检查信息
+      var promiseList = [];
+      for(var i in _this.refs.validOnSave){
+        promiseList.push(new _this.app.Promise(function(resolve, reject){
+          _this.refs.validOnSave[i]
+          .on('invalid', function(){
+            reject();
+          })
+          .on('valid', function(){
+            resolve();
+          })
+          .emit('check');
+        }));
       }
+      _this.app.Promise.all(promiseList).then(function(){
+        // 检测通过, 整理数据
+        var api, data, form = 'Agreement', formdata = {}, alumni_donations;
+        if(_this.refs.alumni_donations[0].checked){
+          alumni_donations = 0
+        }
+        if(_this.refs.alumni_donations[1].checked){
+          alumni_donations = 1
+        }
+        data = {
+          agreement_number: _this.refs.agreement_number.value,
+          agreement_name: _this.refs.agreement_name.value,
+          donor_id: _this.form.donor_id,
+          deadline: _this.refs.deadline.value,
+          contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
+          due_date: _this.app.utils.str2time(_this.refs.due_date.value),
+          award_condition: _this.refs.award_condition.value,
+          donor_nature: _this.refs.donor_nature.value,
+          alumni_donations: alumni_donations,
+          sources_funding: _this.refs.sources_funding.value,
+          remark: _this.refs.remark.value,
+          file: JSON.stringify(_this.form.file) || [],
+          price: _this.form.price || []
+        };
+        for(var k in data){
+          formdata[form+'['+k+']'] = data[k];
+        }
+        if(_this.form.id){
+          api = 'agreement/default/update?id='+_this.form.id;
+        }
+        else{
+          api = 'agreement/default/create';
+        }
+        _this.app.api('POST', api, {
+          trigger: e.target,
+          data: formdata
+        }).on('done', function(){
+
+        });
+      }).catch(function(){
+        // 失败alert
+        _this.app.alert('保存前请检查您的表单数据', 'warning');
+      });
+    },
+    removeFile: function(e){
+      _this.form.file.splice(_this.form.file.indexOf(e.item), 1);
+    },
+    cancel: function(){
+      history.back();
+    },
+    removePrice: function(e){
+      _this.form.Price.splice(_this.form.Price.indexOf(e.item.p), 1);
+    },
+    addPrice: function(e){
+      _this.refs.validPrice
+      .once('valid', function(){
+        _this.form.price.push({
+          currency_sign: _this.refs.addPriceType.value,
+          amount: _this.refs.addPriceNumber.value
+        });
+        _this.refs.addPriceNumber.value = '';
+        _this.refs.addPriceType.value = 'CNY';
+        _this.update();
+      }).emit('check');
     },
     donorList: function(keyword){
+      // 清空校验错误信息
+      // NOTE: 这里强制用了index来指定input-valid
+      _this.refs.validOnSave[2].emit('msg', '');
       if(_this.cache[keyword]){
         return _this.tags['input-select'].emit('push', _this.cache[keyword]);
       }
@@ -110,9 +273,40 @@
         _this.cache[keyword] = data.items;
         _this.tags['input-select'].emit('push', data.items);
       });
+    },
+    currencyCode: function(){
+      // 货币种类
+      _this.app.api('GET', 'agreement/default/currency-code')
+      .on('done', function(data){
+        _this.update({
+          currencyList: data.items
+        });
+      });
     }
   };
   _this.on('mount', function(){
+    // 编辑状态下(/edit/id)
+    if(_this.app.route.params[1] == 'edit'){
+      _this.agreement_id = _this.app.route.params[2];
+      if(!_this.agreement_id){
+        _this.app.alert('协议id错误', 'error');
+        return history.back();
+      }
+      // 查询协议
+      _this.app.api('GET', 'agreement/default/update', {
+        data: { id: _this.agreement_id }
+      })
+      .on('done', function(data){
+        _this.form = data;
+        // 一些二级属性避免报错
+        _this.form.donor = data.donor || {};
+        _this.form.file = data.file || [];
+        _this.form.price = data.price || [];
+        // 刷新捐赠方的显示名字
+        _this.refs.donor_name.emit('value', data.donor.donor_name);
+        _this.update();
+      });
+    }
     // 加载日期选择
     _this.app.addResource('my97');
     // 请求捐赠方数据
@@ -120,12 +314,51 @@
     // 选择了捐赠方
     _this.tags['input-select'].on('select', function(item){
       // _this.app.log('donor select:', item);
-      _this.form.donor_id = item.id;
-      _this.form.donor_name = item.donor_name;
+      _this.refs.donor_id.value = _this.form.donor.id = item.id;
+      _this.form.donor.donor_name = item.donor_name;
+    });
+    // 货币种类信息
+    _this.fn.currencyCode();
+    // 附件上传
+    _this.tags['upload-formdata'].on('post', function(fd){
+      _this.app.api('POST', 'agreement/default/upload-file', {
+        payload: true,
+        showProgress: true,
+        formdata: true,
+        data: fd
+      }).on('done', function(data){
+        _this.form.file = _this.form.file || [].concat(data.items);
+        _this.update();
+      })
+      .on('progress', function(percent){
+        _this.update({
+          fileUploadPercent: percent == 100 ? '上传完毕': percent+'%'
+        });
+      });
     });
   });
   </script>
 </agreement-form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- 协议列表页面 -->
@@ -213,6 +446,7 @@
       _this.app.route(_this.app.route.path + '/add');
     },
     edit: function(e){
+      _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
     },
     remove: function(e){
       _this.tags['modal'].emit('open');
@@ -231,7 +465,7 @@
           search_keyword: _this.q.keyword || ''
         }
       }).on('done', function(data){
-        _this.app.log('api agreement done');
+        // _this.app.log('api agreement done');
         _this.update({
           tableList: data.items,
           page: data.counts.page,
