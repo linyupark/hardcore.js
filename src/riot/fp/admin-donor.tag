@@ -1,3 +1,40 @@
+<!-- 捐赠方表单页 -->
+<donor-form>
+
+  <section>
+    <h2>
+      {app.lang.admin.donor.title} &gt;
+      {app.lang.admin.donor[app.route.params[1]]}
+    </h2>
+    <form class="donor" onsubmit="return false;">
+      <!-- 基本信息 -->
+      <h4>{app.lang.admin.donor.baseinfo}</h4>
+      <div class="c2">
+        <div class="row">
+          <!-- 捐赠方 -->
+          <p>
+            <label>{app.lang.admin.donor.name}*</label>
+            <input type="text" ref="donor_name" value="{form.donor_name}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="donor_name" rule="required" msg="{app.lang.admin.donor.name}{app.lang.admin.form.req}"/>
+          </p>
+          <!-- 类型 -->
+          <p>
+            <label>{app.lang.admin.donor.type}*</label>
+            <input type="text" ref="donor_type" value="{form.donor_type}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="donor_type" rule="required" msg="{app.lang.admin.donor.type}{app.lang.admin.form.req}"/>
+          </p>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <script>
+  var _this = this;
+  _this.form = {};
+  </script>
+</donor-form>
+
+
 <fp-admin-donor>
 
   <header for="admin"></header>
@@ -5,6 +42,8 @@
   <main class="admin">
     <div class="container">
       <admin-sidenav></admin-sidenav>
+      <donor-form if={section=='add'}/>
+      <donor-form if={section=='edit'}/>
       <!-- 列表页面 -->
       <section if={section=='index'}>
 
@@ -76,6 +115,12 @@
   _this.q = _this.app.route.query;
   _this.section = _this.app.route.params[1] || 'index';
   _this.fn = {
+    add: function(){
+
+    },
+    edit: function(e){
+      _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
+    },
     getNatureName: function(type){
       var name;
       _this.app.lang.admin.agreement['donor:nature:list']

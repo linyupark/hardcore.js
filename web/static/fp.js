@@ -316,10 +316,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           var _cookie$split = _cookie.split("="),
               _cookie$split2 = _slicedToArray(_cookie$split, 2),
-              _name = _cookie$split2[0],
+              name = _cookie$split2[0],
               value = _cookie$split2[1];
 
-          if (key !== "" && key === _name) {
+          if (key !== "" && key === name) {
             return decodeURIComponent(value);
           }
         }
@@ -553,7 +553,48 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
         }
 
-        el.__emited[name] = [name].concat(args);
+        if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
+        return el;
+      }
+    });
+
+    /**
+     * 设置陷阱（先于on的emit）
+     */
+    Object.defineProperty(el, "trap", {
+      value: function value(event) {
+        var fns = (_callbacks[event] || []).slice(0);
+
+        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+
+        try {
+          for (var _iterator3 = fns[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _fn = _step3.value;
+
+            _fn.apply(el, args);
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
+        }
+
+        el.__emited[event] = [event].concat(args);
         if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
         return el;
       }
@@ -677,13 +718,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var values = [];
         return new EmitterPromise(function (resolve, reject) {
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
+          var _iteratorNormalCompletion4 = true;
+          var _didIteratorError4 = false;
+          var _iteratorError4 = undefined;
 
           try {
-            for (var _iterator3 = iterable[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var _p = _step3.value;
+            for (var _iterator4 = iterable[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+              var _p = _step4.value;
 
               _p.then(function (value) {
                 values.push(value);
@@ -695,16 +736,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               });
             }
           } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
+              if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                _iterator4.return();
               }
             } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
+              if (_didIteratorError4) {
+                throw _iteratorError4;
               }
             }
           }
@@ -776,28 +817,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var alias_names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
         var batch_list = [];
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
 
         try {
-          for (var _iterator4 = alias_names[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-            var _name2 = _step4.value;
+          for (var _iterator5 = alias_names[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var name = _step5.value;
 
-            if (!json[_name2] || json[_name2].length === 0) continue;
-            batch_list.push(json[_name2]);
+            if (!json[name] || json[name].length === 0) continue;
+            batch_list.push(json[name]);
           }
         } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-              _iterator4.return();
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+              _iterator5.return();
             }
           } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
+            if (_didIteratorError5) {
+              throw _iteratorError5;
             }
           }
         }
@@ -816,8 +857,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function depend() {
         var _this4 = this;
 
-        for (var _len3 = arguments.length, batch_list = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-          batch_list[_key3] = arguments[_key3];
+        for (var _len4 = arguments.length, batch_list = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          batch_list[_key4] = arguments[_key4];
         }
 
         var i = 0,
@@ -861,26 +902,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this._loaded_files = this._loaded_files || [];
         // 收集重复文件，放入备份文件
 
-        for (var _len4 = arguments.length, files = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-          files[_key4] = arguments[_key4];
+        for (var _len5 = arguments.length, files = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+          files[_key5] = arguments[_key5];
         }
 
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
+        var _iteratorNormalCompletion6 = true;
+        var _didIteratorError6 = false;
+        var _iteratorError6 = undefined;
 
         try {
-          for (var _iterator5 = files[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var f = _step5.value;
+          for (var _iterator6 = files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+            var f = _step6.value;
 
             var exist = false;
-            var _iteratorNormalCompletion8 = true;
-            var _didIteratorError8 = false;
-            var _iteratorError8 = undefined;
+            var _iteratorNormalCompletion9 = true;
+            var _didIteratorError9 = false;
+            var _iteratorError9 = undefined;
 
             try {
-              for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                var lf = _step8.value;
+              for (var _iterator9 = load_files[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                var lf = _step9.value;
 
                 if (f.split("/").pop() === lf.split("/").pop()) {
                   exist = true;
@@ -888,16 +929,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
               }
             } catch (err) {
-              _didIteratorError8 = true;
-              _iteratorError8 = err;
+              _didIteratorError9 = true;
+              _iteratorError9 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                  _iterator8.return();
+                if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                  _iterator9.return();
                 }
               } finally {
-                if (_didIteratorError8) {
-                  throw _iteratorError8;
+                if (_didIteratorError9) {
+                  throw _iteratorError9;
                 }
               }
             }
@@ -905,29 +946,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (!exist) load_files = load_files.concat(f);
           }
         } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
+          _didIteratorError6 = true;
+          _iteratorError6 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-              _iterator5.return();
+            if (!_iteratorNormalCompletion6 && _iterator6.return) {
+              _iterator6.return();
             }
           } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
+            if (_didIteratorError6) {
+              throw _iteratorError6;
             }
           }
         }
 
         return new Promise(function (resolve, reject) {
           var load = function load() {
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
               var _loop = function _loop() {
-                var file = _step6.value;
+                var file = _step7.value;
 
                 var name = file.split("/").pop(),
                     ext = name.split(".").pop().split("?")[0],
@@ -954,22 +995,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
               };
 
-              for (var _iterator6 = load_files[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+              for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                 var _ret = _loop();
 
                 if (_ret === 'continue') continue;
               }
             } catch (err) {
-              _didIteratorError6 = true;
-              _iteratorError6 = err;
+              _didIteratorError7 = true;
+              _iteratorError7 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                  _iterator6.return();
+                if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                  _iterator7.return();
                 }
               } finally {
-                if (_didIteratorError6) {
-                  throw _iteratorError6;
+                if (_didIteratorError7) {
+                  throw _iteratorError7;
                 }
               }
             }
@@ -992,28 +1033,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               }
               if (exist && done.length === load_files.length) {
                 // 移除已经加载的文件
-                var _iteratorNormalCompletion7 = true;
-                var _didIteratorError7 = false;
-                var _iteratorError7 = undefined;
+                var _iteratorNormalCompletion8 = true;
+                var _didIteratorError8 = false;
+                var _iteratorError8 = undefined;
 
                 try {
-                  for (var _iterator7 = load_files[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var lf = _step7.value;
+                  for (var _iterator8 = load_files[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var lf = _step8.value;
 
                     removeFile(_this5.types[lf.split(".").pop()], "head", lf);
                   }
                   // 替换成备份文件后能填补空缺就再执行一次
                 } catch (err) {
-                  _didIteratorError7 = true;
-                  _iteratorError7 = err;
+                  _didIteratorError8 = true;
+                  _iteratorError8 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                      _iterator7.return();
+                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                      _iterator8.return();
                     }
                   } finally {
-                    if (_didIteratorError7) {
-                      throw _iteratorError7;
+                    if (_didIteratorError8) {
+                      throw _iteratorError8;
                     }
                   }
                 }
@@ -3894,8 +3935,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
             // 开始监听路由变化
             route(function () {
-              for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-                args[_key5] = arguments[_key5];
+              for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+                args[_key6] = arguments[_key6];
               }
 
               _this13.emit('route::change', args);
@@ -4033,20 +4074,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }).done(function (resp) {
           if (resp.errno == 0) {
             // this.log('api done');
-            api.emit('done', resp.data || {});
+            api.trap('done', resp.data || {});
           } else {
             // this.log('api fail');
-            api.emit('error', {
+            api.trap('error', {
               code: resp.errno || '',
               errmsg: resp.errmsg,
               url: url || ''
             });
           }
         }).progress(function (p) {
-          api.emit('progress', p);
+          api.trap('progress', p);
         }).fail(function (status) {
           // this.log('api fail', status);
-          api.emit('fail', {
+          api.trap('fail', {
             code: status,
             errmsg: '',
             url: url
@@ -4060,7 +4101,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               opts.trigger.innerText = triggerText;
             }, 500);
           }
-          api.emit('complete', url);
+          api.trap('complete', url);
         });
 
         api.on('fail', function (e) {

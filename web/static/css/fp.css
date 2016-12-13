@@ -492,17 +492,17 @@ template {
   content: '\f1f8'; }
 
 /* '' */
-.row:before, form.agreement .row:before, .row:after, form.agreement .row:after {
+.row:before, form.agreement .row:before, form.donor .row:before, .row:after, form.agreement .row:after, form.donor .row:after {
   content: "";
   display: table; }
 
-.row:after, form.agreement .row:after {
+.row:after, form.agreement .row:after, form.donor .row:after {
   clear: both; }
 
-.row, form.agreement .row {
+.row, form.agreement .row, form.donor .row {
   zoom: 1; }
 
-userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.agreement .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
+userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.agreement .c1 .line, form.donor .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -852,106 +852,106 @@ header h1 {
   line-height: 80px;
   text-indent: 60px; }
 
-form.agreement {
+form.agreement, form.donor {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background: #fff;
   padding: 30px;
   border-radius: 5px;
   margin: 0 5px 5px 0; }
-  form.agreement h4 {
+  form.agreement h4, form.donor h4 {
     margin: 0 0 15px 0;
     padding: 0 15px;
     font-size: 16px;
     border-left: 2px solid #DF3A5E; }
-  form.agreement .row {
+  form.agreement .row, form.donor .row {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: -0;
     margin-right: -0; }
-    [class*="no-gutter"] > form.agreement .row {
+    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row {
       margin-left: 0 !important;
       margin-right: 0 !important; }
-    form.agreement .row form.agreement .row {
+    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
       margin-left: -0;
       margin-right: -0; }
     @media screen and (min-width: 960px) {
-      form.agreement .row form.agreement .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
         margin-left: -0;
         margin-right: -0; } }
     @media screen and (max-width: 480px) {
-      form.agreement .row form.agreement .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
         margin-left: -0;
         margin-right: -0; } }
-  form.agreement input[type=text], form.agreement select {
+  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select {
     height: 36px;
     padding: 0 5px;
     border-radius: 3px;
     border: 1px solid #E3E3E3; }
-    form.agreement input[type=text]:focus, form.agreement select:focus {
+    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
-  form.agreement label {
+  form.agreement label, form.donor label {
     width: 60px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 5px; }
-    form.agreement label.center {
+    form.agreement label.center, form.donor label.center {
       text-align: center; }
-    form.agreement label.radio, form.agreement label.checkbox {
+    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox {
       height: 38px;
       margin-right: 20px;
       line-height: 38px; }
-  form.agreement p {
+  form.agreement p, form.donor p {
     padding-bottom: 10px;
     position: relative; }
-    form.agreement p textarea {
+    form.agreement p textarea, form.donor p textarea {
       width: 77%;
       border-color: #ebebeb;
       border-radius: 5px;
       min-height: 100px;
       padding: 5px; }
-    form.agreement p input[type=text], form.agreement p select {
+    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select {
       width: 260px; }
-    form.agreement p i[class^="icon-"] {
+    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"] {
       color: #666;
       margin-left: -30px; }
-    form.agreement p input-valid {
+    form.agreement p input-valid, form.donor p input-valid {
       position: absolute;
       color: #F44C4C;
       top: 44px;
       left: 70px;
       font-size: 13px; }
-    form.agreement p .files {
+    form.agreement p .files, form.donor p .files {
       margin-left: 70px;
       display: inline-block;
       padding: 5px 0;
       color: #999; }
-  form.agreement .c2 p {
+  form.agreement .c2 p, form.donor .c2 p {
     width: 41.66667%;
     margin-right: 4.16667%; }
-  form.agreement .c1 {
+  form.agreement .c1, form.donor .c1 {
     overflow: hidden;
     padding-bottom: 20px; }
-    form.agreement .c1.btn-line {
+    form.agreement .c1.btn-line, form.donor .c1.btn-line {
       text-indent: 70px; }
-      form.agreement .c1.btn-line button {
+      form.agreement .c1.btn-line button, form.donor .c1.btn-line button {
         width: 100px;
         margin-right: 20px; }
-    form.agreement .c1 .top {
+    form.agreement .c1 .top, form.donor .c1 .top {
       width: 66px;
       float: left;
       padding-top: 16px; }
-    form.agreement .c1 .line {
+    form.agreement .c1 .line, form.donor .c1 .line {
       width: 91.66667%; }
-    form.agreement .c1 .price-group {
+    form.agreement .c1 .price-group, form.donor .c1 .price-group {
       display: inline-block;
       margin-top: 10px; }
-      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select {
+      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select {
         min-width: 160px;
         max-width: 160px;
         margin-right: 8px; }
-      form.agreement .c1 .price-group i[class^="icon-"] {
+      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"] {
         margin: 0 8px 0 0; }
 
 table.base {
@@ -1173,24 +1173,11 @@ main {
             color: #DF3A5E;
             border-color: #DF3A5E; }
 
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0.5; }
-  to {
-    opacity: 1; } }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0.5; }
-  to {
-    opacity: 1; } }
-
 section {
   margin-left: 19.16667%;
   margin-right: 4.16667%;
   min-height: 700px;
-  overflow: hidden;
-  animation: fadeIn .5s; }
+  overflow: hidden; }
   section h2 {
     font-weight: normal;
     font-size: 14px;

@@ -16,7 +16,6 @@
   <script>
   var _this = this;
   _this.on('mount', function(){
-
     _this.tags['upload-formdata'].on('post', function(fd){
       _this.app.api('POST', 'agreement/default/upload-file', {
         payload: true,

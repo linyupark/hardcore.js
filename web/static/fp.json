@@ -92,6 +92,7 @@
           "id": "序号",
           "title": "捐赠方管理",
           "add": "添加内容",
+          "edit": "编辑内容",
           "name": "捐赠方",
           "type": "类型",
           "contact": "联络人",
@@ -122,19 +123,7 @@
             {"name": "港澳台", "key": 1},
             {"name": "海外", "key": 2}
           ],
-          "Project:type": "项目类型",
-          "project:type:list": [
-            {"name": "奖学金", "key": 0},
-            {"name": "助学金", "key": 1},
-            {"name": "奖教金", "key": 2},
-            {"name": "国际交流奖学金", "key": 3},
-            {"name": "基础建设", "key": 4},
-            {"name": "学科建设", "key": 5},
-            {"name": "人才培养", "key": 6},
-            {"name": "教育发展基金", "key": 7},
-            {"name": "学生活动与创业", "key": 8},
-            {"name": "其他", "key": 99}
-          ],
+          "project:type": "项目类型",
           "search:types": [
             {"name": "协议编号", "key": "agreement_number"},
             {"name": "协议名称", "key": "agreement_name"},

@@ -494,7 +494,22 @@ const emitter = (el = {}) => {
       for (let _fn of fns) {
         _fn.apply(el, args);
       }
-      el.__emited[name] = [name].concat(args);
+      if (_callbacks["*"] && event !== "*")
+        el.emit.apply(el, ["*", event].concat(args));
+      return el;
+    }
+  });
+
+  /**
+   * 设置陷阱（先于on的emit）
+   */
+  Object.defineProperty(el, "trap", {
+    value(event, ...args) {
+      const fns = (_callbacks[event] || []).slice(0);
+      for (let _fn of fns) {
+        _fn.apply(el, args);
+      }
+      el.__emited[event] = [event].concat(args);
       if (_callbacks["*"] && event !== "*")
         el.emit.apply(el, ["*", event].concat(args));
       return el;
@@ -3854,21 +3869,21 @@ class FP extends RiotApp {
     }).done(resp => {
       if (resp.errno == 0){
         // this.log('api done');
-        api.emit('done', resp.data || {});
+        api.trap('done', resp.data || {});
       }
       else {
         // this.log('api fail');
-        api.emit('error', {
+        api.trap('error', {
           code: resp.errno || '',
           errmsg: resp.errmsg,
           url: url || ''
         });
       }
     }).progress(p => {
-      api.emit('progress', p);
+      api.trap('progress', p);
     }).fail(status => {
       // this.log('api fail', status);
-      api.emit('fail', {
+      api.trap('fail', {
         code: status,
         errmsg: '',
         url: url
@@ -3882,7 +3897,7 @@ class FP extends RiotApp {
           opts.trigger.innerText = triggerText;
         }, 500);
       }
-      api.emit('complete', url);
+      api.trap('complete', url);
     });
 
     api.on('fail', e => {

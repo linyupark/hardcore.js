@@ -88,10 +88,10 @@
       <br>
       <!-- 项目类型 -->
       <div class="c1">
-        <label class="top">项目类型</label>
+        <label class="top" style="padding-top: 10px">{app.lang.admin.agreement['project:type']}</label>
         <div class="line">
           <label style="width: 120px" each={projectType} class="checkbox">
-            <input type="checkbox" value="{key}" checked="{key==form.project_type}">
+            <input type="checkbox" value="{id}" ref="projectType" checked="{fn.checkProjectType(id)}">
             {name}
           </label>
         </div>
@@ -175,7 +175,7 @@
   _this.cache = {};
   _this.donorNature = _this.app.lang.admin.agreement['donor:nature:list'];
   _this.sourcesFunding = _this.app.lang.admin.agreement['sources:funding:list'];
-  _this.projectType = _this.app.lang.admin.agreement['project:type:list'];
+  _this.projectType = [];
   _this.fn = {
     save: function(e){
       // 检查信息
@@ -194,13 +194,18 @@
       }
       _this.app.Promise.all(promiseList).then(function(){
         // 检测通过, 整理数据
-        var api, alumni_donations;
+        var api, alumni_donations, project_type = [];
         if(_this.refs.alumni_donations[0].checked){
           alumni_donations = 1
         }
         if(_this.refs.alumni_donations[1].checked){
           alumni_donations = 0
         }
+        _this.refs.projectType.forEach(function(target){
+          if(target.checked) project_type.push({
+            project_types_id: target.value
+          });
+        });
         if(_this.form.id){
           api = 'agreement/default/update?id='+_this.form.id;
         }
@@ -224,7 +229,7 @@
               remark: _this.refs.remark.value,
               file: _this.form.file || [],
               price: _this.form.price || [],
-              project_type: []
+              project_type: project_type
             })
           }
         }).on('done', function(){
@@ -240,6 +245,24 @@
     },
     cancel: function(){
       history.back();
+    },
+    // 勾选已经选中的项目类型
+    checkProjectType: function(id){
+      var checked = false;
+      _this.form.project_type.forEach(function(item){
+        if(item.project_types_id == id) checked = true;
+      });
+      return checked;
+    },
+    // 获取项目类型
+    projectType: function(){
+      _this.app.api('GET', 'system-setting/project-type/index', {
+        data: {
+          page: 1
+        }
+      }).on('done', function(data){
+        _this.projectType = data.items;
+      });
     },
     removePrice: function(e){
       _this.form.price.splice(_this.form.price.indexOf(e.item.p), 1);
@@ -301,6 +324,7 @@
         _this.form.donor = data.donor || {};
         _this.form.file = data.file || [];
         _this.form.price = data.price || [];
+        _this.form.project_type = data.project_type || [];
         // 刷新捐赠方的显示名字
         _this.refs.donor_name.emit('value', data.donor.donor_name);
         _this.update();
@@ -318,6 +342,8 @@
     });
     // 货币种类信息
     _this.fn.currencyCode();
+    // 项目类型
+    _this.fn.projectType();
     // 附件上传
     _this.tags['upload-formdata'].on('post', function(fd){
       _this.app.api('POST', 'agreement/default/upload-file', {
@@ -368,8 +394,8 @@
   <main class="admin">
     <div class="container">
       <admin-sidenav></admin-sidenav>
-      <agreement-form if={section=='add'}></agreement-form>
-      <agreement-form if={section=='edit'}></agreement-form>
+      <agreement-form if={section=='add'}/>
+      <agreement-form if={section=='edit'}/>
       <!-- 列表页面 -->
       <section if={section=='index'}>
         <h2>{app.lang.admin.agreement.title}</h2>

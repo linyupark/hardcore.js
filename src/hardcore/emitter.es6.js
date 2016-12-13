@@ -68,7 +68,22 @@ export const emitter = (el = {}) => {
       for (let _fn of fns) {
         _fn.apply(el, args);
       }
-      el.__emited[name] = [name].concat(args);
+      if (_callbacks["*"] && event !== "*")
+        el.emit.apply(el, ["*", event].concat(args));
+      return el;
+    }
+  });
+
+  /**
+   * 设置陷阱（先于on的emit）
+   */
+  Object.defineProperty(el, "trap", {
+    value(event, ...args) {
+      const fns = (_callbacks[event] || []).slice(0);
+      for (let _fn of fns) {
+        _fn.apply(el, args);
+      }
+      el.__emited[event] = [event].concat(args);
       if (_callbacks["*"] && event !== "*")
         el.emit.apply(el, ["*", event].concat(args));
       return el;
