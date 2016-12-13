@@ -8,6 +8,29 @@ table.base
   b
     color: $color-main
 
+// 过滤条上方的tab切换
+.table-tab
+  height: 36px
+  a
+    display: block
+    float: left
+    margin: 0 0 0 5px
+    height: 36px
+    line-height: 36px
+    min-width: 100px
+    background: $color-line2
+    color: $color-txt2
+    text-align: center
+    border-top-left-radius: 3px
+    border-top-right-radius: 3px
+    border: 1px solid $color-line2
+    border-bottom: none
+    &.active
+      color: $color-main
+      background: #fff
+
+
+
 
 // 表单过滤条
 table-filter

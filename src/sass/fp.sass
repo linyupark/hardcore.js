@@ -131,19 +131,22 @@ main
 //
 // section
 //
++ani-fadein()
 section
-  +gridle(prefix 2.5 suffix 0.5)
+  +gridle(prefix 2.3 suffix 0.5)
+  min-height: 700px
   overflow: hidden
-  min-height: 80h0px
+  animation: fadeIn .5s
   h2
+    font-weight: normal
+    font-size: $font-s
     margin: 0
-    padding: 40px 0 20px
+    padding: 20px 0
 
 //
 // footer
 //
 footer
-  overflow: hidden
   .info
     padding: 35px
     text-align: center
@@ -153,8 +156,8 @@ footer
     margin-top: 30px
   &.admin
     .info
-      +gridle(9 push 2.5 prefix 0)
-      border-top: 1px solid $color-line1
+      +gridle(9 push 2.3 prefix 0)
+      // border-top: 1px solid $color-line1
 
 //
 // pagination
@@ -176,9 +179,10 @@ admin-sidenav
   height: 100%
   background: #212329
   z-index: 2
+  border-bottom-right-radius: 5px
   ul
     list-style: none
-    margin: 30px 0 0
+    margin: 50px 0 0
     padding: 0
     &.child
       margin-top: 0

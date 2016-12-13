@@ -8,22 +8,6 @@
   "pro": ["/static/css/fp.min.css?v=2e35f4de1b64e0b5ed2791280a9c9e44", "/static/riot/common+component.min.js?v=3f0667bcedfe62f1050f853d2b815d36"],
   "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
   "dev": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
-  "agreement_search_types": [
-    {"name": "协议编号", "key": "agreement_number"},
-    {"name": "协议名称", "key": "agreement_name"},
-    {"name": "捐赠方ID", "key": "donor_id"}
-  ],
-  "admin_sidenav": [
-    {"name": "总览", "url": "admin-index", "icon": "home"},
-    {"name": "协议", "url": "admin-agreement", "icon": "agreement"},
-    {"name": "项目", "url": "admin-project", "icon": "project"},
-    {"name": "捐赠方", "url": "admin-donor", "icon": "donor"},
-    {"name": "用户", "url": "admin-user", "icon": "user"},
-    {"name": "日志", "url": "admin-log", "icon": "log"},
-    {"name": "设置", "url": "", "icon": "setting", "child": [
-      {"name": "密码", "url": "admin-setting-password", "icon": "password"}
-    ]}
-  ],
   "lang": {
     "cn": {
       "year:number": "几年(阿拉伯数字)",
@@ -53,6 +37,17 @@
         "relogin": "访问失败: 需要重新登录"
       },
       "admin": {
+        "sidenav": [
+          {"name": "总览", "url": "admin-index", "icon": "home"},
+          {"name": "协议", "url": "admin-agreement", "icon": "agreement"},
+          {"name": "项目", "url": "admin-project", "icon": "project"},
+          {"name": "捐赠方", "url": "admin-donor", "icon": "donor"},
+          {"name": "用户", "url": "admin-user", "icon": "user"},
+          {"name": "日志", "url": "admin-log", "icon": "log"},
+          {"name": "设置", "url": "", "icon": "setting", "child": [
+            {"name": "密码", "url": "admin-setting-password", "icon": "password"}
+          ]}
+        ],
         "reset": "清空",
         "counts": {
           "items": "找到记录共: ",
@@ -65,6 +60,11 @@
           }
         },
         "handle": "操作",
+        "handles": {
+          "view": "查看详细",
+          "edit": "编辑",
+          "remove": "删除"
+        },
         "deny": "没有相关权限",
         "empty": "没有查询到相关记录",
         "confirm": {
@@ -79,6 +79,23 @@
           "ok": "确定",
           "cancel": "取消",
           "close": "关闭"
+        },
+        "project": {
+          "title": "项目管理",
+          "add": "添加项目",
+          "filter:tab": [
+            {"name": "我的项目", "key": 1},
+            {"name": "所有项目", "key": 0}
+          ]
+        },
+        "donor": {
+          "id": "序号",
+          "title": "捐赠方管理",
+          "add": "添加内容",
+          "name": "捐赠方",
+          "type": "类型",
+          "contact": "联络人",
+          "tel": "联络电话"
         },
         "agreement": {
           "add": "添加协议",
@@ -117,6 +134,11 @@
             {"name": "教育发展基金", "key": 7},
             {"name": "学生活动与创业", "key": 8},
             {"name": "其他", "key": 99}
+          ],
+          "search:types": [
+            {"name": "协议编号", "key": "agreement_number"},
+            {"name": "协议名称", "key": "agreement_name"},
+            {"name": "捐赠方ID", "key": "donor_id"}
           ]
         }
       },

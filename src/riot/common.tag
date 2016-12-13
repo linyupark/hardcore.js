@@ -30,7 +30,7 @@
   </ul>
   <script>
   var _this = this;
-  _this.data = _this.app.data.admin_sidenav;
+  _this.data = _this.app.lang.admin.sidenav;
   _this.fn = {
     toggle: function(e){
       if(e.item.m.child){
@@ -61,7 +61,7 @@
   <div if={opts.for=='agreement'}>
     {app.lang.admin.search.condition}:
     <select ref="agreement">
-      <option each={app.data.agreement_search_types} value={key} selected={type==key}>{name}</option>
+      <option each={app.lang.admin.agreement['search:types']} value={key} selected={type==key}>{name}</option>
     </select>
     <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="{app.lang.admin.search.keyword.placehoder}">
     <button style="margin-left: -5px" class="gray" onclick={fn.search}><i class="icon-search"></i></button>
@@ -168,7 +168,7 @@
         _this.app.utils.cookie.set('user_id', data.user_id);
         _this.update();
       })
-      .on('fail', function(){
+      .off('fail').on('fail', function(){
         _this.app.alert(_this.app.lang.login.relogin, 'warning');
         _this.fn.relogin();
       });
@@ -209,7 +209,7 @@
 <header class="{opts.for}">
 
   <!-- 顶部信息框 -->
-  <alert message={alert.message} type={alert.type}></alert>
+  <alert></alert>
 
   <div class="container {center: opts.for!=='admin'}">
 
@@ -246,28 +246,13 @@
   });
 
   // 自定义信息
-  _this.app.on('alert', function(msg, type){
+  _this.app.off('alert').on('alert', function(msg, type){
+    _this.app.log(msg);
     // 加载后
-    (_this.tags['alert'] &&
-    _this.tags['alert'].emit(
-      'message', msg, type
-    )) || _this.update({
-      alert: {
-        message: msg,
-        type: type
-      }
-    });
+    _this.tags['alert'] &&
+    _this.tags['alert'].emit('message', msg, type);
   });
 
-  // 对象动画
-  _this.app.on('animation', function(target, name){
-    target.setAttribute('class',
-    target.getAttribute('class') + ' animation-'+name);
-    setTimeout(function(){
-      target.setAttribute('class',
-      target.getAttribute('class').replace('animation-'+name, ''));
-    }, 500);
-  });
   </script>
 
 </header>

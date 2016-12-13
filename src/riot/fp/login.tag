@@ -67,13 +67,14 @@
     }
 
     _this.tags['input-valid'].on('valid', function(target){
-      _this.refs.login.innerText = _this.app.lang.login['btn:loading'];
       // 尝试登录
       _this.app.api('POST', 'login/default/index', {
         withCredentials: true,
         data: {
-          'LoginForm[username]': target[0].value,
-          'LoginForm[password]': target[1].value
+          data: JSON.stringify({
+            username: target[0].value,
+            password: target[1].value
+          })
         },
         trigger: _this.refs.login
       })
@@ -93,14 +94,12 @@
           window.scrollTo(0, 0);
         }
       })
-      .on('fail', function(msg){
+      .off('error').on('error', function(msg){
+        // off error 屏蔽系统级别的弹出错误
         // 接口失败错误信息提示
         _this.tags['input-valid'].emit(
           'msg', _this.app.lang.login.fail
         );
-      })
-      .on('complete', function(){
-        _this.refs.login.innerText = _this.app.lang.login.btn;
       });
     });
 

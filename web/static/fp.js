@@ -3996,7 +3996,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           pro: 'www.'
         }[this.config.env];
 
-        var api = this.emitter();
+        var triggerText = void 0,
+            api = this.emitter(),
+            spin = document.createElement('i');
+
+        spin.setAttribute('class', 'icon-spin2');
 
         // 如果设定了发起请求的元素，则在请求完毕前禁用
         this.__api = this.__api || [];
@@ -4012,6 +4016,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.__api.push(url);
 
         if (opts.trigger) {
+          triggerText = opts.trigger.innerText;
+          opts.trigger.innerText = '';
+          opts.trigger.prepend(spin);
           opts.trigger.disabled = true;
         }
 
@@ -4029,7 +4036,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             api.emit('done', resp.data || {});
           } else {
             // this.log('api fail');
-            api.emit('fail', {
+            api.emit('error', {
               code: resp.errno || '',
               errmsg: resp.errmsg,
               url: url || ''
@@ -4048,13 +4055,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           // this.log('api complete');
           _this15.__api.splice(_this15.__api.indexOf(url), 1);
           if (opts.trigger) {
-            opts.trigger.disabled = false;
+            setTimeout(function () {
+              opts.trigger.disabled = false;
+              opts.trigger.innerText = triggerText;
+            }, 500);
           }
           api.emit('complete', url);
         });
 
         api.on('fail', function (e) {
           _this15.alert('接口错误:' + e.code + ' ' + e.errmsg + ' ' + e.url, 'error');
+        });
+
+        api.on('error', function (e) {
+          _this15.alert(e.errmsg, 'error');
         });
 
         return api;

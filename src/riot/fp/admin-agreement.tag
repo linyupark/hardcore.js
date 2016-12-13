@@ -29,7 +29,7 @@
           <p>
             <label>{app.lang.admin.agreement['donor:nature']}</label>
             <select ref="donor_nature">
-              <option each={donorNature} selected={key==form.donor_nature}>{name}</option>
+              <option each={donorNature} selected={key==form.donor_nature}  value={key}>{name}</option>
             </select>
           </p>
         </div>
@@ -194,30 +194,12 @@
       }
       _this.app.Promise.all(promiseList).then(function(){
         // 检测通过, 整理数据
-        var api, data, form = 'Agreement', formdata = {}, alumni_donations;
+        var api, alumni_donations;
         if(_this.refs.alumni_donations[0].checked){
-          alumni_donations = 0
-        }
-        if(_this.refs.alumni_donations[1].checked){
           alumni_donations = 1
         }
-        data = {
-          agreement_number: _this.refs.agreement_number.value,
-          agreement_name: _this.refs.agreement_name.value,
-          donor_id: _this.form.donor_id,
-          deadline: _this.refs.deadline.value,
-          contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
-          due_date: _this.app.utils.str2time(_this.refs.due_date.value),
-          award_condition: _this.refs.award_condition.value,
-          donor_nature: _this.refs.donor_nature.value,
-          alumni_donations: alumni_donations,
-          sources_funding: _this.refs.sources_funding.value,
-          remark: _this.refs.remark.value,
-          file: JSON.stringify(_this.form.file) || [],
-          price: _this.form.price || []
-        };
-        for(var k in data){
-          formdata[form+'['+k+']'] = data[k];
+        if(_this.refs.alumni_donations[1].checked){
+          alumni_donations = 0
         }
         if(_this.form.id){
           api = 'agreement/default/update?id='+_this.form.id;
@@ -227,9 +209,26 @@
         }
         _this.app.api('POST', api, {
           trigger: e.target,
-          data: formdata
+          data: {
+            data: JSON.stringify({
+              agreement_number: _this.refs.agreement_number.value,
+              agreement_name: _this.refs.agreement_name.value,
+              donor_id: _this.refs.donor_id.value,
+              deadline: parseInt(_this.refs.deadline.value, 10),
+              contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
+              due_date: _this.app.utils.str2time(_this.refs.due_date.value),
+              award_condition: _this.refs.award_condition.value,
+              donor_nature: _this.refs.donor_nature.value,
+              alumni_donations: alumni_donations,
+              sources_funding: _this.refs.sources_funding.value,
+              remark: _this.refs.remark.value,
+              file: _this.form.file || [],
+              price: _this.form.price || [],
+              project_type: []
+            })
+          }
         }).on('done', function(){
-
+          _this.app.alert('协议保存成功', 'success');
         });
       }).catch(function(){
         // 失败alert
@@ -243,14 +242,14 @@
       history.back();
     },
     removePrice: function(e){
-      _this.form.Price.splice(_this.form.Price.indexOf(e.item.p), 1);
+      _this.form.price.splice(_this.form.price.indexOf(e.item.p), 1);
     },
     addPrice: function(e){
       _this.refs.validPrice
       .once('valid', function(){
         _this.form.price.push({
           currency_sign: _this.refs.addPriceType.value,
-          amount: _this.refs.addPriceNumber.value
+          amount: Number(_this.refs.addPriceNumber.value)
         });
         _this.refs.addPriceNumber.value = '';
         _this.refs.addPriceType.value = 'CNY';
@@ -327,7 +326,7 @@
         formdata: true,
         data: fd
       }).on('done', function(data){
-        _this.form.file = _this.form.file || [].concat(data.items);
+        _this.form.file = _this.form.file.concat(data.items);
         _this.update();
       })
       .on('progress', function(percent){
@@ -400,8 +399,13 @@
               <td>{app.utils.time2str(contract_date)}</td>
               <td>{app.utils.time2str(due_date)}</td>
               <td>
-                <i onclick={fn.edit} class="btn-icon icon-pencil"></i>
-                <i onclick={fn.remove} class="btn-icon icon-trash"></i>
+                <!-- 操作 -->
+                <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
+                  <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
+                </a>
+                <a href="javascript:;" aria-label="{app.lang.admin.handles.remove}" class="c-tooltip--top">
+                  <i onclick={fn.remove}  class="btn-icon icon-trash"></i>
+                </a>
               </td>
             </tr>
             <tr if={!tableList}>
@@ -460,7 +464,7 @@
       // search_keyword 搜索关键字
       _this.app.api('GET', 'agreement/default/index', {
         data: {
-          page: _this.page,
+          page: _this.q.page || 1,
           search_type: _this.q.type || '',
           search_keyword: _this.q.keyword || ''
         }
@@ -478,7 +482,6 @@
   };
   _this.on('mount', function(){
     if(_this.section === 'index'){
-      _this.page = _this.q.page || 1;
       _this.fn.getList();
       _this.tags['pagination-number'].on('change', function(n){
         _this.q.page = n;

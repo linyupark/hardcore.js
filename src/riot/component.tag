@@ -2,15 +2,27 @@
 
 <!-- 警示信息 -->
 <alert show={message} class="{type}">
-  <p>{message}</p>
+  <p each={m in message}>
+    <i show={type=='error'} class="icon-cancel"></i>
+    <i show={type=='success'} class="icon-ok"></i>
+    <span>{m}</span>
+  </p>
   <script>
   var _this = this;
-  _this.message = opts.message;
   _this.type = opts.type;
   _this.on('mount', function(){
     // console.log('alert mounted');
   });
   _this.on('message', function(msg, type){
+    var message = [];
+    if(typeof msg === 'object'){
+      for(var k in msg){
+        message.push(k+':'+msg[k]);
+      }
+    }
+    else{
+      message.push(msg);
+    }
     clearTimeout(_this.timer);
     _this.timer = setTimeout(function(){
       _this.update({
@@ -19,7 +31,7 @@
       });
     }, 2900);
     _this.update({
-      message: msg,
+      message: message,
       type: type ||'info'
     });
   });

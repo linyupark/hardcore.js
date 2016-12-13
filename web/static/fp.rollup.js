@@ -3816,7 +3816,12 @@ class FP extends RiotApp {
       pro: 'www.'
     }[this.config.env];
 
-    let api = this.emitter();
+    let
+      triggerText,
+      api = this.emitter(),
+      spin = document.createElement('i');
+
+    spin.setAttribute('class', 'icon-spin2');
 
     // 如果设定了发起请求的元素，则在请求完毕前禁用
     this.__api = this.__api || [];
@@ -3832,6 +3837,9 @@ class FP extends RiotApp {
     this.__api.push(url);
 
     if (opts.trigger) {
+      triggerText = opts.trigger.innerText;
+      opts.trigger.innerText = '';
+      opts.trigger.prepend(spin);
       opts.trigger.disabled = true;
     }
 
@@ -3850,7 +3858,7 @@ class FP extends RiotApp {
       }
       else {
         // this.log('api fail');
-        api.emit('fail', {
+        api.emit('error', {
           code: resp.errno || '',
           errmsg: resp.errmsg,
           url: url || ''
@@ -3869,13 +3877,20 @@ class FP extends RiotApp {
       // this.log('api complete');
       this.__api.splice(this.__api.indexOf(url), 1);
       if (opts.trigger) {
-        opts.trigger.disabled = false;
+        setTimeout(() => {
+          opts.trigger.disabled = false;
+          opts.trigger.innerText = triggerText;
+        }, 500);
       }
       api.emit('complete', url);
     });
 
     api.on('fail', e => {
       this.alert('接口错误:'+e.code+' '+e.errmsg+' '+e.url, 'error');
+    });
+
+    api.on('error', e => {
+      this.alert(e.errmsg, 'error');
     });
 
     return api;
