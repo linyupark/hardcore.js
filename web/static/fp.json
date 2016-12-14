@@ -78,14 +78,24 @@
           "save": "保存",
           "ok": "确定",
           "cancel": "取消",
+          "back": "返回",
           "close": "关闭"
         },
         "project": {
           "title": "项目管理",
           "add": "添加项目",
-          "filter:tab": [
-            {"name": "我的项目", "key": 1},
-            {"name": "所有项目", "key": 0}
+          "filter:range": [
+            {"name": "我的项目", "key": "my"},
+            {"name": "所有项目", "key": "all"}
+          ],
+          "filter:status": [
+            {"name": "全部", "key": ""},
+            {"name": "已立项", "key": 1},
+            {"name": "已到款", "key": 2},
+            {"name": "已评审", "key": 3},
+            {"name": "已审核", "key": 4},
+            {"name": "已确认", "key": 5},
+            {"name": "已关闭", "key": 6}
           ]
         },
         "donor": {
@@ -97,13 +107,13 @@
           "type": "捐赠方性质",
           "contact": "联络人",
           "tel": "联络电话",
+          "fax": "传真",
           "baseinfo": "基本信息",
           "company": "单位名称",
           "address": "单位地址",
           "head": "负责人",
-          "operator": "联络人",
           "head:name": "负责人姓名",
-          "operator:name": "联络人姓名",
+          "contact:name": "联络人姓名",
           "email": "邮箱",
           "website": "网站",
           "weibo": "微博",

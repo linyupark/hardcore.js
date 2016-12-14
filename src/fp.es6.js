@@ -52,21 +52,27 @@ class FP extends RiotApp {
     }).done(resp => {
       if (resp.errno == 0){
         // this.log('api done');
-        api.trap('done', resp.data || {});
+        api.emit('done', resp.data || {});
       }
       else {
+        // 403无权限
+        if(resp.errno == 403)
+          window.location.replace(`${this.config.routeBase}/admin-deny`);
+        // 401要求重新登录
+        if(resp.errno == 401)
+          window.location.replace(`${this.config.routeBase}/${this.config.lologinPage}?ref=${location.href}`);
         // this.log('api fail');
-        api.trap('error', {
+        api.emit('error', {
           code: resp.errno || '',
           errmsg: resp.errmsg,
           url: url || ''
         });
       }
     }).progress(p => {
-      api.trap('progress', p);
+      api.emit('progress', p);
     }).fail(status => {
       // this.log('api fail', status);
-      api.trap('fail', {
+      api.emit('fail', {
         code: status,
         errmsg: '',
         url: url
@@ -80,7 +86,7 @@ class FP extends RiotApp {
           opts.trigger.innerText = triggerText;
         }, 500);
       }
-      api.trap('complete', url);
+      api.emit('complete', url);
     });
 
     api.on('fail', e => {
@@ -100,6 +106,21 @@ class FP extends RiotApp {
     this.__timer = setTimeout(() => {
       this.emit('alert', msg, type);
     }, 500);
+  }
+
+  // 校验同名input-valid全部通过
+  validAll(validList) {
+    let promiseList = [];
+    validList.forEach(valid => {
+      promiseList.push(new this.Promise((resolve, reject) => {
+        valid.on('valid', () => {
+          resolve();
+        }).on('invalid', () => {
+          reject();
+        }).emit('check');
+      }));
+    });
+    return this.Promise.all(promiseList);
   }
 
   static detectEnv(env) {

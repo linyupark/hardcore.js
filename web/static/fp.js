@@ -620,16 +620,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
       emitter(this);
       this._resolve = function (value) {
-        _this.emit("resolve", value);
-        _this._emited_value = value;
-        _this.off("reject");
+        setTimeout(function () {
+          _this.emit("resolve", value);
+          _this._emited_value = value;
+          _this.off("reject");
+        }, 0);
       };
       if (rr.length === 1) {
         rr.call(this, this._resolve);
       } else {
         this._reject = function (reason) {
-          _this.emit("reject", reason);
-          _this.off("resolve");
+          setTimeout(function () {
+            _this.emit("reject", reason);
+            _this.off("resolve");
+          }, 0);
         };
         rr.call(this, this._resolve, this._reject);
       }
@@ -794,9 +798,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
-  if ("Promise" in window) {
-    Promise = window.Promise;
-  }
 
   var Loader = function () {
     function Loader() {
@@ -1090,12 +1091,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return Loader;
   }();
 
-  // https://github.com/riot/tmpl/blob/master/dist/es6.tmpl.js
-  // update: 2016/12/2
-
   /**
    * The riot template engine
-   * @version WIP
+   * @version v3.0.1
    */
   /**
    * riot.util.brackets
@@ -1317,11 +1315,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _riot_id: ctx && ctx._riot_id //eslint-disable-line camelcase
       };
 
-      if (_tmpl.errorHandler) _tmpl.errorHandler(err);
-
-      if (typeof console !== 'undefined' && typeof console.error === 'function') {
+      if (_tmpl.errorHandler) _tmpl.errorHandler(err);else if (typeof console !== 'undefined' && typeof console.error === 'function') {
         if (err.riotData.tagName) {
-          console.error('Riot template error thrown in the <%s> tag', err.riotData.tagName);
+          console.error('Riot template error thrown in the <%s> tag', err.riotData.tagName.toLowerCase());
         }
         console.error(err);
       }
@@ -1460,12 +1456,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return expr;
     }
 
-    _tmpl.version = brackets.version = 'WIP';
+    _tmpl.version = brackets.version = 'v3.0.1';
 
     return _tmpl;
   }();
 
-  // 3.0.2
+  // 3.0.3
 
   var __TAGS_CACHE = [];
   var __TAG_IMPL = {};
@@ -1766,6 +1762,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   var cssTextProp;
   var byName = {};
   var remainder = [];
+  var needsInject = false;
 
   // skip the following code on the server
   if (WIN) {
@@ -1798,6 +1795,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
     add: function add(css, name) {
       if (name) byName[name] = css;else remainder.push(css);
+      needsInject = true;
     },
 
     /**
@@ -1805,7 +1803,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * innerHTML seems slow: http://jsperf.com/riot-insert-style
      */
     inject: function inject() {
-      if (!WIN) return;
+      if (!WIN || !needsInject) return;
+      needsInject = false;
       var style = Object.keys(byName).map(function (k) {
         return byName[k];
       }).concat(remainder).join('\n');
@@ -2026,7 +2025,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   function updateExpression(expr) {
     var dom = expr.dom,
         attrName = expr.attr,
-        value = tmpl(expr.expr, this),
+        isToggle = /^(show|hide)$/.test(attrName),
+        value = isToggle || tmpl(expr.expr, this),
         isValueAttr = attrName === 'riot-value',
         isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
         parent = dom && (expr.parent || dom.parentNode),
@@ -2094,7 +2094,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     if (isFunction(value)) {
       setEventHandler(attrName, value, dom, this);
       // show / hide
-    } else if (/^(show|hide)$/.test(attrName)) {
+    } else if (isToggle) {
+      value = tmpl(expr.expr, extend({}, this, this.parent));
       if (attrName === 'hide') value = !value;
       dom.style.display = value ? '' : 'none';
       // field value
@@ -4041,8 +4042,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             api = this.emitter(),
             spin = document.createElement('i');
 
-        spin.setAttribute('class', 'icon-spin2');
-
         // 如果设定了发起请求的元素，则在请求完毕前禁用
         this.__api = this.__api || [];
         for (var i in this.__api) {
@@ -4058,6 +4057,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (opts.trigger) {
           triggerText = opts.trigger.innerText;
+          spin.setAttribute('class', 'icon-spin2');
           opts.trigger.innerText = '';
           opts.trigger.prepend(spin);
           opts.trigger.disabled = true;
@@ -4074,20 +4074,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }).done(function (resp) {
           if (resp.errno == 0) {
             // this.log('api done');
-            api.trap('done', resp.data || {});
+            api.emit('done', resp.data || {});
           } else {
+            // 403无权限
+            if (resp.errno == 403) window.location.replace(_this15.config.routeBase + '/admin-deny');
+            // 401要求重新登录
+            if (resp.errno == 401) window.location.replace(_this15.config.routeBase + '/' + _this15.config.lologinPage + '?ref=' + location.href);
             // this.log('api fail');
-            api.trap('error', {
+            api.emit('error', {
               code: resp.errno || '',
               errmsg: resp.errmsg,
               url: url || ''
             });
           }
         }).progress(function (p) {
-          api.trap('progress', p);
+          api.emit('progress', p);
         }).fail(function (status) {
           // this.log('api fail', status);
-          api.trap('fail', {
+          api.emit('fail', {
             code: status,
             errmsg: '',
             url: url
@@ -4101,7 +4105,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               opts.trigger.innerText = triggerText;
             }, 500);
           }
-          api.trap('complete', url);
+          api.emit('complete', url);
         });
 
         api.on('fail', function (e) {
@@ -4128,6 +4132,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.__timer = setTimeout(function () {
           _this16.emit('alert', msg, type);
         }, 500);
+      }
+
+      // 校验同名input-valid全部通过
+
+    }, {
+      key: 'validAll',
+      value: function validAll(validList) {
+        var _this17 = this;
+
+        var promiseList = [];
+        validList.forEach(function (valid) {
+          promiseList.push(new _this17.Promise(function (resolve, reject) {
+            valid.on('valid', function () {
+              resolve();
+            }).on('invalid', function () {
+              reject();
+            }).emit('check');
+          }));
+        });
+        return this.Promise.all(promiseList);
       }
     }], [{
       key: 'detectEnv',

@@ -1,10 +1,13 @@
 
 
 <!-- 警示信息 -->
-<alert show={message} class="{type}">
-  <p each={m in message}>
-    <i show={type=='error'} class="icon-cancel"></i>
-    <i show={type=='success'} class="icon-ok"></i>
+<alert class="{type}">
+  <style scoped>
+  .center{text-align: center;}
+  </style>
+  <p each={m in message} class="{center: message.length==1}">
+    <i show={type=='error'&&message.length==1} class="icon-cancel"></i>
+    <i show={type=='success'&&message.length==1} class="icon-ok"></i>
     <span>{m}</span>
   </p>
   <script>
@@ -15,6 +18,7 @@
   });
   _this.on('message', function(msg, type){
     var message = [];
+    _this.root.style.display = 'block';
     if(typeof msg === 'object'){
       for(var k in msg){
         message.push(k+':'+msg[k]);
@@ -25,6 +29,7 @@
     }
     clearTimeout(_this.timer);
     _this.timer = setTimeout(function(){
+      _this.root.style.display = 'none';
       _this.update({
         message: null,
         type: null
@@ -135,7 +140,7 @@
 </input-select>
 
 <!-- 弹出框 -->
-<modal show={open}>
+<modal>
   <style scoped>
   #modal-mask{
     position: fixed;
@@ -222,6 +227,7 @@
   _this.open = false;
   _this.fn = {
     close: function(){
+      _this.root.style.display = 'none';
       _this.update({
         open: false
       });
@@ -229,6 +235,7 @@
   };
   _this.on('open', function(){
     _this.open = true;
+    _this.root.style.display = 'block';
     document.addEventListener('keydown', function(e){
       if(e.keyCode == 27) _this.fn.close();
     }, {once: true});
@@ -294,7 +301,7 @@
 <!-- 输入内容校验 -->
 <input-valid>
 
-  <span show={message}>{message}</span>
+  <span>{message}</span>
 
   <script>
   // <input-valid
@@ -303,7 +310,7 @@
   //   rule='一些校验规则用, 分隔'
   //   reg='正则规则' flag='正则的flag'
   //   msg='如果不符合的报错信息'>
-  var _this = this, target = [], invalid = false;
+  var _this = this, target = [], invalid;
 
   this.on('mount', function(){
 
@@ -337,35 +344,53 @@
     }
 
     // 改变值得时候清空校验结果信息
+    var focusFn = function(){
+      _this.update({
+        message: ''
+      });
+    };
     for(var i in target){
-      target[i].addEventListener('focus', function(){
-        _this.update({
-          message: ''
-        })
-      }, false);
+      if(target[i] instanceof Array){
+        target[i].forEach(function(t){
+          t.addEventListener('focus', focusFn, false);
+        });
+      }
+      else{
+        target[i].addEventListener('focus', focusFn, false);
+      }
     }
   });
 
   _this.on('check', function(){
+
+    invalid = false;
+
     // 必填
     if(opts.rule.split(',').indexOf('required') !== -1){
       // console.log('check required');
       for(var i in target){
-        invalid = target[i].value.replace(/\s/g, '') === '';
+        if(target[i].value.replace(/\s/g, '') === '') invalid = true;
       }
     }
     // 数字
     if(!invalid && opts.rule.split(',').indexOf('number') !== -1){
       // console.log('check number');
       for(var i in target){
-        invalid = Number(target[i].value) != target[i].value;
+        if(Number(target[i].value) != target[i].value) invalid = true;
       }
     }
     // 正整数
     if(!invalid && opts.rule.split(',').indexOf('+int') !== -1){
       // console.log('check +int');
       for(var i in target){
-        invalid = parseInt(target[i].value, 10) < 1;
+        if(parseInt(target[i].value, 10) < 1) invalid = true;
+      }
+    }
+    // 邮箱
+    if(!invalid && opts.rule.split(',').indexOf('email') !== -1){
+      // console.log('email +int');
+      for(var i in target){
+        if(/[^@]+@[^@]+\.[^@]+/.test(target[i].value) === false) invalid = true;
       }
     }
     // 正则
@@ -503,15 +528,15 @@
 <pagination-number>
 
   <ul class="pagination">
-    <li show={hasPrevPage}>
+    <li if={hasPrevPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>1</a>
     </li>
-    <li show={hasPrevPage}>
+    <li if={hasPrevPage}>
       <a href="javascript:;" onclick={fn.prevPage}>
         &lt;
       </a>
     </li>
-    <li show={hasPrevSpan}>...</li>
+    <li if={hasPrevSpan}>...</li>
     <li each={p in prevPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
@@ -521,16 +546,16 @@
     <li each={p in nextPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
-    <li show={hasNextSpan}>...</li>
-    <li show={hasNextPage}>
+    <li if={hasNextSpan}>...</li>
+    <li if={hasNextPage}>
       <a href="javascript:;" onclick={fn.nextPage}>
         &gt;
       </a>
     </li>
-    <li show={hasNextPage}>
+    <li if={hasNextPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>{pages}</a>
     </li>
-    <li class="select" show={opts.select=='y'}>
+    <li class="select" if={opts.select=='y'}>
       跳转至
       <select onchange={fn.jumpPage}>
         <option each={p in pageList} value="{p}" selected={page==p}>{p}</option>

@@ -9,7 +9,7 @@
         <h2>{app.lang.admin.project.title}</h2>
         <!-- 我的项目、所有项目 -->
         <div class="table-tab">
-          <a href="javascript:;" onclick={fn.filterTab} each={filterTab} class={active:q.my==key}>{name}</a>
+          <a href="javascript:;" onclick={fn.filterRange} each={filterRange} class={active:q.range==key}>{name}</a>
         </div>
         <table-filter for="project">
           <yield to="addon">
@@ -32,11 +32,11 @@
   // 默认列表页
   _this.section = _this.app.route.params[1] || 'index';
   // 项目过滤(我的、全部)
-  _this.filterTab = _this.app.lang.admin.project['filter:tab'];
+  _this.filterRange = _this.app.lang.admin.project['filter:range'];
 
   _this.fn = {
-    filterTab: function(e){
-      _this.q.my = e.item.key;
+    filterRange: function(e){
+      _this.q.range = e.item.key;
       _this.app.query();
     }
   };
@@ -44,7 +44,7 @@
   this.on('mount', function(){
     if(_this.section === 'index'){
       // 默认显示我的项目
-      _this.q.my = _this.q.my || 1;
+      _this.q.range = _this.q.range || "my";
       _this.update();
     }
   });

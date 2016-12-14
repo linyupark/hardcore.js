@@ -131,12 +131,12 @@ main
 //
 // section
 //
-// +ani-fadein()
++ani-fadein()
 section
   +gridle(prefix 2.3 suffix 0.5)
   min-height: 700px
   overflow: hidden
-  // animation: fadeIn .5s
+  animation: fadeIn .1s
   h2
     font-weight: normal
     font-size: $font-s
@@ -215,6 +215,7 @@ admin-sidenav
 //
 input-select
   ul
+    z-index: 33
     max-height: 200px
     overflow: auto
     background: #fff
@@ -225,8 +226,21 @@ input-select
     border: 1px solid $color-line1
     border-bottom: none
     li
+      cursor: pointer
       padding: 8px
       border-bottom: 1px solid $color-line1
+      overflow: hidden
       &.active, &:hover
-        background: rgba(#F44C4C, .1)
+        background: #fbe0e0
         color: $color-main
+
+// modal
+modal
+  display: none
+
+// upload-formdata
+upload-formdata
+  input[type=file]
+    color: #ccc
+  button
+    +btn-3(25px)

@@ -57,6 +57,11 @@
 
 <!-- table筛选过滤 -->
 <table-filter>
+  <!-- 项目管理 -->
+  <div if={opts.for=='project'}>
+  按条件筛选：
+  <a class="tab-sub {active: app.route.query.status==key}" href="javascript:;" onclick={fn.tab} each={app.lang.admin.project['filter:status']}>{name}</a>
+  </div>
   <!-- 协议管理 -->
   <div if={opts.for=='agreement'}>
     {app.lang.admin.search.condition}:
@@ -73,6 +78,10 @@
   <script>
   var _this = this;
   _this.fn = {
+    tab: function(e){
+      _this.app.route.query.status = e.item.key;
+      _this.app.query();
+    },
     reset: function(){
       _this.app.route.query = {};
       _this.app.query();
@@ -94,6 +103,10 @@
     if(opts.for === 'agreement'){
       _this.type = _this.app.route.query.type;
       _this.keyword = _this.app.route.query.keyword;
+    }
+    if(opts.for === 'project'){
+      _this.app.route.query.status =
+      _this.app.route.query.status || '';
     }
     _this.update();
   });
@@ -129,9 +142,9 @@
         _this.app.route(_this.app.config.loginPage);
       });
     },
-    relogin: function(){
-      _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
-    },
+    // relogin: function(){
+    //   _this.app.route(_this.app.config.loginPage+'?ref='+location.href);
+    // },
     active: function(){
       clearTimeout(_this.timer);
       _this.active = true;
@@ -148,10 +161,10 @@
   _this.on('mount', function(){
 
     // 没有身份信息，要求重新登录
-    _this.role = _this.app.utils.cookie.get('role');
-    if(!_this.role){
-      return _this.fn.relogin();
-    }
+    // _this.role = _this.app.utils.cookie.get('role');
+    // if(!_this.role){
+    //   return _this.fn.relogin();
+    // }
 
     // 能从cookie获取到的就不读接口
     if(_this.app.utils.cookie.get('user_name')){
@@ -168,12 +181,11 @@
         _this.app.utils.cookie.set('user_id', data.user_id);
         _this.update();
       })
-      .off('fail').on('fail', function(){
-        _this.app.alert(_this.app.lang.login.relogin, 'warning');
-        _this.fn.relogin();
-      });
+      // .off('fail').on('fail', function(){
+      //   _this.app.alert(_this.app.lang.login.relogin, 'warning');
+      //   _this.fn.relogin();
+      // });
     }
-    _this.update();
 
   });
   </script>
@@ -247,7 +259,7 @@
 
   // 自定义信息
   _this.app.off('alert').on('alert', function(msg, type){
-    _this.app.log(msg);
+    // _this.app.log(msg);
     // 加载后
     _this.tags['alert'] &&
     _this.tags['alert'].emit('message', msg, type);

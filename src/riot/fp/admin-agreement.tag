@@ -132,19 +132,22 @@
       <br>
       <h4>附属信息</h4>
       <br>
-      <div class="c1">
-        <label class="top">附件上传</label>
-        <p>
-          <upload-formdata name="file[]"></upload-formdata>
-          <span>{fileUploadPercent}</span>
-          <br>
-          <span class="files" each={form.file}>
-            {file_name}
-            <a href="javascript:;" onclick="{fn.removeFile}">
-              <i style="margin-left: 0" class="icon-cancel"></i>
-            </a>
-          </span>
-        </p>
+      <div class="c2">
+        <div class="row">
+          <label class="top">附件上传</label>
+          <p>
+            <upload-formdata name="file[]"></upload-formdata>
+            &nbsp;&nbsp;<span style="font-size: 12px; color: #ccc">{fileUploadPercent}</span>
+          </p>
+          <p>
+            <span class="files" each={form.file}>
+              <a href="javascript:;" onclick="{fn.removeFile}">
+                <i style="margin-left: 0" class="icon-cancel"></i>
+              </a>
+              {file_name}
+            </span>
+          </p>
+        </div>
       </div>
       <div class="c1">
         <label class="top">协议录入人</label>
@@ -161,7 +164,7 @@
       <hr>
       <div class="c1 btn-line">
         <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
-        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.cancel}</button>
+        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
       </div>
     </form>
   </section>
@@ -179,20 +182,7 @@
   _this.fn = {
     save: function(e){
       // 检查信息
-      var promiseList = [];
-      for(var i in _this.refs.validOnSave){
-        promiseList.push(new _this.app.Promise(function(resolve, reject){
-          _this.refs.validOnSave[i]
-          .on('invalid', function(){
-            reject();
-          })
-          .on('valid', function(){
-            resolve();
-          })
-          .emit('check');
-        }));
-      }
-      _this.app.Promise.all(promiseList).then(function(){
+      _this.app.validAll(_this.refs.validOnSave).then(function(){
         // 检测通过, 整理数据
         var api, alumni_donations, project_type = [];
         if(_this.refs.alumni_donations[0].checked){
@@ -249,6 +239,7 @@
     // 勾选已经选中的项目类型
     checkProjectType: function(id){
       var checked = false;
+      if(!_this.form.project_type) return; // 避免没数据的时候报错
       _this.form.project_type.forEach(function(item){
         if(item.project_types_id == id) checked = true;
       });
@@ -449,7 +440,7 @@
           </tfoot>
         </table>
 
-        <pagination-number show={pages>1} page={page} pages={pages} select="y"/>
+        <pagination-number page={page} pages={pages} select="y"/>
       </section>
 
 

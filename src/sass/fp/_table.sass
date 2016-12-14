@@ -42,7 +42,18 @@ table-filter
   overflow: hidden
   div
     display: inline-block
-    margin: 8px 15px
+    margin: 5px 15px
+    line-height: 40px
+    .tab-sub
+      &:last-child
+        border: none
+      &.active
+        color: $color-main
+      line-height: 20px
+      height: 20px
+      padding: 0 10px
+      margin: 0
+      border-right: 1px solid $color-line1
     // 附加按钮靠右
     &.addon
       float: right
