@@ -909,8 +909,6 @@ form.agreement, form.donor {
   form.agreement p, form.donor p {
     padding-bottom: 10px;
     position: relative; }
-    form.agreement p.files-box, form.donor p.files-box {
-      background: #f5f5f5; }
     form.agreement p textarea, form.donor p textarea {
       width: 77%;
       border-color: #ebebeb;
