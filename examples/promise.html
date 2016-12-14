@@ -41,29 +41,29 @@
   //   console.log(error);
   // });
 
-  setTimeout(function(){
-    HC.Promise.resolve('resolved')
-    .then(function(result) {
-      console.log('Direct Resolved Promise.');
-      return new HC.Promise(function(resolve) {
-        setTimeout(function(){console.log("number"); resolve(123);}, 100);
-      });
-    }).then(function(result) {
-      console.log('Chained Resolved Promise.');
-      console.log(result);
-      return 1234;
-    }).then(function(num){
-      console.log(num);
-    })
-    .then(function(num){
-      return new HC.Promise(function(resolve) {
-        setTimeout(function(){console.log("number2"); resolve(456);}, 100);
-      });
-    })
-    .then(function(num){
-      console.log(num);
-    });
-  }, 2000);
+  // setTimeout(function(){
+  //   HC.Promise.resolve('resolved')
+  //   .then(function(result) {
+  //     console.log('Direct Resolved Promise.');
+  //     return new HC.Promise(function(resolve) {
+  //       setTimeout(function(){console.log("number"); resolve(123);}, 100);
+  //     });
+  //   }).then(function(result) {
+  //     console.log('Chained Resolved Promise.');
+  //     console.log(result);
+  //     return 1234;
+  //   }).then(function(num){
+  //     console.log(num);
+  //   })
+  //   .then(function(num){
+  //     return new HC.Promise(function(resolve) {
+  //       setTimeout(function(){console.log("number2"); resolve(456);}, 100);
+  //     });
+  //   })
+  //   .then(function(num){
+  //     console.log(num);
+  //   });
+  // }, 2000);
 
 
     // HC.Promise.reject(new Error('just a error')).catch(function(error) {
@@ -73,7 +73,7 @@
     //   console.log('Chained Resolved Promise.');
     //   console.log(result);
     // });
-    // //
+    //
     // HC.Promise.reject(new Error('just a error')).catch(function(error) {
     //   console.log('Direct Rejected Promise.');
     //   throw new Error('piped error.');
@@ -109,6 +109,23 @@
   // HC.Promise.resolve(HC.Promise.resolve(123)).then(function(result){
   //   console.log(result);
   // });
+  //
+  //
+  HC.Promise.all([
+    new HC.Promise(function(r,rj){
+      r()
+    }),
+    new HC.Promise(function(r,rj){
+      rj()
+    }),
+    new HC.Promise(function(r,rj){
+      r()
+    })
+  ]).then(function(){
+    console.log('ok');
+  }).catch(function(){
+    console.log('failed');
+  })
   </script>
 </body>
 </html>

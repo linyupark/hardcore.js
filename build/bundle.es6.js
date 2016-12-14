@@ -596,16 +596,20 @@ let EmitterPromise = class {
     }
     emitter(this);
     this._resolve = (value) => {
-      this.emit("resolve", value);
-      this._emited_value = value;
-      this.off("reject");
+      setTimeout(() => {
+        this.emit("resolve", value);
+        this._emited_value = value;
+        this.off("reject");
+      }, 0);
     };
     if (rr.length === 1) {
       rr.call(this, this._resolve);
     } else {
       this._reject = (reason) => {
-        this.emit("reject", reason);
-        this.off("resolve");
+        setTimeout(() => {
+          this.emit("reject", reason);
+          this.off("resolve");
+        }, 0);
       };
       rr.call(this, this._resolve, this._reject);
     }
@@ -719,9 +723,6 @@ let EmitterPromise = class {
 
 // 当支持原生promise的时候Promise替换成原生
 Promise = EmitterPromise;
-if ("Promise" in window) {
-  Promise = window.Promise;
-}
 
 class Loader {
 

@@ -701,16 +701,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
       emitter(this);
       this._resolve = function (value) {
-        _this2.emit("resolve", value);
-        _this2._emited_value = value;
-        _this2.off("reject");
+        setTimeout(function () {
+          _this2.emit("resolve", value);
+          _this2._emited_value = value;
+          _this2.off("reject");
+        }, 0);
       };
       if (rr.length === 1) {
         rr.call(this, this._resolve);
       } else {
         this._reject = function (reason) {
-          _this2.emit("reject", reason);
-          _this2.off("resolve");
+          setTimeout(function () {
+            _this2.emit("reject", reason);
+            _this2.off("resolve");
+          }, 0);
         };
         rr.call(this, this._resolve, this._reject);
       }
@@ -875,9 +879,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   // 当支持原生promise的时候Promise替换成原生
   Promise = EmitterPromise;
-  if ("Promise" in window) {
-    Promise = window.Promise;
-  }
 
   var Loader = function () {
     function Loader() {
