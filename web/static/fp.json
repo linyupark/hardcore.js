@@ -94,9 +94,20 @@
           "add": "添加内容",
           "edit": "编辑内容",
           "name": "捐赠方",
-          "type": "类型",
+          "type": "捐赠方性质",
           "contact": "联络人",
-          "tel": "联络电话"
+          "tel": "联络电话",
+          "baseinfo": "基本信息",
+          "company": "单位名称",
+          "address": "单位地址",
+          "head": "负责人",
+          "operator": "联络人",
+          "head:name": "负责人姓名",
+          "operator:name": "联络人姓名",
+          "email": "邮箱",
+          "website": "网站",
+          "weibo": "微博",
+          "members": "成员信息"
         },
         "agreement": {
           "add": "添加协议",

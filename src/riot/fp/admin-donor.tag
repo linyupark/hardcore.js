@@ -19,18 +19,85 @@
           </p>
           <!-- 类型 -->
           <p>
-            <label>{app.lang.admin.donor.type}*</label>
-            <input type="text" ref="donor_type" value="{form.donor_type}" placeholder="{app.lang.admin.form.req}">
-            <input-valid ref="validOnSave" for="donor_type" rule="required" msg="{app.lang.admin.donor.type}{app.lang.admin.form.req}"/>
+            <label>{app.lang.admin.donor.type}</label>
+            <select ref="donor_type">
+              <option each={donorNature} selected={key==form.type}  value={key}>{name}</option>
+            </select>
+          </p>
+        </div>
+        <div class="row">
+          <!-- 单位名称 -->
+          <p>
+            <label>{app.lang.admin.donor.company}</label>
+            <input type="text" ref="company" value="{form.company}" placeholder="">
+          </p>
+          <!-- 单位地址 -->
+          <p>
+            <label>{app.lang.admin.donor.address}</label>
+            <input type="text" ref="address" value="{form.address}" placeholder="">
+          </p>
+        </div>
+        <div class="row">
+          <!-- 网站 -->
+          <p>
+            <label>{app.lang.admin.donor.website}</label>
+            <input type="text" ref="website" value="{form.website}" placeholder="">
+          </p>
+          <!-- 微博 -->
+          <p>
+            <label>{app.lang.admin.donor.weibo}</label>
+            <input type="text" ref="weibo" value="{form.weibo}" placeholder="">
           </p>
         </div>
       </div>
+      <!-- 负责人 -->
+      <div class="row">
+        <p>
+          <label>{app.lang.admin.donor.head}</label>
+          <input type="text" ref="head" value="{form.head}" placeholder="{app.lang.admin.donor['head:name']}">
+          &nbsp;
+          <input type="text" ref="head_tel" value="{form.head_tel}" placeholder="{app.lang.admin.donor.tel}">
+        </p>
+      </div>
+      <!-- 联络人 -->
+      <div class="row">
+        <p>
+          <label>{app.lang.admin.donor.operator}</label>
+          <input type="text" ref="operator" value="{form.operator}" placeholder="{app.lang.admin.donor['operator:name']}">
+          &nbsp;
+          <input type="text" ref="operator_tel" value="{form.operator_tel}" placeholder="{app.lang.admin.donor.tel}">
+        </p>
+      </div>
+      <hr>
+      <br>
+      <!-- 成员信息 -->
+      <h4>{app.lang.admin.donor.members}</h4>
+      <br>
     </form>
   </section>
 
   <script>
   var _this = this;
+  _this.q = _this.app.route.query;
+  _this.form_id = _this.app.route.params[2] || 0;
+  _this.donorNature = _this.app.lang.admin.agreement['donor:nature:list'];
   _this.form = {};
+  _this.fn = {
+    // 获取捐赠方信息
+    getDonor: function(id){
+      _this.app.api('GET', 'donor/default/update', {
+        data: {id: id}
+      }).on('done', function(data){
+        _this.form = data;
+        _this.update();
+      });
+    }
+  };
+  _this.on('mount', function(){
+    if(_this.form_id){
+      _this.fn.getDonor(_this.form_id);
+    }
+  });
   </script>
 </donor-form>
 

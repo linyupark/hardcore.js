@@ -261,7 +261,7 @@
           page: 1
         }
       }).on('done', function(data){
-        _this.projectType = data.items;
+        _this.update({projectType: data.items});
       });
     },
     removePrice: function(e){

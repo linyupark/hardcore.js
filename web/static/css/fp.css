@@ -902,6 +902,9 @@ form.agreement, form.donor {
       height: 38px;
       margin-right: 20px;
       line-height: 38px; }
+    form.agreement label.top, form.donor label.top {
+      float: left;
+      padding-top: 18px; }
   form.agreement p, form.donor p {
     padding-bottom: 10px;
     position: relative; }
@@ -938,10 +941,6 @@ form.agreement, form.donor {
       form.agreement .c1.btn-line button, form.donor .c1.btn-line button {
         width: 100px;
         margin-right: 20px; }
-    form.agreement .c1 .top, form.donor .c1 .top {
-      width: 66px;
-      float: left;
-      padding-top: 16px; }
     form.agreement .c1 .line, form.donor .c1 .line {
       width: 91.66667%; }
     form.agreement .c1 .price-group, form.donor .c1 .price-group {
