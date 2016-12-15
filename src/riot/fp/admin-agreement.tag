@@ -20,10 +20,8 @@
         <div class="row">
           <!-- 捐赠方 -->
           <p>
-            <label class="center">{app.lang.admin.agreement.donor}</label>
-            <input-select name="donor_name" ref="donor_name" placehoder={app.lang.admin.agreement['donor:select']} value="{form.donor.donor_name}"></input-select>
-            <input type="hidden" ref="donor_id" value="{form.donor.id}">
-            <input-valid ref="validOnSave" for="donor_id" rule="required" msg="请选择捐赠方"/>
+            <label>{app.lang.admin.agreement.donor}</label>
+            <donor-select ref="donor"/>
           </p>
           <!-- 捐赠方性质 -->
           <p>
@@ -182,7 +180,9 @@
   _this.fn = {
     save: function(e){
       // 检查信息
-      _this.app.validAll(_this.refs.validOnSave).then(function(){
+      _this.app.validAll(
+        _this.refs.validOnSave.concat(_this.refs.donor)
+      ).then(function(){
         // 检测通过, 整理数据
         var api, alumni_donations, project_type = [];
         if(_this.refs.alumni_donations[0].checked){
@@ -208,7 +208,7 @@
             data: JSON.stringify({
               agreement_number: _this.refs.agreement_number.value,
               agreement_name: _this.refs.agreement_name.value,
-              donor_id: _this.refs.donor_id.value,
+              donor_id: _this.refs.donor.getId(),
               deadline: parseInt(_this.refs.deadline.value, 10),
               contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
               due_date: _this.app.utils.str2time(_this.refs.due_date.value),
@@ -245,16 +245,6 @@
       });
       return checked;
     },
-    // 获取项目类型
-    projectType: function(){
-      _this.app.api('GET', 'system-setting/project-type/index', {
-        data: {
-          page: 1
-        }
-      }).on('done', function(data){
-        _this.update({projectType: data.items});
-      });
-    },
     removePrice: function(e){
       _this.form.price.splice(_this.form.price.indexOf(e.item.p), 1);
     },
@@ -269,23 +259,6 @@
         _this.refs.addPriceType.value = 'CNY';
         _this.update();
       }).emit('check');
-    },
-    donorList: function(keyword){
-      // 清空校验错误信息
-      // NOTE: 这里强制用了index来指定input-valid
-      _this.refs.validOnSave[2].emit('msg', '');
-      if(_this.cache[keyword]){
-        return _this.tags['input-select'].emit('push', _this.cache[keyword]);
-      }
-      // 获取捐赠方列表
-      _this.app.api('GET', 'donor/default/search', {
-        data: {
-          keyword: keyword
-        }
-      }).on('done', function(data){
-        _this.cache[keyword] = data.items;
-        _this.tags['input-select'].emit('push', data.items);
-      });
     },
     currencyCode: function(){
       // 货币种类
@@ -316,25 +289,22 @@
         _this.form.file = data.file || [];
         _this.form.price = data.price || [];
         _this.form.project_type = data.project_type || [];
-        // 刷新捐赠方的显示名字
-        _this.refs.donor_name.emit('value', data.donor.donor_name);
+        // 设置捐赠方
+        _this.refs.donor.emit('set', {
+          id: _this.form.donor.id,
+          name: _this.form.donor.donor_name
+        });
         _this.update();
       });
     }
     // 加载日期选择
     _this.app.addResource('my97');
-    // 请求捐赠方数据
-    _this.tags['input-select'].on('pull', _this.fn.donorList);
-    // 选择了捐赠方
-    _this.tags['input-select'].on('select', function(item){
-      // _this.app.log('donor select:', item);
-      _this.refs.donor_id.value = _this.form.donor.id = item.id;
-      _this.form.donor.donor_name = item.donor_name;
-    });
     // 货币种类信息
     _this.fn.currencyCode();
     // 项目类型
-    _this.fn.projectType();
+    _this.app.getProjectTypeList(function(data){
+      _this.update({projectType: data});
+    });
     // 附件上传
     _this.tags['upload-formdata'].on('post', function(fd){
       _this.app.api('POST', 'agreement/default/upload-file', {

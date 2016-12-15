@@ -1,3 +1,119 @@
+<!-- 职务查询 -->
+<place-select>
+  <input-select name="place_name" ref="place_name" placehoder="搜索选择" value=""/>
+  <input type="hidden" ref="place_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validPlace" for="place_id" rule="required" msg="请选择职务"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.place_id.value;
+  };
+  _this.on('mount', function(){
+    // 请求职务数据
+    _this.refs.place_name.on('pull', function(keyword){
+      _this.refs.validPlace.emit('msg', '');
+      if(_this.keywordCache[keyword]){
+        return _this.refs.place_name.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'system-setting/place/search', {
+        data: { keyword: keyword }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.place_name.emit('push', data.items);
+      });
+
+    });
+    // 选择了职务
+    _this.refs.place_name.on('select', function(item){
+      _this.refs.place_id.value = item.id || '';
+      _this.refs.place_name.value = item.place_name || '';
+    });
+  });
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validPlace
+    .on('valid', function(){
+      _this.emit('valid');
+    }).on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(place){
+    _this.refs.place_id.value = place.id;
+    _this.refs.place_name.value = place.name;
+    _this.refs.place_name.emit('value', place.name);
+  });
+  </script>
+</place-select>
+
+
+<!-- 捐赠方下拉选择 -->
+<donor-select>
+  <input-select name="donor_name" ref="donor_name" placehoder="搜索选择" value=""/>
+  <input type="hidden" ref="donor_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.donor_id.value;
+  };
+  _this.on('mount', function(){
+
+    // 请求捐赠方数据
+    _this.refs.donor_name.on('pull', function(keyword){
+
+      _this.refs.validDonor.emit('msg', '');
+
+      if(_this.keywordCache[keyword]){
+        return _this.refs.donor_name.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+
+      _this.app.api('GET', 'donor/default/search', {
+        data: { keyword: keyword }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.donor_name.emit('push', data.items);
+      });
+
+    });
+
+    // 选择了捐赠方
+    _this.refs.donor_name.on('select', function(item){
+      _this.refs.donor_id.value = item.id || '';
+      _this.refs.donor_name.value = item.donor_name || '';
+    });
+  });
+
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validDonor
+    .on('valid', function(){
+      _this.emit('valid');
+    }).on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(donor){
+    _this.refs.donor_id.value = donor.id;
+    _this.refs.donor_name.value = donor.name;
+    _this.refs.donor_name.emit('value', donor.name);
+  })
+  </script>
+</donor-select>
+
+
 <!-- 侧栏导航 -->
 <admin-sidenav>
   <style scoped>
@@ -54,13 +170,12 @@
   </script>
 </admin-sidenav>
 
-
 <!-- table筛选过滤 -->
 <table-filter>
   <!-- 项目管理 -->
   <div if={opts.for=='project'}>
   按条件筛选：
-  <a class="tab-sub {active: app.route.query.status==key}" href="javascript:;" onclick={fn.tab} each={app.lang.admin.project['filter:status']}>{name}</a>
+  <a class="tab-sub {active: app.route.query.status==key}" href="javascript:;" onclick={fn.tab} each={projectStatusList}>{name}</a>
   </div>
   <!-- 协议管理 -->
   <div if={opts.for=='agreement'}>
@@ -77,6 +192,9 @@
   </div>
   <script>
   var _this = this;
+  _this.projectStatusList = [{
+    name: "全部", key: "all"
+  }].concat(_this.app.lang.admin.project['filter:status']);
   _this.fn = {
     tab: function(e){
       _this.app.route.query.status = e.item.key;
@@ -112,7 +230,6 @@
   });
   </script>
 </table-filter>
-
 
 <!-- 用户信息 -->
 <userinfo>
@@ -186,17 +303,10 @@
       //   _this.fn.relogin();
       // });
     }
-
+    _this.update();
   });
   </script>
-
 </userinfo>
-
-
-
-
-
-
 
 
 <footer>
@@ -211,11 +321,6 @@
     </p>
   </div>
 </footer>
-
-
-
-
-
 
 
 <header class="{opts.for}">

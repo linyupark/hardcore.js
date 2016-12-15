@@ -82,20 +82,34 @@
           "close": "关闭"
         },
         "project": {
+          "id": "序号",
+          "number": "项目编号",
           "title": "项目管理",
+          "name": "项目名称",
+          "type": "项目类型",
+          "amount": "总金额",
+          "status": "项目状态",
+          "createAt": "创建日期",
           "add": "添加项目",
+          "isPublic": "是否公开",
+          "formTab": [
+            {"name": "项目资料", "key": "baseinfo"},
+            {"name": "关联协议", "key": "agreements"},
+            {"name": "到款记录", "key": "cashLog"},
+            {"name": "项目进度", "key": "statusProgress"}
+          ],
           "filter:range": [
             {"name": "我的项目", "key": "my"},
             {"name": "所有项目", "key": "all"}
           ],
           "filter:status": [
-            {"name": "全部", "key": ""},
-            {"name": "已立项", "key": 1},
+            {"name": "已关闭", "key": 0},
+            {"name": "执行中", "key": 1},
             {"name": "已到款", "key": 2},
             {"name": "已评审", "key": 3},
             {"name": "已审核", "key": 4},
             {"name": "已确认", "key": 5},
-            {"name": "已关闭", "key": 6}
+            {"name": "已发放", "key": 6}
           ]
         },
         "donor": {

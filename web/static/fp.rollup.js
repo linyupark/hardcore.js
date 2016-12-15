@@ -3924,6 +3924,60 @@ class FP extends RiotApp {
     }, 500);
   }
 
+  // 组织机构列表
+  getOrgList(cb, pid=0){
+    this.api('GET', 'system-setting/organization/index', {
+      data: {parent_id: pid}
+    })
+    .on('done', data => {
+      cb(data.items);
+    });
+  }
+
+  // 获取捐赠方类型
+  getNatureName(type) {
+    let name;
+    this.lang.admin.agreement['donor:nature:list']
+    .forEach((item) => {
+      if(item.key == type) name = item.name;
+    });
+    return name || '';
+  }
+
+  // 项目类型列表
+  getProjectTypeList(cb){
+    if(this.data.projectTypeList)
+      return cb(this.data.projectTypeList);
+    this.api('GET', 'system-setting/project-type/index')
+    .on('done', data => {
+      this.data.projectTypeList = data.items;
+      cb(this.data.projectTypeList);
+    });
+  }
+
+  // 项目类型名称
+  getProjectType(type){
+    let name;
+    this.getProjectTypeList(data => {
+      data.forEach(item => {
+        if(item.id == type){
+          name = item.name;
+        }
+      });
+    });
+    return name || '-';
+  }
+
+  // 项目状态
+  getProjectStatus(status) {
+    let name;
+    this.lang.admin.project['filter:status']
+    .forEach((item) => {
+      if(item.key == status) name = item.name;
+    });
+    return name || '';
+  }
+
   // 校验同名input-valid全部通过
   validAll(validList) {
     let promiseList = [];

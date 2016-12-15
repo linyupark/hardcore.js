@@ -1,3 +1,231 @@
+<!-- 关联协议 -->
+<project-agreement>
+
+</project-agreement>
+
+
+<!-- 项目资料 -->
+<project-form>
+  <section>
+    <h2>
+      {app.lang.admin.project.title} &gt;
+      <span if={key==parent.formTab} each={formTabList}>{name}</span>
+    </h2>
+    <form class="project" onsubmit="return false;" onkeypress="return false">
+      <div class="top-tab-line">
+        <a href="javascript:;" onclick={fn.tabChange} class="c4 {active: key==parent.formTab}" each={formTabList}>{name}</a>
+      </div>
+      <h4>基本信息</h4>
+      <div class="c2">
+        <div class="row">
+          <!-- 项目名称 -->
+          <p>
+            <label>{app.lang.admin.project.name}</label>
+            <input type="text" ref="name" value="{project.baseinfo.name}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="name" rule="required" msg="{app.lang.admin.project.name}{app.lang.admin.form.req}"/>
+          </p>
+          <!-- 项目编号 -->
+          <p>
+            <label>{app.lang.admin.project.number}</label>
+            <input type="text" ref="number" value="{project.baseinfo.number}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="number" rule="required" msg="{app.lang.admin.project.number}{app.lang.admin.form.req}"/>
+          </p>
+        </div>
+        <div class="row">
+          <!-- 项目类型 -->
+          <p>
+            <label>{app.lang.admin.project.type}</label>
+            <select ref="project_type">
+              <option each={app.data.projectTypeList} selected={key==project.baseinfo.project_types_id}  value={id}>{name}</option>
+            </select>
+          </p>
+          <!-- 项目状态 -->
+          <p>
+            <label>{app.lang.admin.project.status}</label>
+            <select ref="status">
+              <option each={app.lang.admin.project['filter:status']} selected={key==project.baseinfo.status}  value={key}>{name}</option>
+            </select>
+          </p>
+        </div>
+        <div class="row">
+          <!-- 项目金额 -->
+          <p>
+            <label>{app.lang.admin.project.amount}</label>
+            <input type="text" ref="amount" value="{project.baseinfo.amount}" placeholder="{app.lang.admin.form.req}">
+            <input-valid ref="validOnSave" for="amount" rule="number" msg="{app.lang.admin.project.amount}{app.lang.admin.form.req}"/>
+          </p>
+          <!-- 是否公开 -->
+          <p>
+            <label>{app.lang.admin.project.isPublic}</label>
+            <label class="radio">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==1}> {app.lang.yes}
+            </label>
+            <label class="radio">
+              <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==0}>
+              {app.lang.no}
+            <label>
+          </p>
+        </div>
+      </div>
+      <!-- 项目简介 -->
+      <div class="c1">
+        <label class="top">项目简介</label>
+        <p>
+          <textarea ref="description">{project.baseinfo.description}</textarea>
+        </p>
+      </div>
+      <hr>
+      <br>
+      <h4>执行信息</h4>
+      <div class="row c4">
+        <!-- 部门单位 -->
+        <p>
+          <label>部门单位</label>
+          <input-select name="name" ref="organization_name" placehoder="请选择" value="{project.baseinfo.organization_name}"/>
+          <input type="hidden" ref="organization_id" value="{project.baseinfo.organization_id}">
+        </p>
+      </div>
+      <div class="row c4">
+        <!-- 负责人 -->
+        <p>
+          <label>负责人</label>
+          <input type="text" ref="head_name" placeholder="姓名" value="{project.baseinfo.head_name}">
+          &nbsp;
+          <input type="text" ref="head_tel" placeholder="电话" value="{project.baseinfo.head_tel}">
+          &nbsp;
+          <input type="text" ref="head_email" placeholder="邮箱" value="{project.baseinfo.head_email}">
+          <input-valid ref="validOnSave" for="head_name,head_tel,head_email" rule="required" msg="请填写负责人的姓名、电话、邮箱"/>
+          <input-valid style="left: 445px" ref="validOnSave" for="head_email" rule="email" msg="邮箱格式不正确"/>
+        </p>
+      </div>
+      <div class="row c4">
+        <!-- 联络人 -->
+        <p>
+          <label>联络人</label>
+          <input type="text" ref="contact_name" placeholder="姓名" value="{project.baseinfo.contact_name}">
+          &nbsp;
+          <input type="text" ref="contact_tel" placeholder="电话" value="{project.baseinfo.contact_tel}">
+          &nbsp;
+          <input type="text" ref="contact_email" placeholder="邮箱" value="{project.baseinfo.contact_email}">
+          <input-valid ref="validOnSave" for="contact_name,contact_tel,contact_email" rule="required" msg="请填写联络人的姓名、电话、邮箱"/>
+          <input-valid style="left: 445px" ref="validOnSave" for="contact_email" rule="email" msg="邮箱格式不正确"/>
+        </p>
+      </div>
+      <hr>
+      <br>
+      <div class="c1 btn-line">
+        <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+  var _this = this;
+  _this.q = _this.app.route.query;
+  // 页面tab列表
+  _this.formTabList = _this.app.lang.admin.project.formTab;
+  // 当前tab（默认为列表第一页）
+  _this.formTab = _this.q.tab || _this.formTabList[0].key;
+  // 项目相关数据
+  _this.project = {
+    id: _this.app.route.params[2] || 0,
+    baseinfo: {
+      is_public: 1
+    }
+  };
+  _this.fn = {
+    save: function(e){
+      // 修改添加基础信息
+      if(_this.formTab === 'baseinfo'){
+        _this.app.validAll(_this.refs.validOnSave)
+        .then(function(){
+          if(_this.project.id > 0){
+            api = 'project/default/base-info-update?id=' + _this.project.id;
+          }
+          else{
+            api = 'project/default/base-info-create';
+          }
+          _this.app.api('POST', api, {
+            data: {
+              data: JSON.stringify({
+                name: _this.refs.name.value,
+                number: _this.refs.number.value,
+                project_types_id: _this.refs.project_type.value,
+                status: _this.refs.status.value,
+                amount: _this.refs.amount.value,
+                is_public: _this.refs.is_public[0].checked ? 1 : 0,
+                description: _this.refs.description.value,
+                organization_id: _this.refs.organization.value,
+                contact_name: _this.refs.contact_name.value,
+                contact_tel: _this.refs.contact_tel.value,
+                contact_email: _this.refs.contact_email.value,
+                head_name: _this.refs.head_name.value,
+                head_tel: _this.refs.head_tel.value,
+                head_email: _this.refs.head_email.value
+              })
+            }
+          }).on('done', function(data){
+            _this.app.alert('项目资料保存成功', 'success');
+          });
+        })
+        .catch(function(){
+          _this.app.alert('请检查表单', 'warning');
+        });
+      }
+    },
+    // 返回
+    cancel: function(){
+      _this.app.route(_this.app.route.params[0]);
+    },
+    tabChange: function(e){
+      // 切换顶tab
+      _this.q.tab = e.item.key;
+      _this.app.query();
+    }
+  };
+  _this.on('mount', function(){
+    // 项目资料
+    if(_this.formTab === 'baseinfo'){
+      // 请求组织机构信息
+      _this.refs.organization_name.on('pull', function(){
+        _this.app.getOrgList(function(list){
+          _this.refs.organization_name.emit('push', list);
+        }, 0);
+      });
+      // 选择了组织机构
+      _this.refs.organization_name.on('select', function(item){
+        _this.app.getOrgList(function(list){
+          if(list.length > 0){
+            // 二级
+            _this.refs.organization_name2.emit('push', list);
+          }
+        }, item.id);
+      });
+      // 查询基本信息
+      if(_this.project.id > 0){
+        _this.app.getProjectTypeList(function(){
+          _this.app.getOrgList(function(){
+            _this.app.api('GET', 'project/default/base-info', {
+              data: { id: _this.project.id }
+            }).on('done', function(data){
+              _this.project.baseinfo = data;
+              _this.update();
+            });
+          });
+        });
+      }
+    }
+  });
+  </script>
+</project-form>
+
+
+
+
+
+<!-- 项目资料列表 -->
 <fp-admin-project>
 
   <header for="admin"></header>
@@ -5,6 +233,8 @@
   <main class="admin">
     <div class="container">
       <admin-sidenav></admin-sidenav>
+      <project-form if={section=='add'}/>
+      <project-form if={section=='edit'}/>
       <section if={section=='index'}>
         <h2>{app.lang.admin.project.title}</h2>
         <!-- 我的项目、所有项目 -->
@@ -18,6 +248,57 @@
             </button>
           </yield>
         </table-filter>
+
+        <table class="base">
+          <thead>
+            <tr>
+              <th width="10%">{app.lang.admin.project.id}</th>
+              <th width="10%">{app.lang.admin.project.number}</th>
+              <th width="30%">{app.lang.admin.project.name}</th>
+              <th width="10%">{app.lang.admin.project.type}</th>
+              <th width="10%">{app.lang.admin.project.amount}</th>
+              <th width="10%">{app.lang.admin.project.status}</th>
+              <th width="10%">{app.lang.admin.project.createAt}</th>
+              <th width="10%">{app.lang.admin.handle}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr each={tableList}>
+              <td>{id}</td>
+              <td>{number}</td>
+              <td class="left">{name}</td>
+              <td>{app.getProjectType(project_types_id)}</td>
+              <td>{amount}</td>
+              <td>{app.getProjectStatus(status)}</td>
+              <td>{createAt&&app.utils.time2str(createAt)||'-'}</td>
+              <td>
+                <a href="javascript:;" aria-label="{app.lang.admin.handles.view}" class="c-tooltip--top">
+                  <i onclick={fn.edit}  class="btn-icon icon-menu"></i>
+                </a>
+                <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
+                  <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
+                </a>
+                <a href="javascript:;" aria-label="{app.lang.admin.handles.remove}" class="c-tooltip--top">
+                  <i onclick={fn.remove}  class="btn-icon icon-trash"></i>
+                </a>
+              </td>
+            </tr>
+            <tr if={!tableList}>
+              <td colspan="6"><spinner-dot/></td>
+            </tr>
+          </tbody>
+          <tfoot if={tableList}>
+            <tr>
+              <td class="left" colspan="8">
+                {app.lang.admin.counts.items}
+                <b>{items}</b>
+                {app.lang.admin.counts.unit}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <pagination-number page={page} pages={pages} select="y"/>
 
       </section>
     </div>
@@ -33,19 +314,53 @@
   _this.section = _this.app.route.params[1] || 'index';
   // 项目过滤(我的、全部)
   _this.filterRange = _this.app.lang.admin.project['filter:range'];
-
   _this.fn = {
+    // 添加项目
+    add: function(){
+      _this.app.route(_this.app.route.path + '/add');
+    },
+    // 编辑项目
+    edit: function(e){
+      _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
+    },
     filterRange: function(e){
       _this.q.range = e.item.key;
       _this.app.query();
+    },
+    getProjectList: function(){
+      // all: 全部、0已关闭、1执行中、2已到款、3已评审、4已审核、5已确认、6已发放
+      _this.app.api('GET', 'project/default/' + _this.q.range, {
+        data: {
+          condition: _this.q.status == 'all' ? '' : _this.q.status
+        }
+      })
+      .on('done', function(data){
+        _this.update({
+          tableList: data.items,
+          page: data.counts.page,
+          pages: data.counts.total_page,
+          items: data.counts.total_items
+        });
+        _this.tags['pagination-number'].emit('render');
+      });
     }
   };
 
   this.on('mount', function(){
     if(_this.section === 'index'){
       // 默认显示我的项目
-      _this.q.range = _this.q.range || "my";
-      _this.update();
+      _this.q.range = _this.q.range || 'my';
+      // 默认过滤为全部
+      _this.q.status = _this.q.status || 'all';
+      // 分页
+      _this.tags['pagination-number'].on('change', function(n){
+        _this.q.page = n;
+        _this.app.query();
+      });
+      // 项目类型需要先从接口获取，因此列表接口是回调载入
+      _this.app.getProjectTypeList(function(){
+        _this.fn.getProjectList();
+      });
     }
   });
 

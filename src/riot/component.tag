@@ -63,7 +63,7 @@
       onclick={fn.pull}
       onkeyup={fn.keyup}
       onblur={fn.blur}>
-    <ul show={items&&items.length > 0}>
+    <ul if={items&&items.length > 0}>
       <li each={item, i in items} class="{active: i==selectIndex-1}" onclick={fn.select}>
         {item[parent.opts.name]}
       </li>
@@ -85,11 +85,13 @@
           _this.selectIndex = 0;
           e.target.value = '';
           delete _this.items;
+          _this.emit("select", _this.selected);
           _this.update();
         }
       }, 100);
     },
     pull: function(e){
+      e.target.value = '';
       _this.emit('pull', e.target.value);
     },
     select: function(e){

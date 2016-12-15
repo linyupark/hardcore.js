@@ -93,9 +93,8 @@
           <label>成员{i+1}</label>
           <input type="text" value="{m.username}" placeholder="姓名">
           &nbsp;
-          <select>
-            <option value="{id}" each={placeList} selected="{id==m.place_id}">{place_name}</option>
-          </select>
+          <!-- 职务 -->
+          <place-select ref="place_{i}"/>
           &nbsp;
           <input type="text" value="{m.tel}" placeholder="电话">
           &nbsp;
@@ -110,9 +109,8 @@
         <label>成员{form.donor_member.length+1}</label>
         <input type="text" ref="member_username" placeholder="姓名">
         &nbsp;
-        <select ref="member_place">
-          <option value="{id}" each={placeList}>{place_name}</option>
-        </select>
+        <!-- 职务 -->
+        <place-select ref="member_place" left="255"/>
         &nbsp;
         <input type="text" ref="member_tel" placeholder="电话">
         &nbsp;
@@ -120,8 +118,8 @@
         <a href="javascript:;" onclick={fn.addMember} class="c-tooltips--top" aria-label="添加">
           <i class="icon-plus"></i>
         </a>
-        <input-valid ref="validOnAddMember" for="member_username,member_place,member_tel" rule="required" msg="请填写该成员的姓名、职务、电话"/>
-        <input-valid style="left: 610px" ref="validOnAddMember" for="member_email" rule="email" msg="邮箱格式不正确"/>
+        <input-valid ref="validOnAddMember" for="member_username,member_tel" rule="required" msg="请填写该成员的姓名、电话"/>
+        <input-valid style="left: 625px" ref="validOnAddMember" for="member_email" rule="email" msg="邮箱格式不正确"/>
         </p>
       </div>
       <hr>
@@ -130,6 +128,9 @@
         <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
         <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
       </div>
+
+      <br><br>
+      <br><br>
     </form>
   </section>
 
@@ -138,8 +139,6 @@
   _this.q = _this.app.route.query;
   _this.form_id = _this.app.route.params[2] || 0;
   _this.donorNature = _this.app.lang.admin.agreement['donor:nature:list'];
-  // 职务列表
-  _this.placeList = [];
   _this.form = {
     donor_member: []
   };
@@ -196,16 +195,17 @@
     // 增加成员
     addMember: function(){
       // 检查信息
-      _this.app.validAll(_this.refs.validOnAddMember)
+      _this.app.validAll(
+        _this.refs.validOnAddMember.concat(_this.refs.member_place)
+      )
       .then(function(){
         _this.form.donor_member.push({
           username: _this.refs.member_username.value,
-          place_id: _this.refs.member_place.value,
+          place_id: _this.refs.member_place.getId(),
           tel: _this.refs.member_tel.value,
           email: _this.refs.member_email.value
         });
         _this.refs.member_username.value =
-        _this.refs.member_place.value =
         _this.refs.member_tel.value =
         _this.refs.member_email.value = '';
         _this.update();
@@ -218,17 +218,14 @@
       }).on('done', function(data){
         _this.form = data;
         _this.update();
-      });
-    },
-    // 获取职务列表
-    getPlace: function(){
-      _this.app.api('GET', 'system-setting/place/index')
-      .on('done', function(data){
-        data.items.unshift({
-          id: '', place_name: '选择职务'
+        // 职务循环
+        _this.form.donor_member.forEach(function(member, i){
+          _this.refs['place_'+i].emit('set', {
+            id: member.place_id,
+            name: member.place_name
+          });
         });
-        _this.placeList = data.items;
-        _this.update();
+
       });
     }
   };
@@ -236,7 +233,6 @@
     if(_this.form_id){
       _this.fn.getDonor(_this.form_id);
     }
-    _this.fn.getPlace();
   });
   </script>
 </donor-form>
@@ -279,7 +275,7 @@
             <tr each={tableList}>
               <td>{id}</td>
               <td class="left">{donor_name}</td>
-              <td>{fn.getNatureName(type)}</td>
+              <td>{app.getNatureName(type)}</td>
               <td>{contact||'-'}</td>
               <td>{tel}</td>
               <td>
@@ -324,14 +320,6 @@
     },
     edit: function(e){
       _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
-    },
-    getNatureName: function(type){
-      var name;
-      _this.app.lang.admin.agreement['donor:nature:list']
-      .forEach(function(item){
-        if(item.key == type) name = item.name;
-      });
-      return name || '';
     },
     getList: function(){
       _this.app.api('GET', 'donor/default/index', {

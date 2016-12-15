@@ -4134,16 +4134,84 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, 500);
       }
 
+      // 组织机构列表
+
+    }, {
+      key: 'getOrgList',
+      value: function getOrgList(cb) {
+        var pid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+        this.api('GET', 'system-setting/organization/index', {
+          data: { parent_id: pid }
+        }).on('done', function (data) {
+          cb(data.items);
+        });
+      }
+
+      // 获取捐赠方类型
+
+    }, {
+      key: 'getNatureName',
+      value: function getNatureName(type) {
+        var name = void 0;
+        this.lang.admin.agreement['donor:nature:list'].forEach(function (item) {
+          if (item.key == type) name = item.name;
+        });
+        return name || '';
+      }
+
+      // 项目类型列表
+
+    }, {
+      key: 'getProjectTypeList',
+      value: function getProjectTypeList(cb) {
+        var _this17 = this;
+
+        if (this.data.projectTypeList) return cb(this.data.projectTypeList);
+        this.api('GET', 'system-setting/project-type/index').on('done', function (data) {
+          _this17.data.projectTypeList = data.items;
+          cb(_this17.data.projectTypeList);
+        });
+      }
+
+      // 项目类型名称
+
+    }, {
+      key: 'getProjectType',
+      value: function getProjectType(type) {
+        var name = void 0;
+        this.getProjectTypeList(function (data) {
+          data.forEach(function (item) {
+            if (item.id == type) {
+              name = item.name;
+            }
+          });
+        });
+        return name || '-';
+      }
+
+      // 项目状态
+
+    }, {
+      key: 'getProjectStatus',
+      value: function getProjectStatus(status) {
+        var name = void 0;
+        this.lang.admin.project['filter:status'].forEach(function (item) {
+          if (item.key == status) name = item.name;
+        });
+        return name || '';
+      }
+
       // 校验同名input-valid全部通过
 
     }, {
       key: 'validAll',
       value: function validAll(validList) {
-        var _this17 = this;
+        var _this18 = this;
 
         var promiseList = [];
         validList.forEach(function (valid) {
-          promiseList.push(new _this17.Promise(function (resolve, reject) {
+          promiseList.push(new _this18.Promise(function (resolve, reject) {
             valid.on('valid', function () {
               resolve();
             }).on('invalid', function () {

@@ -492,17 +492,17 @@ template {
   content: '\f1f8'; }
 
 /* '' */
-.row:before, form.agreement .row:before, form.donor .row:before, .row:after, form.agreement .row:after, form.donor .row:after {
+.row:before, form.agreement .row:before, form.donor .row:before, form.project .row:before, .row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after {
   content: "";
   display: table; }
 
-.row:after, form.agreement .row:after, form.donor .row:after {
+.row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after {
   clear: both; }
 
-.row, form.agreement .row, form.donor .row {
+.row, form.agreement .row, form.donor .row, form.project .row {
   zoom: 1; }
 
-userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.agreement .c1 .line, form.donor .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
+userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -584,7 +584,8 @@ a {
 
 hr {
   border: none;
-  border-bottom: 1px solid #ebebeb;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #f5f5f5;
   margin: 20px 0; }
 
 h1 {
@@ -853,109 +854,128 @@ header h1 {
   line-height: 80px;
   text-indent: 60px; }
 
-form.agreement, form.donor {
+form.agreement, form.donor, form.project {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background: #fff;
   padding: 30px;
   border-radius: 5px;
   margin: 0 5px 5px 0; }
-  form.agreement h4, form.donor h4 {
+  form.agreement h4, form.donor h4, form.project h4 {
     margin: 0 0 15px 0;
     padding: 0 15px;
     font-size: 16px;
     border-left: 2px solid #DF3A5E; }
-  form.agreement .row, form.donor .row {
+  form.agreement .row, form.donor .row, form.project .row {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: -0;
     margin-right: -0; }
-    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row {
+    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row, [class*="no-gutter"] > form.project .row {
       margin-left: 0 !important;
       margin-right: 0 !important; }
-    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
+    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
       margin-left: -0;
       margin-right: -0; }
     @media screen and (min-width: 960px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
         margin-left: -0;
         margin-right: -0; } }
     @media screen and (max-width: 480px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.donor .row form.agreement .row, form.donor .row form.donor .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
         margin-left: -0;
         margin-right: -0; } }
-  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select {
+  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select, form.project input[type=text], form.project select {
     height: 36px;
     padding: 0 5px;
     border-radius: 3px;
     border: 1px solid #E3E3E3; }
-    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus {
+    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus, form.project input[type=text]:focus, form.project select:focus {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
-  form.agreement label, form.donor label {
-    width: 60px;
+  form.agreement label, form.donor label, form.project label {
+    width: 66px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 5px; }
-    form.agreement label.center, form.donor label.center {
+    form.agreement label.center, form.donor label.center, form.project label.center {
       text-align: center; }
-    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox {
+    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox, form.project label.radio, form.project label.checkbox {
       height: 38px;
       margin-right: 20px;
       line-height: 38px; }
-    form.agreement label.top, form.donor label.top {
+    form.agreement label.top, form.donor label.top, form.project label.top {
       float: left;
       padding-top: 18px; }
-  form.agreement p, form.donor p {
+  form.agreement p, form.donor p, form.project p {
     padding-bottom: 10px;
     position: relative; }
-    form.agreement p textarea, form.donor p textarea {
+    form.agreement p textarea, form.donor p textarea, form.project p textarea {
       width: 77%;
       border-color: #ebebeb;
       border-radius: 5px;
       min-height: 100px;
       padding: 5px; }
-    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select {
+    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select, form.project p input[type=text], form.project p select {
       width: 260px; }
-    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"] {
+    form.agreement p select, form.donor p select, form.project p select {
+      width: 272px; }
+    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"], form.project p i[class^="icon-"] {
       color: #666;
       margin-left: -30px; }
-    form.agreement p input-valid, form.donor p input-valid {
+    form.agreement p input-valid, form.donor p input-valid, form.project p input-valid {
       position: absolute;
       color: #F44C4C;
       top: 44px;
       left: 70px;
       font-size: 13px; }
-    form.agreement p .files, form.donor p .files {
+    form.agreement p .files, form.donor p .files, form.project p .files {
       display: block;
       padding: 5px 0;
       color: #999; }
-  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select {
+  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select {
     width: 160px; }
-  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"] {
+  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"] {
     margin-left: 5px; }
-  form.agreement .c2 p, form.donor .c2 p {
+  form.agreement .c2 p, form.donor .c2 p, form.project .c2 p {
     width: 41.66667%;
     margin-right: 4.16667%; }
-  form.agreement .c1, form.donor .c1 {
+  form.agreement .c1, form.donor .c1, form.project .c1 {
     overflow: hidden;
     padding-bottom: 20px; }
-    form.agreement .c1.btn-line, form.donor .c1.btn-line {
+    form.agreement .c1.btn-line, form.donor .c1.btn-line, form.project .c1.btn-line {
       text-indent: 70px; }
-      form.agreement .c1.btn-line button, form.donor .c1.btn-line button {
+      form.agreement .c1.btn-line button, form.donor .c1.btn-line button, form.project .c1.btn-line button {
         width: 100px;
         margin-right: 20px; }
-    form.agreement .c1 .line, form.donor .c1 .line {
+    form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line {
       width: 91.66667%; }
-    form.agreement .c1 .price-group, form.donor .c1 .price-group {
+    form.agreement .c1 .price-group, form.donor .c1 .price-group, form.project .c1 .price-group {
       display: inline-block;
       margin-top: 10px; }
-      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select {
+      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select, form.project .c1 .price-group input[type=text], form.project .c1 .price-group select {
         min-width: 160px;
         max-width: 160px;
         margin-right: 8px; }
-      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"] {
+      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"], form.project .c1 .price-group i[class^="icon-"] {
         margin: 0 8px 0 0; }
+
+form.project .top-tab-line {
+  margin: -30px -30px 30px -30px;
+  height: 55px;
+  text-align: center;
+  line-height: 55px; }
+  form.project .top-tab-line a.c4 {
+    width: 25%;
+    display: block;
+    float: left;
+    height: 55px;
+    color: #999;
+    font-size: 16px;
+    border-bottom: 1px solid #ebebeb; }
+    form.project .top-tab-line a.c4.active {
+      color: #222;
+      border-bottom: 1px solid #DF3A5E; }
 
 table.base {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -1299,7 +1319,7 @@ input-select ul {
   overflow: auto;
   background: #fff;
   width: 99.5%;
-  top: 18px;
+  top: 20px;
   left: 0;
   border-radius: 3px;
   border: 1px solid #ebebeb;
