@@ -59,7 +59,7 @@
   <div class="input-select">
     <input ref="keyword" type="text"
       value="{inputValue}"
-      placeholder="{opts.placehoder}"
+      placeholder="{opts.placeholder}"
       onclick={fn.pull}
       onkeyup={fn.keyup}
       onblur={fn.blur}>

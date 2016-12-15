@@ -1,6 +1,65 @@
+
+<!-- 组织机构 -->
+<org-select>
+
+  <span each={s in selectList}>
+    <select onchange={fn.change}>
+      <option each={s} value="{id}">{pid}{name}</option>
+    </select>
+  </span>
+
+
+  <script>
+  var _this = this;
+  _this.orgList = _this.app.data.orgList || [];
+  _this.selectList = [];
+  _this.ids = [0];
+  _this.fn = {
+    change: function(e){
+      _this.ids[e.item.s[0].lv+1] = Number(e.target.value);
+      _this.update();
+    },
+    // 层次扫描
+    scan: function(id, lv, data){
+      var parentId = id || 0;
+      var level = lv || 0;
+      var list = [];
+      var orgList = data || _this.orgList;
+      orgList.forEach(function(org, i){
+        if(org.child.length > 0){
+          _this.fn.scan(org.id, level+1, org.child);
+        }
+        list.push({
+          lv: level, pid: parentId, id: org.id, name: org.name
+        });
+      });
+      _this.selectList[level] = list;
+    }
+  };
+  _this.on('mount', function(){
+    // 选中的值
+    _this.selectValue = (opts.value && opts.value.split(',')) || [];
+    if(_this.orgList.length > 0) return;
+    _this.app.xhr('http://dev.fp.sosho.cn/system-setting/organization/search')
+    .done(function(data) {
+      _this.orgList = _this.app.data.orgList = data;
+      _this.fn.scan();
+      console.log(_this.selectList);
+      _this.update();
+    });
+
+  });
+
+  </script>
+</org-select>
+
+
+<!-- 项目类型 -->
+
+
 <!-- 职务查询 -->
 <place-select>
-  <input-select name="place_name" ref="place_name" placehoder="搜索选择" value=""/>
+  <input-select name="place_name" ref="place_name" placeholder="搜索选择" value=""/>
   <input type="hidden" ref="place_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validPlace" for="place_id" rule="required" msg="请选择职务"/>
   <script>
@@ -10,7 +69,13 @@
   _this.getId = function(){
     return _this.refs.place_id.value;
   };
+  _this.getName = function(){
+    return _this.refs.place_name.value;
+  };
   _this.on('mount', function(){
+
+    _this.refs.place_name.emit('value', opts.place_name);
+
     // 请求职务数据
     _this.refs.place_name.on('pull', function(keyword){
       _this.refs.validPlace.emit('msg', '');
@@ -47,7 +112,7 @@
   _this.on('set', function(place){
     _this.refs.place_id.value = place.id;
     _this.refs.place_name.value = place.name;
-    _this.refs.place_name.emit('value', place.name);
+    _this.refs.place_name.emit('value', place.name || ' ');
   });
   </script>
 </place-select>
@@ -55,7 +120,7 @@
 
 <!-- 捐赠方下拉选择 -->
 <donor-select>
-  <input-select name="donor_name" ref="donor_name" placehoder="搜索选择" value=""/>
+  <input-select name="donor_name" ref="donor_name" placeholder="搜索选择" value=""/>
   <input type="hidden" ref="donor_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"/>
   <script>

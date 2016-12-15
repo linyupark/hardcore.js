@@ -13,6 +13,8 @@
 
   <upload-formdata name="file[]"></upload-formdata>
 
+  <org-select></org-select>
+
   <script>
   var _this = this;
   _this.on('mount', function(){

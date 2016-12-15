@@ -893,6 +893,10 @@ form.agreement, form.donor, form.project {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
+    form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled] {
+      border-radius: 0;
+      border: none;
+      border-bottom: 1px solid #E3E3E3; }
   form.agreement label, form.donor label, form.project label {
     width: 66px;
     display: inline-block;
@@ -1066,6 +1070,10 @@ table-filter {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
+    table-filter input[type=text][disabled], table-filter select[disabled] {
+      border-radius: 0;
+      border: none;
+      border-bottom: 1px solid #E3E3E3; }
   table-filter button {
     padding: 1px 10px; }
     table-filter button.main {
@@ -1148,6 +1156,10 @@ main {
           outline: none;
           border-radius: 5px;
           box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
+        main.login form input[disabled] {
+          border-radius: 0;
+          border: none;
+          border-bottom: 1px solid #E3E3E3; }
       main.login form .pwd-show, main.login form .pwd-hide {
         width: 35px;
         height: 35px;

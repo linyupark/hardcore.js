@@ -91,14 +91,14 @@
       <div class="row c4" each={m, i in form.donor_member}>
         <p>
           <label>成员{i+1}</label>
-          <input type="text" value="{m.username}" placeholder="姓名">
+          <input type="text" value="{m.username}" disabled>
           &nbsp;
           <!-- 职务 -->
-          <place-select ref="place_{i}"/>
+          <input type="text" value="{m.place_name}" disabled>
           &nbsp;
-          <input type="text" value="{m.tel}" placeholder="电话">
+          <input type="text" value="{m.tel}" disabled>
           &nbsp;
-          <input type="text" value="{m.email}" placeholder="邮箱">
+          <input type="text" value="{m.email}" disabled>
           <a href="javascript:;" onclick={fn.removeMember} class="c-tooltips--top" aria-label="移除">
             <i class="icon-trash"></i>
           </a>
@@ -202,8 +202,12 @@
         _this.form.donor_member.push({
           username: _this.refs.member_username.value,
           place_id: _this.refs.member_place.getId(),
+          place_name: _this.refs.member_place.getName(),
           tel: _this.refs.member_tel.value,
           email: _this.refs.member_email.value
+        });
+        _this.refs.member_place.emit('set', {
+          id: '', name: ''
         });
         _this.refs.member_username.value =
         _this.refs.member_tel.value =
@@ -218,14 +222,6 @@
       }).on('done', function(data){
         _this.form = data;
         _this.update();
-        // 职务循环
-        _this.form.donor_member.forEach(function(member, i){
-          _this.refs['place_'+i].emit('set', {
-            id: member.place_id,
-            name: member.place_name
-          });
-        });
-
       });
     }
   };
