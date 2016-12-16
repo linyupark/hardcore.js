@@ -1236,7 +1236,7 @@ var tmpl = (function () {
 
 })();
 
-// 3.0.3
+// 3.0.4
 
 const __TAGS_CACHE = [];
 const __TAG_IMPL = {};
@@ -1848,7 +1848,7 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) return updateDataIs(expr, this)
-  if (old === value) return
+  if (old === value && !isToggle) return
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) return
 
@@ -1898,10 +1898,11 @@ function updateExpression(expr) {
   } else {
     // <select> <option selected={true}> </select>
     if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
-      parent.value = dom.value;
+      // parent.value = dom.value;
+      // NOTE select bug 去掉这个暂时没问题了，坐等修复
     } if (expr.bool) {
       dom[attrName] = value;
-      if (!value) return
+      if (!value) return;
     } if (value === 0 || value && typeof value !== T_OBJECT) {
       setAttr(dom, attrName, value);
     }
@@ -3924,14 +3925,12 @@ class FP extends RiotApp {
     }, 500);
   }
 
-  // 组织机构列表
-  getOrgList(cb, pid=0){
-    this.api('GET', 'system-setting/organization/index', {
-      data: {parent_id: pid}
-    })
-    .on('done', data => {
-      cb(data.items);
-    });
+  // 超过字符字数变...
+  subText(str, max) {
+    if(str.length > max){
+      return str.slice(0, max) + '...';
+    }
+    else return str;
   }
 
   // 获取捐赠方类型
@@ -3948,7 +3947,7 @@ class FP extends RiotApp {
   getProjectTypeList(cb){
     if(this.data.projectTypeList)
       return cb(this.data.projectTypeList);
-    this.api('GET', 'system-setting/project-type/index')
+    this.api('GET', 'system-setting/project-type/search')
     .on('done', data => {
       this.data.projectTypeList = data.items;
       cb(this.data.projectTypeList);

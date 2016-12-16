@@ -31,8 +31,9 @@ $font-primary: "Arial", "SimHei", "STHeiti"
   box-shadow: 0 4px 4px -2px rgba(#000, .2) inset
 
 // global
-*:focus
-  outline: none
+*
+  &:focus
+    outline: none
 
 body
   color: #222
@@ -70,6 +71,12 @@ h1
   cursor: pointer
   &:hover
     color: $color-main
+
+.warning-box
+  +alert($color-warning)
+  width: auto
+  text-align: center
+  font-size: $font-m
 
 .btn-main
   +btn-1()
@@ -132,12 +139,12 @@ main
 //
 // section
 //
-+ani-fadein()
+// +ani-fadein()
 section
   +gridle(prefix 2.3 suffix 0.5)
   min-height: 700px
   overflow: hidden
-  animation: fadeIn .1s
+  // animation: fadeIn .1s
   h2
     font-weight: normal
     font-size: $font-s
@@ -236,8 +243,6 @@ input-select
         color: $color-main
 
 // modal
-modal
-  display: none
 
 // upload-formdata
 upload-formdata

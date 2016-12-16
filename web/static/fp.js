@@ -1461,7 +1461,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return _tmpl;
   }();
 
-  // 3.0.3
+  // 3.0.4
 
   var __TAGS_CACHE = [];
   var __TAG_IMPL = {};
@@ -2061,7 +2061,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     if (expr.isRtag && value) return updateDataIs(expr, this);
-    if (old === value) return;
+    if (old === value && !isToggle) return;
     // no change, so nothing more to do
     if (isValueAttr && dom.value === value) return;
 
@@ -2109,7 +2109,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     } else {
       // <select> <option selected={true}> </select>
       if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
-        parent.value = dom.value;
+        // parent.value = dom.value;
+        // NOTE select bug 去掉这个暂时没问题了，坐等修复
       }if (expr.bool) {
         dom[attrName] = value;
         if (!value) return;
@@ -4134,18 +4135,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, 500);
       }
 
-      // 组织机构列表
+      // 超过字符字数变...
 
     }, {
-      key: 'getOrgList',
-      value: function getOrgList(cb) {
-        var pid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-        this.api('GET', 'system-setting/organization/index', {
-          data: { parent_id: pid }
-        }).on('done', function (data) {
-          cb(data.items);
-        });
+      key: 'subText',
+      value: function subText(str, max) {
+        if (str.length > max) {
+          return str.slice(0, max) + '...';
+        } else return str;
       }
 
       // 获取捐赠方类型
@@ -4168,7 +4165,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var _this17 = this;
 
         if (this.data.projectTypeList) return cb(this.data.projectTypeList);
-        this.api('GET', 'system-setting/project-type/index').on('done', function (data) {
+        this.api('GET', 'system-setting/project-type/search').on('done', function (data) {
           _this17.data.projectTypeList = data.items;
           cb(_this17.data.projectTypeList);
         });

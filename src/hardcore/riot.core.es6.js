@@ -1,4 +1,4 @@
-// 3.0.3
+// 3.0.4
 
 import { brackets, tmpl } from './riot.tmpl.es6.js';
 import { emitter as observable } from './emitter.es6.js';
@@ -613,7 +613,7 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) return updateDataIs(expr, this)
-  if (old === value) return
+  if (old === value && !isToggle) return
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) return
 
@@ -663,10 +663,11 @@ function updateExpression(expr) {
   } else {
     // <select> <option selected={true}> </select>
     if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
-      parent.value = dom.value;
+      // parent.value = dom.value;
+      // NOTE select bug 去掉这个暂时没问题了，坐等修复
     } if (expr.bool) {
       dom[attrName] = value;
-      if (!value) return
+      if (!value) return;
     } if (value === 0 || value && typeof value !== T_OBJECT) {
       setAttr(dom, attrName, value);
     }

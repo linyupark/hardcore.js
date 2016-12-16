@@ -138,13 +138,16 @@
       inputValue: value
     });
   });
+  _this.on('disable', function(){
+    _this.refs.keyword.disabled = true;
+  });
   </script>
 </input-select>
 
 <!-- 弹出框 -->
-<modal>
+<modal show="{open}">
   <style scoped>
-  #modal-mask{
+  .modal-mask{
     position: fixed;
     top: 0;
     left: 0;
@@ -212,7 +215,7 @@
     </div>
     <div class="btn-group">
       <yield from="button"/>
-      <button class="btn-gray" onclick={fn.close}>
+      <button type="button" class="btn-gray" onclick={fn.close}>
         <yield from="close"/>
       </button>
     </div>
@@ -220,16 +223,14 @@
 
   <!-- 遮罩层 -->
   <div onclick={fn.close}
-    show={open}
     style="opacity: {opts.mask}; z-index: {opts.z||11}"
-    id="modal-mask"></div>
+    class="modal-mask"></div>
 
   <script>
   var _this = this;
   _this.open = false;
   _this.fn = {
     close: function(){
-      _this.root.style.display = 'none';
       _this.update({
         open: false
       });
@@ -237,10 +238,10 @@
   };
   _this.on('open', function(){
     _this.open = true;
-    _this.root.style.display = 'block';
     document.addEventListener('keydown', function(e){
       if(e.keyCode == 27) _this.fn.close();
     }, {once: true});
+    _this.update();
   });
   _this.on('close', function(){
     _this.fn.close();
@@ -559,8 +560,8 @@
     </li>
     <li class="select" if={opts.select=='y'}>
       跳转至
-      <select onchange={fn.jumpPage}>
-        <option each={p in pageList} value="{p}" selected={page==p}>{p}</option>
+      <select onchange="{fn.jumpPage}">
+        <option each="{p in pageList}" value="{p}" selected="{p==page}">{p}</option>
       </select> / {pages}页
     </li>
   </ul>

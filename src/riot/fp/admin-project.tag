@@ -1,6 +1,125 @@
 <!-- 关联协议 -->
 <project-agreement>
 
+  <style scoped>
+  .project-agreement table-filter div{
+    margin: 0
+  }
+  </style>
+
+  <div class="project-agreement" if="{opts.pid>0}">
+    <table-filter for="project-agreement">
+      <yield to="addon">
+        <button class="main" onclick={parent.fn.modalAddAgreement}>
+          <i class="icon-plus"></i> 添加关联协议
+        </button>
+      </yield>
+    </table-filter>
+    <br>
+    <table class="base">
+      <thead>
+        <tr>
+          <th width="10%">{app.lang.admin.agreement.id}</th>
+          <th width="15%">{app.lang.admin.project.number}</th>
+          <th width="50%">{app.lang.admin.agreement.name}</th>
+          <th width="15%">关联日期</th>
+          <th width="10%">{app.lang.admin.handle}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr each={tableList}>
+          <td>{id}</td>
+          <td>{agreement_number}</td>
+          <td class="left">{agreement_name}</td>
+          <td>{app.utils.time2str(create_date)}</td>
+          <td>
+            <a href="javascript:;" aria-label="取消关联" class="c-tooltip--top">
+              <i onclick={fn.remove} class="btn-icon icon-trash"></i>
+            </a>
+          </td>
+        </tr>
+        <tr if={!tableList}>
+          <td colspan="5"><spinner-dot/></td>
+        </tr>
+      </tbody>
+      <tfoot if={tableList}>
+        <tr>
+          <td class="left" colspan="5">
+            {app.lang.admin.counts.items}
+            <b>{items}</b>
+            {app.lang.admin.counts.unit}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <pagination-number page={page} pages={pages} select="y"/>
+    <br><br><br>
+
+  </div>
+
+  <!-- 没有项目ID提示 -->
+  <div class="warning-box" if="{opts.pid==0}">
+    需要先创建项目后才能编辑此页
+    <a href="#!{app.route.path}?tab=baseinfo">返回创建</a>
+  </div>
+
+  <!-- 关联协议弹窗 -->
+  <modal-agreement pid="{opts.pid}" ref="agmodal"/>
+
+  <!-- 取消关联弹窗 -->
+  <modal-remove ref="rmmodal"/>
+
+  <script>
+  var _this = this;
+  _this.fn = {
+    remove: function(e){
+      // 取消关联
+      _this.refs.rmmodal.emit('open')
+      .on('ok', function(){
+        _this.app.api('GET', 'project/agreement/delete', {
+          data: {
+            pk_id: e.item.id,
+            id: opts.pid
+          }
+        }).on('done', function(){
+          _this.app.alert('取消关联成功', 'success');
+          _this.fn.getAgreementList();
+        });
+      });
+    },
+    modalAddAgreement: function(){
+      // 添加关联协议弹窗
+      _this.refs.agmodal.emit('open');
+    },
+    getAgreementList: function(){
+      // 通过GET来获取某个项目的协议数据，必需传入get参数?id=当前项目id。
+      _this.app.api('GET', 'project/agreement/index', {
+        data: {
+          id: opts.pid
+        }
+      })
+      .on('done', function(data){
+        _this.update({
+          tableList: data.items,
+          page: data.counts.page,
+          pages: data.counts.total_page,
+          items: data.counts.total_items
+        });
+        _this.tags['pagination-number'].emit('render');
+      });
+    }
+  };
+  _this.on('mount', function(){
+    if(opts.pid > 0){
+      _this.fn.getAgreementList();
+    }
+    // 添加关联成功了要刷新列表
+    _this.refs.agmodal.on('added', function(){
+      _this.fn.getAgreementList();
+    });
+  });
+  </script>
+
 </project-agreement>
 
 
@@ -11,112 +130,112 @@
       {app.lang.admin.project.title} &gt;
       <span if={key==parent.formTab} each={formTabList}>{name}</span>
     </h2>
-    <form class="project" onsubmit="return false;" onkeypress="return false">
+    <form class="project">
       <div class="top-tab-line">
         <a href="javascript:;" onclick={fn.tabChange} class="c4 {active: key==parent.formTab}" each={formTabList}>{name}</a>
       </div>
-      <h4>基本信息</h4>
-      <div class="c2">
-        <div class="row">
-          <!-- 项目名称 -->
+      <project-agreement if={formTab=='agreements'} pid="{project.id}" />
+      <div if={formTab=='baseinfo'}>
+        <h4>基本信息</h4>
+        <div class="c2">
+          <div class="row">
+            <!-- 项目名称 -->
+            <p>
+              <label>{app.lang.admin.project.name}</label>
+              <input type="text" ref="name" value="{project.baseinfo.name}" placeholder="{app.lang.admin.form.req}">
+              <input-valid ref="validOnSave" for="name" rule="required" msg="{app.lang.admin.project.name}{app.lang.admin.form.req}"/>
+            </p>
+            <!-- 项目编号 -->
+            <p>
+              <label>{app.lang.admin.project.number}</label>
+              <input type="text" ref="number" value="{project.baseinfo.number}" placeholder="{app.lang.admin.form.req}">
+              <input-valid ref="validOnSave" for="number" rule="required" msg="{app.lang.admin.project.number}{app.lang.admin.form.req}"/>
+            </p>
+          </div>
+          <div class="row">
+            <!-- 项目类型 -->
+            <p>
+              <label>{app.lang.admin.project.type}</label>
+              <project-type-select disable="{project.id>0?1:0}" ref="project_type"/>
+            </p>
+            <!-- 项目状态 -->
+            <p>
+              <label>{app.lang.admin.project.status}</label>
+              <select ref="status">
+                <option each={app.lang.admin.project['filter:status']} selected="{project.baseinfo.status==key}" value={key}>{name}</option>
+              </select>
+            </p>
+          </div>
+          <div class="row">
+            <!-- 项目金额 -->
+            <p>
+              <label>{app.lang.admin.project.amount}</label>
+              <input type="text" ref="amount" value="{project.baseinfo.amount}" placeholder="{app.lang.admin.form.req}">
+              <input-valid ref="validOnSave" for="amount" rule="number" msg="{app.lang.admin.project.amount}{app.lang.admin.form.req}"/>
+            </p>
+            <!-- 是否公开 -->
+            <p>
+              <label>{app.lang.admin.project.isPublic}</label>
+              <label class="radio">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==1}> {app.lang.yes}
+              </label>
+              <label class="radio">
+                <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==0}>
+                {app.lang.no}
+              <label>
+            </p>
+          </div>
+        </div>
+        <!-- 项目简介 -->
+        <div class="c1">
+          <label class="top">项目简介</label>
           <p>
-            <label>{app.lang.admin.project.name}</label>
-            <input type="text" ref="name" value="{project.baseinfo.name}" placeholder="{app.lang.admin.form.req}">
-            <input-valid ref="validOnSave" for="name" rule="required" msg="{app.lang.admin.project.name}{app.lang.admin.form.req}"/>
-          </p>
-          <!-- 项目编号 -->
-          <p>
-            <label>{app.lang.admin.project.number}</label>
-            <input type="text" ref="number" value="{project.baseinfo.number}" placeholder="{app.lang.admin.form.req}">
-            <input-valid ref="validOnSave" for="number" rule="required" msg="{app.lang.admin.project.number}{app.lang.admin.form.req}"/>
+            <textarea ref="description">{project.baseinfo.description}</textarea>
           </p>
         </div>
-        <div class="row">
-          <!-- 项目类型 -->
+        <hr>
+        <br>
+        <h4>执行信息</h4>
+        <div class="row c4">
+          <!-- 部门单位 -->
           <p>
-            <label>{app.lang.admin.project.type}</label>
-            <select ref="project_type">
-              <option each={app.data.projectTypeList} selected={key==project.baseinfo.project_types_id}  value={id}>{name}</option>
-            </select>
-          </p>
-          <!-- 项目状态 -->
-          <p>
-            <label>{app.lang.admin.project.status}</label>
-            <select ref="status">
-              <option each={app.lang.admin.project['filter:status']} selected={key==project.baseinfo.status}  value={key}>{name}</option>
-            </select>
+            <label>部门单位</label>
+            <org-select ref="organization"/>
           </p>
         </div>
-        <div class="row">
-          <!-- 项目金额 -->
+        <div class="row c4">
+          <!-- 负责人 -->
           <p>
-            <label>{app.lang.admin.project.amount}</label>
-            <input type="text" ref="amount" value="{project.baseinfo.amount}" placeholder="{app.lang.admin.form.req}">
-            <input-valid ref="validOnSave" for="amount" rule="number" msg="{app.lang.admin.project.amount}{app.lang.admin.form.req}"/>
-          </p>
-          <!-- 是否公开 -->
-          <p>
-            <label>{app.lang.admin.project.isPublic}</label>
-            <label class="radio">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==1}> {app.lang.yes}
-            </label>
-            <label class="radio">
-              <input type="radio" name="is_public" ref="is_public" checked={project.baseinfo.is_public==0}>
-              {app.lang.no}
-            <label>
+            <label>负责人</label>
+            <input type="text" ref="head_name" placeholder="姓名" value="{project.baseinfo.head_name}">
+            &nbsp;
+            <input type="text" ref="head_tel" placeholder="电话" value="{project.baseinfo.head_tel}">
+            &nbsp;
+            <input type="text" ref="head_email" placeholder="邮箱" value="{project.baseinfo.head_email}">
+            <input-valid ref="validOnSave" for="head_name,head_tel,head_email" rule="required" msg="请填写负责人的姓名、电话、邮箱"/>
+            <input-valid style="left: 445px" ref="validOnSave" for="head_email" rule="email" msg="邮箱格式不正确"/>
           </p>
         </div>
-      </div>
-      <!-- 项目简介 -->
-      <div class="c1">
-        <label class="top">项目简介</label>
-        <p>
-          <textarea ref="description">{project.baseinfo.description}</textarea>
-        </p>
-      </div>
-      <hr>
-      <br>
-      <h4>执行信息</h4>
-      <div class="row c4">
-        <!-- 部门单位 -->
-        <p>
-          <label>部门单位</label>
-          <input-select name="name" ref="organization_name" placehoder="请选择" value="{project.baseinfo.organization_name}"/>
-          <input type="hidden" ref="organization_id" value="{project.baseinfo.organization_id}">
-        </p>
-      </div>
-      <div class="row c4">
-        <!-- 负责人 -->
-        <p>
-          <label>负责人</label>
-          <input type="text" ref="head_name" placeholder="姓名" value="{project.baseinfo.head_name}">
-          &nbsp;
-          <input type="text" ref="head_tel" placeholder="电话" value="{project.baseinfo.head_tel}">
-          &nbsp;
-          <input type="text" ref="head_email" placeholder="邮箱" value="{project.baseinfo.head_email}">
-          <input-valid ref="validOnSave" for="head_name,head_tel,head_email" rule="required" msg="请填写负责人的姓名、电话、邮箱"/>
-          <input-valid style="left: 445px" ref="validOnSave" for="head_email" rule="email" msg="邮箱格式不正确"/>
-        </p>
-      </div>
-      <div class="row c4">
-        <!-- 联络人 -->
-        <p>
-          <label>联络人</label>
-          <input type="text" ref="contact_name" placeholder="姓名" value="{project.baseinfo.contact_name}">
-          &nbsp;
-          <input type="text" ref="contact_tel" placeholder="电话" value="{project.baseinfo.contact_tel}">
-          &nbsp;
-          <input type="text" ref="contact_email" placeholder="邮箱" value="{project.baseinfo.contact_email}">
-          <input-valid ref="validOnSave" for="contact_name,contact_tel,contact_email" rule="required" msg="请填写联络人的姓名、电话、邮箱"/>
-          <input-valid style="left: 445px" ref="validOnSave" for="contact_email" rule="email" msg="邮箱格式不正确"/>
-        </p>
-      </div>
-      <hr>
-      <br>
-      <div class="c1 btn-line">
-        <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
-        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+        <div class="row c4">
+          <!-- 联络人 -->
+          <p>
+            <label>联络人</label>
+            <input type="text" ref="contact_name" placeholder="姓名" value="{project.baseinfo.contact_name}">
+            &nbsp;
+            <input type="text" ref="contact_tel" placeholder="电话" value="{project.baseinfo.contact_tel}">
+            &nbsp;
+            <input type="text" ref="contact_email" placeholder="邮箱" value="{project.baseinfo.contact_email}">
+            <input-valid ref="validOnSave" for="contact_name,contact_tel,contact_email" rule="required" msg="请填写联络人的姓名、电话、邮箱"/>
+            <input-valid style="left: 445px" ref="validOnSave" for="contact_email" rule="email" msg="邮箱格式不正确"/>
+          </p>
+        </div>
+        <hr>
+        <br>
+        <div class="c1 btn-line">
+          <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+          <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+        </div>
       </div>
     </form>
   </section>
@@ -139,7 +258,9 @@
     save: function(e){
       // 修改添加基础信息
       if(_this.formTab === 'baseinfo'){
-        _this.app.validAll(_this.refs.validOnSave)
+        _this.app.validAll(
+          _this.refs.validOnSave.concat(_this.refs.organization)
+        )
         .then(function(){
           if(_this.project.id > 0){
             api = 'project/default/base-info-update?id=' + _this.project.id;
@@ -148,16 +269,17 @@
             api = 'project/default/base-info-create';
           }
           _this.app.api('POST', api, {
+            trigger: e.target,
             data: {
               data: JSON.stringify({
                 name: _this.refs.name.value,
                 number: _this.refs.number.value,
-                project_types_id: _this.refs.project_type.value,
+                project_types_id: _this.refs.project_type.getId(),
                 status: _this.refs.status.value,
                 amount: _this.refs.amount.value,
                 is_public: _this.refs.is_public[0].checked ? 1 : 0,
                 description: _this.refs.description.value,
-                organization_id: _this.refs.organization.value,
+                organization_id: _this.refs.organization.getId(),
                 contact_name: _this.refs.contact_name.value,
                 contact_tel: _this.refs.contact_tel.value,
                 contact_email: _this.refs.contact_email.value,
@@ -170,7 +292,7 @@
             _this.app.alert('项目资料保存成功', 'success');
           });
         })
-        .catch(function(){
+        .catch(function(e){
           _this.app.alert('请检查表单', 'warning');
         });
       }
@@ -188,32 +310,19 @@
   _this.on('mount', function(){
     // 项目资料
     if(_this.formTab === 'baseinfo'){
-      // 请求组织机构信息
-      _this.refs.organization_name.on('pull', function(){
-        _this.app.getOrgList(function(list){
-          _this.refs.organization_name.emit('push', list);
-        }, 0);
-      });
-      // 选择了组织机构
-      _this.refs.organization_name.on('select', function(item){
-        _this.app.getOrgList(function(list){
-          if(list.length > 0){
-            // 二级
-            _this.refs.organization_name2.emit('push', list);
-          }
-        }, item.id);
-      });
       // 查询基本信息
       if(_this.project.id > 0){
-        _this.app.getProjectTypeList(function(){
-          _this.app.getOrgList(function(){
-            _this.app.api('GET', 'project/default/base-info', {
-              data: { id: _this.project.id }
-            }).on('done', function(data){
-              _this.project.baseinfo = data;
-              _this.update();
-            });
-          });
+        _this.app.api('GET', 'project/default/base-info', {
+          data: { id: _this.project.id }
+        }).on('done', function(data){
+          _this.project.baseinfo = data;
+          _this.refs.project_type.emit(
+            'set', {
+              id: data.project_types_id
+            }
+          );
+          _this.refs.organization.emit('set', data.organization_id);
+          _this.update();
         });
       }
     }
@@ -273,7 +382,7 @@
               <td>{createAt&&app.utils.time2str(createAt)||'-'}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.view}" class="c-tooltip--top">
-                  <i onclick={fn.edit}  class="btn-icon icon-menu"></i>
+                  <i onclick={fn.view}  class="btn-icon icon-menu"></i>
                 </a>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
                   <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
@@ -284,7 +393,7 @@
               </td>
             </tr>
             <tr if={!tableList}>
-              <td colspan="6"><spinner-dot/></td>
+              <td colspan="8"><spinner-dot/></td>
             </tr>
           </tbody>
           <tfoot if={tableList}>

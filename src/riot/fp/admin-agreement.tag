@@ -2,7 +2,7 @@
 <agreement-form>
   <section>
     <h2>{app.lang.admin.agreement[app.route.params[1]]}</h2>
-    <form class="agreement" onsubmit="return false;">
+    <form class="agreement">
       <h4>帐号信息</h4>
       <div class="c2">
         <div class="row">
@@ -27,7 +27,7 @@
           <p>
             <label>{app.lang.admin.agreement['donor:nature']}</label>
             <select ref="donor_nature">
-              <option each={donorNature} selected={key==form.donor_nature}  value={key}>{name}</option>
+              <option each={donorNature} value={key} selected="{form.donor_nature==key}">{name}</option>
             </select>
           </p>
         </div>
@@ -47,7 +47,7 @@
           <p>
             <label>{app.lang.admin.agreement['sources:funding']}</label>
             <select ref="sources_funding">
-              <option each={sourcesFunding} value="{key}" selected={key==form.sources_funding}>{name}</option>
+              <option each={sourcesFunding} value="{key}" selected="{form.sources_funding==key}">{name}</option>
             </select>
           </p>
         </div>
@@ -100,7 +100,7 @@
         <div class="line">
           <p each={p in form.price} class="price-group">
             <select placehoder="货币种类" disabled>
-              <option each={c in currencyList} value="{c[0]}" selected="{p.currency_sign==c[0]}">{c[1]}</option>
+              <option each={c in currencyList} value="{c[0]}" selected="{c[0]==p.currency_sign}">{c[1]}</option>
             </select>
             <input type="text" placeholder="金额" value={p.amount} disabled>
             <a href="javascript:;" onclick="{fn.removePrice}">
@@ -161,8 +161,8 @@
       </div>
       <hr>
       <div class="c1 btn-line">
-        <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
-        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+        <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
       </div>
     </form>
   </section>
@@ -419,14 +419,7 @@
   </main>
 
   <!-- 删除记录弹窗 -->
-  <modal>
-    <yield to="title">{app.lang.admin.confirm.tips}</yield>
-    <yield to="content">{app.lang.admin.confirm.delete}</yield>
-    <yield to="button">
-      <button class="btn-main">{app.lang.admin.btn.ok}</button>
-    </yield>
-    <yield to="close">{app.lang.admin.btn.cancel}</yield>
-  </modal>
+  <modal-remove/>
 
   <script>
   var _this = this;
@@ -440,7 +433,12 @@
       _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
     },
     remove: function(e){
-      _this.tags['modal'].emit('open');
+      _this.tags['modal-remove']
+      .on('ok', function(){
+        // 删除操作
+        this.emit('close');
+      })
+      .emit('open');
     },
     getList: function(){
       // 获取协议列表

@@ -6,7 +6,7 @@
       {app.lang.admin.donor.title} &gt;
       {app.lang.admin.donor[app.route.params[1]]}
     </h2>
-    <form class="donor" onsubmit="return false;">
+    <form class="donor">
       <!-- 基本信息 -->
       <h4>{app.lang.admin.donor.baseinfo}</h4>
       <div class="c2">
@@ -21,7 +21,7 @@
           <p>
             <label>{app.lang.admin.donor.type}</label>
             <select ref="donor_type">
-              <option each={donorNature} selected={key==form.type}  value={key}>{name}</option>
+              <option each={donorNature} value={key} selected="{form.type==key}">{name}</option>
             </select>
           </p>
         </div>
@@ -125,8 +125,8 @@
       <hr>
       <br>
       <div class="c1 btn-line">
-        <button onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
-        <button onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+        <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
       </div>
 
       <br><br>

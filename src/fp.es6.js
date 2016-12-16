@@ -108,14 +108,12 @@ class FP extends RiotApp {
     }, 500);
   }
 
-  // 组织机构列表
-  getOrgList(cb, pid=0){
-    this.api('GET', 'system-setting/organization/index', {
-      data: {parent_id: pid}
-    })
-    .on('done', data => {
-      cb(data.items);
-    });
+  // 超过字符字数变...
+  subText(str, max) {
+    if(str.length > max){
+      return str.slice(0, max) + '...';
+    }
+    else return str;
   }
 
   // 获取捐赠方类型
@@ -132,7 +130,7 @@ class FP extends RiotApp {
   getProjectTypeList(cb){
     if(this.data.projectTypeList)
       return cb(this.data.projectTypeList);
-    this.api('GET', 'system-setting/project-type/index')
+    this.api('GET', 'system-setting/project-type/search')
     .on('done', data => {
       this.data.projectTypeList = data.items;
       cb(this.data.projectTypeList);

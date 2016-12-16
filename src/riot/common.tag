@@ -1,61 +1,300 @@
+<!-- 关联协议 -->
+<modal-agreement>
+  <modal ref="modal" w="640" h="520" top="150px">
+    <yield to="title">选择新增协议</yield>
+    <yield to="content">
+      <table-filter ref="filter" for="agreement" modal="true"/>
+      <br>
+      <table class="base" style="min-height: 255px">
+        <thead>
+          <tr>
+            <th width="10%">关联</th>
+            <th width="30%">{app.lang.admin.project.number}</th>
+            <th width="60%">{app.lang.admin.agreement.name}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr each={parent.tableList}>
+            <td>
+              <input onclick="{parent.parent.fn.addIds}" type="checkbox" checked="{parent.parent.ids.indexOf(id)!=-1}">
+            </td>
+            <td>{agreement_number}</td>
+            <td class="left">{app.subText(agreement_name, 20)}</td>
+          </tr>
+          <tr if={!parent.tableList}>
+            <td colspan="3"><spinner-dot/></td>
+          </tr>
+          <tr if={parent.tableList && parent.tableList.length==0}>
+            <td colspan="3">没有可添加关联的协议</td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination-number ref="page" page={parent.page} pages={parent.pages} select="y"/>
+    </yield>
+    <yield to="button">
+      <button type="button" onclick="{parent.fn.addAgreement}"  class="btn-main">{app.lang.admin.btn.ok}</button>
+    </yield>
+    <yield to="close">{app.lang.admin.btn.cancel}</yield>
+  </modal>
+  <script>
+  var _this = this;
+  _this.q = {};
+  // 记录勾选id
+  _this.ids = [];
+  _this.fn = {
+    addAgreement: function(){
+      // 添加绑定后关闭窗口
+      _this.app.api('POST', 'project/agreement/create?id='+opts.pid, {
+        data: {
+          data: JSON.stringify(_this.ids)
+        }
+      }).on('done', function(data){
+        _this.app.alert('协议关联添加成功', 'success');
+        _this.refs.modal.emit('close');
+        _this.emit('added');
+      });
+    },
+    addIds: function(e){
+      if(e.target.checked){
+        _this.ids.push(e.item.id);
+      } else{
+        _this.ids.splice(_this.ids.indexOf(e.item.id), 1);
+      }
+    },
+    getList: function(){
+      _this.update({
+        tableList: false
+      });
+      _this.app.api('GET', 'project/agreement/search', {
+        data: {
+          page: _this.q.page || 1,
+          search_type: _this.q.type || '',
+          search_keyword: _this.q.keyword || ''
+        }
+      }).on('done', function(data){
+        _this.update({
+          tableList: data.items,
+          page: data.counts.page,
+          pages: data.counts.total_page,
+          items: data.counts.total_items
+        });
+        _this.refs.modal.refs.page.emit('render');
+      });
+    }
+  };
+  _this.on('mount', function(){
+
+    _this.fn.getList();
+
+    _this.refs.modal.refs.page.on('change', function(n){
+      _this.q.page = n;
+      _this.fn.getList();
+    });
+
+    _this.refs.modal.refs.filter.on('query', function(q){
+      _this.q = q;
+      _this.fn.getList();
+    });
+
+  });
+
+  _this.on('open', function(){
+    _this.refs.modal.emit('open');
+  });
+
+  </script>
+</modal-agreement>
+
+
+<!-- 确认删除框 -->
+<modal-remove>
+  <modal>
+    <yield to="title">{app.lang.admin.confirm.tips}</yield>
+    <yield to="content">{app.lang.admin.confirm.delete}</yield>
+    <yield to="button">
+      <button type="button" onclick="{parent.fn.ok}"  class="btn-main">{app.lang.admin.btn.ok}</button>
+    </yield>
+    <yield to="close">{app.lang.admin.btn.cancel}</yield>
+  </modal>
+  <script>
+  var _this = this;
+  _this.fn = {
+    ok: function(){
+      _this.emit('ok');
+      _this.tags.modal.emit('close');
+    }
+  };
+  _this.on('open', function(){
+    _this.tags.modal.emit('open');
+  });
+  _this.on('close', function(){
+    _this.tags.modal.emit('close');
+  });
+  </script>
+</modal-remove>
+
 
 <!-- 组织机构 -->
 <org-select>
-
-  <span each={s in selectList}>
-    <select onchange={fn.change}>
-      <option each={s} value="{id}">{pid}{name}</option>
-    </select>
-  </span>
-
+  <style scoped>
+  select{margin-right: 12px}
+  </style>
+  <select
+    ref="orgs"
+    each="{id, lv in selectValue}"
+    if={selectList[id] && selectList[id].length}
+    onchange="{fn.change}">
+    <option selected="{Number(selectValue[lv+1])===id}"
+      value="{id}"
+      each="{selectList[id]}">{name}</option>
+  </select>
+  <!-- 最终id -->
+  <input type="hidden" ref="org_id" value="{selectValue.slice(-1)[0]}">
+  <!-- 错误信息 -->
+  <input-valid
+    style="{opts.left&&'left:'+opts.left+'px'}"
+    ref="validOrg" for="org_id" rule="required" msg=""/>
 
   <script>
   var _this = this;
   _this.orgList = _this.app.data.orgList || [];
-  _this.selectList = [];
-  _this.ids = [0];
+  _this.selectList = {};
+  // 选中的值
+  _this.selectValue = [0];
+  // 外露函数
+  _this.getId = function(){
+    return _this.selectValue.slice(-1)[0];
+  };
   _this.fn = {
     change: function(e){
-      _this.ids[e.item.s[0].lv+1] = Number(e.target.value);
+      var nextLv = Number(e.item.lv) + 1;
+      _this.refs.validOrg.emit('msg', '');
+      _this.selectValue[nextLv] = Number(e.target.value);
+      // 删除未知的子类
+      while(_this.selectValue.length > nextLv + 1){
+        _this.selectValue.pop();
+      }
       _this.update();
     },
     // 层次扫描
     scan: function(id, lv, data){
       var parentId = id || 0;
       var level = lv || 0;
-      var list = [];
+      var list = [{
+        lv: level, id: -1, name: '--请选择--'
+      }];
       var orgList = data || _this.orgList;
       orgList.forEach(function(org, i){
         if(org.child.length > 0){
           _this.fn.scan(org.id, level+1, org.child);
         }
         list.push({
-          lv: level, pid: parentId, id: org.id, name: org.name
+          lv: level, id: org.id, name: org.name
         });
       });
-      _this.selectList[level] = list;
+      _this.selectList[parentId] = list;
     }
   };
   _this.on('mount', function(){
-    // 选中的值
-    _this.selectValue = (opts.value && opts.value.split(',')) || [];
-    if(_this.orgList.length > 0) return;
-    _this.app.xhr('http://dev.fp.sosho.cn/system-setting/organization/search')
-    .done(function(data) {
-      _this.orgList = _this.app.data.orgList = data;
+    if(_this.orgList.length > 0){
       _this.fn.scan();
-      console.log(_this.selectList);
+      return _this.update();
+    }
+    _this.app.api('GET', 'system-setting/organization/search')
+    .on('done', function(data) {
+      _this.orgList = data.items;
+      _this.fn.scan();
       _this.update();
     });
-
   });
-
+  // 检查数据
+  _this.on('check', function(){
+    var id = _this.selectValue.slice(-1)[0];
+    if(_this.selectList[id] || id === -1 || id == ''){
+      _this.emit('invalid');
+      return _this.refs.validOrg.emit('msg', '请继续选择');
+    }
+    _this.emit('valid');
+  });
+  // 设置值
+  _this.on('set', function(value){
+    _this.selectValue = [0].concat((''+value).split(','));
+  });
   </script>
 </org-select>
 
 
 <!-- 项目类型 -->
+<project-type-select>
+  <input-select name="name" ref="project_type" placeholder="搜索选择" value=""/>
+  <input type="hidden" ref="project_type_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validProjectType" for="project_type_id" rule="required" msg="项目类型"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.project_type_id.value;
+  };
+  _this.getName = function(){
+    return _this.refs.project_type.value;
+  };
+  _this.on('mount', function(){
 
+    if(opts.disable == 1){
+      _this.refs.project_type.emit('disable');
+      return;
+    }
+
+    // 请求数据
+    _this.refs.project_type.on('pull', function(keyword){
+
+      _this.refs.validProjectType.emit('msg', '');
+
+      if(_this.keywordCache[keyword]){
+        return _this.refs.project_type.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'system-setting/project-type/search', {
+        data: { keyword: keyword }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.project_type.emit('push', data.items);
+      });
+
+    });
+    // 选择了
+    _this.refs.project_type.on('select', function(item){
+      _this.refs.project_type_id.value = item.id || '';
+      _this.refs.project_type.value = item.name || '';
+    });
+  });
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validProjectType
+    .on('valid', function(){
+      _this.emit('valid');
+    })
+    .on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(item){
+    var id = _this.refs.project_type_id.value = item.id;
+    _this.app.api('GET', 'system-setting/project-type/search')
+    .on('done', function(data){
+      data.items.forEach(function(item){
+        if(item.id == id){
+          _this.refs.project_type.emit('value', item.name);
+        }
+      });
+    });
+  });
+  </script>
+</project-type-select>
 
 <!-- 职务查询 -->
 <place-select>
@@ -246,11 +485,11 @@
   <div if={opts.for=='agreement'}>
     {app.lang.admin.search.condition}:
     <select ref="agreement">
-      <option each={app.lang.admin.agreement['search:types']} value={key} selected={type==key}>{name}</option>
+      <option each={app.lang.admin.agreement['search:types']} value={key} selected="{key==type}">{name}</option>
     </select>
     <input type="text" ref="keyword" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="{app.lang.admin.search.keyword.placehoder}">
-    <button style="margin-left: -5px" class="gray" onclick={fn.search}><i class="icon-search"></i></button>
-    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.reset}>{app.lang.admin.reset}</a>
+    <button onclick={fn.search} type="button" class="btn-gray"><i class="icon-search"></i></button>
+    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.agreementReset}>{app.lang.admin.reset}</a>
   </div>
   <div class="addon">
     <yield from="addon"></yield>
@@ -265,8 +504,17 @@
       _this.app.route.query.status = e.item.key;
       _this.app.query();
     },
-    reset: function(){
-      _this.app.route.query = {};
+    agreementReset: function(){
+      _this.refs.agreement.value = 'agreement_number';
+      _this.app.route.query.page = 1;
+      _this.app.route.query.type =
+      _this.app.route.query.page =
+      _this.refs.keyword.value =
+      _this.app.route.query.keyword = '';
+      if(opts.modal){
+        _this.emit('query', _this.app.route.query);
+        return;
+      }
       _this.app.query();
     },
     enter: function(e){
@@ -276,10 +524,15 @@
     },
     search: function(){
       if(opts.for === 'agreement'){
-        _this.app.route.query.type = _this.refs.agreement.value || '';
-        _this.app.route.query.keyword = _this.refs.keyword.value || '';
-        _this.app.query();
+        _this.app.route.query.type =
+        _this.refs.agreement.value || '';
+        _this.app.route.query.keyword =  _this.refs.keyword.value || '';
       }
+      if(opts.modal){
+        _this.emit('query', _this.app.route.query);
+        return;
+      }
+      _this.app.query();
     }
   };
   _this.on('mount', function(){

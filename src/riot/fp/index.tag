@@ -13,7 +13,8 @@
 
   <upload-formdata name="file[]"></upload-formdata>
 
-  <org-select></org-select>
+  <org-select value=""></org-select>
+  <pagination-number page="1" pages="100" select="y"/>
 
   <script>
   var _this = this;

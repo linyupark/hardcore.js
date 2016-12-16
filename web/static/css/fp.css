@@ -629,6 +629,18 @@ h1 {
   .btn-icon:hover {
     color: #DF3A5E; }
 
+.warning-box {
+  width: 500px;
+  font-size: 13px;
+  padding: 12px;
+  text-align: left;
+  color: #EB9D00;
+  background: #fff0d2;
+  border: 1px solid #ffce6c;
+  width: auto;
+  text-align: center;
+  font-size: 16px; }
+
 .btn-main {
   cursor: pointer;
   background: #DF3A5E;
@@ -894,8 +906,8 @@ form.agreement, form.donor, form.project {
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
     form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled] {
-      border-radius: 0;
-      border: none;
+      background: #fff;
+      border-color: #fff;
       border-bottom: 1px solid #E3E3E3; }
   form.agreement label, form.donor label, form.project label {
     width: 66px;
@@ -939,6 +951,8 @@ form.agreement, form.donor, form.project {
       color: #999; }
   form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select {
     width: 160px; }
+  form.agreement .c4 select, form.donor .c4 select, form.project .c4 select {
+    width: 172px; }
   form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"] {
     margin-left: 5px; }
   form.agreement .c2 p, form.donor .c2 p, form.project .c2 p {
@@ -1071,8 +1085,8 @@ table-filter {
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
     table-filter input[type=text][disabled], table-filter select[disabled] {
-      border-radius: 0;
-      border: none;
+      background: #fff;
+      border-color: #fff;
       border-bottom: 1px solid #E3E3E3; }
   table-filter button {
     padding: 1px 10px; }
@@ -1157,8 +1171,8 @@ main {
           border-radius: 5px;
           box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
         main.login form input[disabled] {
-          border-radius: 0;
-          border: none;
+          background: #fff;
+          border-color: #fff;
           border-bottom: 1px solid #E3E3E3; }
       main.login form .pwd-show, main.login form .pwd-hide {
         width: 35px;
@@ -1219,24 +1233,11 @@ main {
             color: #DF3A5E;
             border-color: #DF3A5E; }
 
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0.5; }
-  to {
-    opacity: 1; } }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0.5; }
-  to {
-    opacity: 1; } }
-
 section {
   margin-left: 19.16667%;
   margin-right: 4.16667%;
   min-height: 700px;
-  overflow: hidden;
-  animation: fadeIn .1s; }
+  overflow: hidden; }
   section h2 {
     font-weight: normal;
     font-size: 14px;
@@ -1344,9 +1345,6 @@ input-select ul {
     input-select ul li.active, input-select ul li:hover {
       background: #fbe0e0;
       color: #DF3A5E; }
-
-modal {
-  display: none; }
 
 upload-formdata input[type=file] {
   color: #ccc; }
