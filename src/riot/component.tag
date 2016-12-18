@@ -95,6 +95,8 @@
       _this.emit('pull', e.target.value);
     },
     select: function(e){
+      // 如果id为-1则不选中
+      if(e.item.item.id === -1) return;
       _this.selected = e.item.item;
       _this.refs.keyword.value = _this.selected[opts.name];
       _this.selectIndex = 0;
@@ -126,6 +128,11 @@
   };
   _this.on('mount', function(){});
   _this.on('push', function(items){
+    if(!items || items.length === 0){
+      items = [{}];
+      items[0][opts.name] = '没搜到请更换关键字';
+      items[0].id = -1;
+    }
     // 查询到数据渲染到下拉表中
     _this.update({
       items: items,

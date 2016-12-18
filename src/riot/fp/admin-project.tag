@@ -10,7 +10,7 @@
   <div class="project-agreement" if="{opts.pid>0}">
     <table-filter for="project-agreement">
       <yield to="addon">
-        <button class="main" onclick={parent.fn.modalAddAgreement}>
+        <button type="button" class="main" onclick={parent.fn.modalAddAgreement}>
           <i class="icon-plus"></i> 添加关联协议
         </button>
       </yield>
@@ -208,12 +208,12 @@
           <!-- 负责人 -->
           <p>
             <label>负责人</label>
-            <input type="text" ref="head_name" placeholder="姓名" value="{project.baseinfo.head_name}">
+            <user-select ref="head_name" for="admin"/>
             &nbsp;
             <input type="text" ref="head_tel" placeholder="电话" value="{project.baseinfo.head_tel}">
             &nbsp;
             <input type="text" ref="head_email" placeholder="邮箱" value="{project.baseinfo.head_email}">
-            <input-valid ref="validOnSave" for="head_name,head_tel,head_email" rule="required" msg="请填写负责人的姓名、电话、邮箱"/>
+            <input-valid style="left: 245px" ref="validOnSave" for="head_tel,head_email" rule="required" msg="请填写负责人的电话、邮箱"/>
             <input-valid style="left: 445px" ref="validOnSave" for="head_email" rule="email" msg="邮箱格式不正确"/>
           </p>
         </div>
@@ -283,7 +283,7 @@
                 contact_name: _this.refs.contact_name.value,
                 contact_tel: _this.refs.contact_tel.value,
                 contact_email: _this.refs.contact_email.value,
-                head_name: _this.refs.head_name.value,
+                head_uid: _this.refs.head_name.getId(),
                 head_tel: _this.refs.head_tel.value,
                 head_email: _this.refs.head_email.value
               })

@@ -1,6 +1,6 @@
 <!-- 关联协议 -->
 <modal-agreement>
-  <modal ref="modal" w="640" h="520" top="150px">
+  <modal ref="modal" w="640" h="520" top="15%">
     <yield to="title">选择新增协议</yield>
     <yield to="content">
       <table-filter ref="filter" for="agreement" modal="true"/>
@@ -134,6 +134,74 @@
 </modal-remove>
 
 
+<!-- 用户搜索 -->
+<user-select>
+  <input-select name="real_name" ref="user_name" placeholder="搜索选择" value=""/>
+  <input type="hidden" ref="user_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validUser" for="user_id" rule="required" msg="请选择用户"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.user_id.value;
+  };
+  _this.getName = function(){
+    return _this.refs.user_name.value;
+  };
+  _this.on('mount', function(){
+
+    if(opts.disable == 1){
+      _this.refs.user_name.emit('disable');
+      return;
+    }
+
+    // 请求数据
+    _this.refs.user_name.on('pull', function(keyword){
+
+      _this.refs.validUser.emit('msg', '');
+
+      if(_this.keywordCache[keyword]){
+        return _this.refs.user_name.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'user-manager/default/search', {
+        data: {
+          identity: opts.for=='admin' ? 1: 0,
+          keyword: keyword
+        }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.user_name.emit('push', data.items);
+      });
+
+    });
+    // 选择了
+    _this.refs.user_name.on('select', function(item){
+      _this.refs.user_id.value = item.id || '';
+      _this.refs.user_name.value = item.name || '';
+    });
+  });
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validUser
+    .on('valid', function(){
+      _this.emit('valid');
+    })
+    .on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(item){
+    _this.refs.user_id.value = item.id;
+    _this.refs.user_name.emit('value', item.name);
+  });
+  </script>
+</user-select>
+
 <!-- 组织机构 -->
 <org-select>
   <style scoped>
@@ -228,7 +296,7 @@
 <project-type-select>
   <input-select name="name" ref="project_type" placeholder="搜索选择" value=""/>
   <input type="hidden" ref="project_type_id" value=""/>
-  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validProjectType" for="project_type_id" rule="required" msg="项目类型"/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validProjectType" for="project_type_id" rule="required" msg="请选择项目类型"/>
   <script>
   var _this = this;
   _this.keywordCache = {};
@@ -626,7 +694,7 @@
   </script>
 </userinfo>
 
-
+<!-- 页脚 -->
 <footer>
   <div class="container">
     <!-- 底部信息 -->
@@ -640,7 +708,7 @@
   </div>
 </footer>
 
-
+<!-- header -->
 <header class="{opts.for}">
 
   <!-- 顶部信息框 -->

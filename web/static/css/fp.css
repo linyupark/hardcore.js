@@ -1327,6 +1327,7 @@ admin-sidenav {
       background: #333; }
 
 input-select ul {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   z-index: 33;
   max-height: 200px;
   overflow: auto;
