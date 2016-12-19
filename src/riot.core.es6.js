@@ -1,4 +1,4 @@
-// 3.0.4
+// 3.0.5
 
 import { brackets, tmpl } from './riot.tmpl.es6.js';
 import { emitter as observable } from './emitter.es6.js';
@@ -576,7 +576,8 @@ function updateExpression(expr) {
   var dom = expr.dom,
     attrName = expr.attr,
     isToggle = /^(show|hide)$/.test(attrName),
-    value = isToggle || tmpl(expr.expr, this),
+    // the value for the toggle must consider also the parent tag
+    value = isToggle ? tmpl(expr.expr, extend({}, this, this.parent)) : tmpl(expr.expr, this),
     isValueAttr = attrName === 'riot-value',
     isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
     parent = dom && (expr.parent || dom.parentNode),
@@ -613,7 +614,7 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) return updateDataIs(expr, this)
-  if (old === value && !isToggle) return
+  if (old === value) return
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) return
 
@@ -647,7 +648,6 @@ function updateExpression(expr) {
     setEventHandler(attrName, value, dom, this);
   // show / hide
   } else if (isToggle) {
-    value = tmpl(expr.expr, extend({}, this, this.parent));
     if (attrName === 'hide') value = !value;
     dom.style.display = value ? '' : 'none';
   // field value
@@ -662,12 +662,11 @@ function updateExpression(expr) {
       setAttr(dom, attrName, value);
   } else {
     // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
-      // parent.value = dom.value;
-      // NOTE select bug 去掉这个暂时没问题了，坐等修复
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value) {
+      parent.value = dom.value;
     } if (expr.bool) {
       dom[attrName] = value;
-      if (!value) return;
+      if (!value) return
     } if (value === 0 || value && typeof value !== T_OBJECT) {
       setAttr(dom, attrName, value);
     }
@@ -679,7 +678,7 @@ function updateExpression(expr) {
  * @this Tag
  * @param { Array } expressions - expression that must be re evaluated
  */
-function update(expressions) {
+function updateAllExpressions(expressions) {
   each(expressions, updateExpression.bind(this));
 }
 
@@ -716,7 +715,7 @@ var IfExpr = {
       this.expressions = [];
     }
 
-    if (newValue) update.call(this.parentTag, this.expressions);
+    if (newValue) updateAllExpressions.call(this.parentTag, this.expressions);
   },
   unmount() {
     unmountAll(this.expressions || []);
@@ -891,7 +890,7 @@ function _each(dom, parent, expr) {
     tagName = getTagName(dom),
     impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
     useRoot = RE_SPECIAL_TAGS.test(tagName),
-    root = dom.parentNode,
+    parentNode = dom.parentNode,
     ref = createDOMPlaceholder(),
     child = getTag(dom),
     ifExpr = getAttr(dom, 'if'),
@@ -909,27 +908,15 @@ function _each(dom, parent, expr) {
   if (ifExpr) remAttr(dom, 'if');
 
   // insert a marked where the loop tags will be injected
-  root.insertBefore(ref, dom);
-  root.removeChild(dom);
+  parentNode.insertBefore(ref, dom);
+  parentNode.removeChild(dom);
 
   expr.update = function updateEach() {
 
     // get the new items collection
     var items = tmpl(expr.val, parent),
-      parentNode,
-      frag,
-      placeholder;
-
-
-    root = ref.parentNode;
-
-    if (parentNode) {
-      placeholder = createDOMPlaceholder('');
-      parentNode.insertBefore(placeholder, root);
-      parentNode.removeChild(root);
-    } else {
-      frag = createFrag();
-    }
+      frag = createFrag(),
+      root = ref.parentNode;
 
     // object loop. any changes cause full redraw
     if (!isArray(items)) {
@@ -1027,13 +1014,7 @@ function _each(dom, parent, expr) {
     // clone the items array
     oldItems = items.slice();
 
-    if (frag) {
-      root.insertBefore(frag, ref);
-    } else {
-      parentNode.insertBefore(root, placeholder);
-      parentNode.removeChild(placeholder);
-    }
-
+    root.insertBefore(frag, ref);
   };
 
   expr.unmount = function() {
@@ -1423,7 +1404,7 @@ function mixin$$1(name, mix, g) {
  * Update all the tags instances created
  * @returns { Array } all the tags instances
  */
-function update$1() {
+function update$$1() {
   return each(__TAGS_CACHE, tag$$1 => tag$$1.update())
 }
 
@@ -1452,7 +1433,7 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 
   var ctx = !isAnonymous && isLoop ? this : parent || this;
   each(instAttrs, (attr) => {
-    if (attr.expr) update.call(ctx, [attr.expr]);
+    if (attr.expr) updateAllExpressions.call(ctx, [attr.expr]);
     opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value;
   });
 }
@@ -1504,8 +1485,9 @@ function Tag$$1(impl, conf, innerHTML) {
   // it could be handy to use it also to improve the virtual dom rendering speed
   defineProperty(this, '_riot_id', ++__uid); // base 1 allows test !t._riot_id
 
-  extend(this, { parent, root, opts }, item);
+  extend(this, { root, opts }, item);
   // protect the "tags" and "refs" property from being overridden
+  defineProperty(this, 'parent', parent || null);
   defineProperty(this, 'tags', {});
   defineProperty(this, 'refs', {});
 
@@ -1528,7 +1510,7 @@ function Tag$$1(impl, conf, innerHTML) {
     extend(this, data);
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
     if (this.isMounted) this.emit('update', data);
-    update.call(this, expressions);
+    updateAllExpressions.call(this, expressions);
     if (this.isMounted) this.emit('updated');
 
     return this
@@ -1788,7 +1770,7 @@ function initChildTag(child, opts, innerHTML, parent) {
     tagName = opts.tagName || getTagName(opts.root, true),
     ptag = getImmediateCustomParentTag(parent);
   // fix for the parent attribute in the looped elements
-  tag.parent = ptag;
+  defineProperty(tag, 'parent', ptag);
   // store the real parent tag
   // in some cases this could be different from the custom parent tag
   // for example in nested loops
@@ -2075,8 +2057,8 @@ var riot$1 = Object.freeze({
 	tag2: tag2$$1,
 	mount: mount$$1,
 	mixin: mixin$$1,
-	update: update$1,
+	update: update$$1,
 	unregister: unregister$$1
 });
 
-export { settings, util, observable, Tag$1 as Tag, tag$$1 as tag, tag2$$1 as tag2, mount$$1 as mount, mixin$$1 as mixin, update$1 as update, unregister$$1 as unregister };export default riot$1;
+export { settings, util, observable, Tag$1 as Tag, tag$$1 as tag, tag2$$1 as tag2, mount$$1 as mount, mixin$$1 as mixin, update$$1 as update, unregister$$1 as unregister };export default riot$1;
