@@ -88,7 +88,7 @@
           _this.emit("select", _this.selected);
           _this.update();
         }
-      }, 100);
+      }, 500);
     },
     pull: function(e){
       e.target.value = '';

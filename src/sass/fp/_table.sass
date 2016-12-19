@@ -71,3 +71,67 @@ table-filter
     padding: 1px 10px
   a
     margin-left: 10px
+
+
+// 项目进度
+.project-perform
+  min-width: 800px
+  .title
+    font-size: $font-l
+    margin-left: 8%
+  .step-box
+    padding-top: 15px
+    width: 50px
+    text-align: center
+    float: left
+  .step-num
+    width: 34px
+    height: 34px
+    border-radius: 34px
+    background-color: #D1D3D7
+    color: #fff
+    text-align: center
+    line-height: 34px
+    border: 8px solid #fff
+    &.active
+      background-color: $color-main
+  .step-line
+    height: 40px
+    width: 0
+    border-right: 1px solid $color-line2
+    margin: 0 auto
+  .process-list
+    float: left
+    margin-left: 30px
+    min-width: 600px
+    width: 88%
+    border: 1px solid $color-line1
+    border-bottom: none
+    border-radius: 5px
+    .line
+      &.odd
+        background-color: #fafafa
+      height: 90px
+      border-bottom: 1px solid $color-line1
+      h4
+        font-size: $font-m
+        border: none
+        font-weight: normal
+        padding: 18px 18px 0 18px
+        margin-bottom: 0
+      p
+        padding: 0 18px
+        color: $color-txt1
+        span, button
+          float: right
+          margin: -20px 5px 0 0
+        span
+          display: inline-block
+          text-align: center
+          width: 90px
+          color: $color-success
+          margin: -12px 5px 0 0
+        button
+          width: 90px
+          height: 30px
+          line-height: 24px

@@ -1,3 +1,4 @@
+
 <!-- 关联协议 -->
 <modal-agreement>
   <modal ref="modal" w="640" h="520" top="15%">
@@ -69,7 +70,8 @@
         data: {
           page: _this.q.page || 1,
           search_type: _this.q.type || '',
-          search_keyword: _this.q.keyword || ''
+          search_keyword: _this.q.keyword || '',
+          per_page: 5
         }
       }).on('done', function(data){
         _this.update({
@@ -134,6 +136,75 @@
 </modal-remove>
 
 
+<!-- 协议搜索 -->
+<agreement-select>
+  <input-select name="agreement_name" ref="agreement_name" placeholder="搜索选择" value=""/>
+  <input type="hidden" ref="agreement_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validAgreement" for="agreement_id" rule="required" msg="请选择协议"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.agreement_id.value;
+  };
+  _this.getName = function(){
+    return _this.refs.agreement_name.value;
+  };
+  _this.on('mount', function(){
+
+    if(opts.disable == 1){
+      _this.refs.agreement_name.emit('disable');
+      return;
+    }
+
+    // 请求数据
+    _this.refs.agreement_name.on('pull', function(keyword){
+
+      _this.refs.validAgreement.emit('msg', '');
+
+      if(_this.keywordCache[keyword]){
+        return _this.refs.agreement_name.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'project/agreement/search', {
+        data: {
+          search_type: 'agreement_name',
+          search_keyword: keyword,
+          per_page: 99999
+        }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.agreement_name.emit('push', data.items);
+      });
+
+    });
+    // 选择了
+    _this.refs.agreement_name.on('select', function(item){
+      _this.refs.agreement_id.value = item.id || '';
+      _this.refs.agreement_name.value = item.agreement_name || '';
+    });
+  });
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validAgreement
+    .on('valid', function(){
+      _this.emit('valid');
+    })
+    .on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(item){
+    _this.refs.agreement_id.value = item.id;
+    _this.refs.agreement_name.emit('value', item.name);
+  });
+  </script>
+</agreement-select>
+
 <!-- 用户搜索 -->
 <user-select>
   <input-select name="real_name" ref="user_name" placeholder="搜索选择" value=""/>
@@ -179,8 +250,8 @@
     });
     // 选择了
     _this.refs.user_name.on('select', function(item){
-      _this.refs.user_id.value = item.id || '';
-      _this.refs.user_name.value = item.name || '';
+      _this.refs.user_id.value = item.user_id || '';
+      _this.refs.user_name.value = item.real_name || '';
     });
   });
   // 检查数据
@@ -332,12 +403,15 @@
       });
 
     });
+
     // 选择了
     _this.refs.project_type.on('select', function(item){
       _this.refs.project_type_id.value = item.id || '';
       _this.refs.project_type.value = item.name || '';
     });
+
   });
+
   // 检查数据
   _this.on('check', function(){
     _this.refs.validProjectType
@@ -349,6 +423,7 @@
     })
     .emit('check');
   });
+
   // 设置默认显示值
   _this.on('set', function(item){
     var id = _this.refs.project_type_id.value = item.id;
@@ -361,6 +436,7 @@
       });
     });
   });
+
   </script>
 </project-type-select>
 

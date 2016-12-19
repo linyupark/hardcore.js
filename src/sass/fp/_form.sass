@@ -59,7 +59,7 @@
         color: $color-main
         border-color: $color-main
 
-form.agreement, form.donor, form.project
+form.agreement, form.donor, form.project, form.payment
   +shadow-block()
   background: #fff
   padding: 30px
@@ -163,3 +163,15 @@ form.project
       &.active
         color: #222
         border-bottom: 1px solid $color-main
+
+form.payment
+  box-shadow: none
+  border-bottom: 1px solid $color-line1
+  border-radius: 0
+  position: relative
+  .btn-line-top
+    position: absolute
+    right: 0
+    top: 20px
+  .btn-line
+    padding-bottom: 0

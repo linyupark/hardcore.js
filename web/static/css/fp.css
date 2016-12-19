@@ -492,17 +492,17 @@ template {
   content: '\f1f8'; }
 
 /* '' */
-.row:before, form.agreement .row:before, form.donor .row:before, form.project .row:before, .row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after {
+.row:before, form.agreement .row:before, form.donor .row:before, form.project .row:before, form.payment .row:before, .row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after {
   content: "";
   display: table; }
 
-.row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after {
+.row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after {
   clear: both; }
 
-.row, form.agreement .row, form.donor .row, form.project .row {
+.row, form.agreement .row, form.donor .row, form.project .row, form.payment .row {
   zoom: 1; }
 
-userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
+userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -581,6 +581,9 @@ a {
   color: #575E85; }
   a:hover {
     color: #6f76a0; }
+  a.under-line {
+    color: #37ACE6;
+    text-decoration: underline; }
 
 hr {
   border: none;
@@ -649,7 +652,7 @@ h1 {
   color: #fff;
   font-size: 13.16667px;
   height: 35px;
-  line-height: 33px;
+  line-height: 32px;
   border-radius: 3px; }
   .btn-main:hover {
     background: #c62044; }
@@ -658,7 +661,8 @@ h1 {
   .btn-main[disabled], .btn-main:disabled {
     background: #ea7c94;
     border-color: #ea7c94;
-    color: #df3a5e; }
+    color: #df3a5e;
+    cursor: default; }
 
 .btn-yellow {
   cursor: pointer;
@@ -668,7 +672,7 @@ h1 {
   color: #FFF;
   font-size: 13.16667px;
   height: 35px;
-  line-height: 33px;
+  line-height: 32px;
   border-radius: 3px; }
   .btn-yellow:hover {
     background: #fe951d; }
@@ -677,7 +681,8 @@ h1 {
   .btn-yellow[disabled], .btn-yellow:disabled {
     background: #fed19c;
     border-color: #fed19c;
-    color: #fead50; }
+    color: #fead50;
+    cursor: default; }
 
 .btn-gray {
   cursor: pointer;
@@ -687,7 +692,7 @@ h1 {
   color: #999999;
   font-size: 13.16667px;
   height: 35px;
-  line-height: 33px;
+  line-height: 32px;
   border-radius: 3px; }
   .btn-gray:hover {
     background: #c8c8c8; }
@@ -696,7 +701,12 @@ h1 {
   .btn-gray[disabled], .btn-gray:disabled {
     background: white;
     border-color: white;
-    color: #e1e1e1; }
+    color: #e1e1e1;
+    cursor: default; }
+  .btn-gray[disabled], .btn-gray:disabled {
+    background: #eeeeee;
+    border-color: #ddd;
+    color: #ccc; }
 
 @-webkit-keyframes fadeInDown {
   from {
@@ -866,116 +876,116 @@ header h1 {
   line-height: 80px;
   text-indent: 60px; }
 
-form.agreement, form.donor, form.project {
+form.agreement, form.donor, form.project, form.payment {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   background: #fff;
   padding: 30px;
   border-radius: 5px;
   margin: 0 5px 5px 0; }
-  form.agreement h4, form.donor h4, form.project h4 {
+  form.agreement h4, form.donor h4, form.project h4, form.payment h4 {
     margin: 0 0 15px 0;
     padding: 0 15px;
     font-size: 16px;
     border-left: 2px solid #DF3A5E; }
-  form.agreement .row, form.donor .row, form.project .row {
+  form.agreement .row, form.donor .row, form.project .row, form.payment .row {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: -0;
     margin-right: -0; }
-    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row, [class*="no-gutter"] > form.project .row {
+    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row, [class*="no-gutter"] > form.project .row, [class*="no-gutter"] > form.payment .row {
       margin-left: 0 !important;
       margin-right: 0 !important; }
-    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
+    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row {
       margin-left: -0;
       margin-right: -0; }
     @media screen and (min-width: 960px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row {
         margin-left: -0;
         margin-right: -0; } }
     @media screen and (max-width: 480px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row {
         margin-left: -0;
         margin-right: -0; } }
-  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select, form.project input[type=text], form.project select {
+  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select, form.project input[type=text], form.project select, form.payment input[type=text], form.payment select {
     height: 36px;
     padding: 0 5px;
     border-radius: 3px;
     border: 1px solid #E3E3E3; }
-    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus, form.project input[type=text]:focus, form.project select:focus {
+    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus, form.project input[type=text]:focus, form.project select:focus, form.payment input[type=text]:focus, form.payment select:focus {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
-    form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled] {
+    form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled], form.payment input[type=text][disabled], form.payment select[disabled] {
       background: #fff;
       border-color: #fff;
       border-bottom: 1px solid #E3E3E3; }
-  form.agreement label, form.donor label, form.project label {
+  form.agreement label, form.donor label, form.project label, form.payment label {
     width: 66px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 5px; }
-    form.agreement label.center, form.donor label.center, form.project label.center {
+    form.agreement label.center, form.donor label.center, form.project label.center, form.payment label.center {
       text-align: center; }
-    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox, form.project label.radio, form.project label.checkbox {
+    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox, form.project label.radio, form.project label.checkbox, form.payment label.radio, form.payment label.checkbox {
       height: 38px;
       margin-right: 20px;
       line-height: 38px; }
-    form.agreement label.top, form.donor label.top, form.project label.top {
+    form.agreement label.top, form.donor label.top, form.project label.top, form.payment label.top {
       float: left;
       padding-top: 18px; }
-  form.agreement p, form.donor p, form.project p {
+  form.agreement p, form.donor p, form.project p, form.payment p {
     padding-bottom: 10px;
     position: relative; }
-    form.agreement p textarea, form.donor p textarea, form.project p textarea {
+    form.agreement p textarea, form.donor p textarea, form.project p textarea, form.payment p textarea {
       width: 77%;
       border-color: #ebebeb;
       border-radius: 5px;
       min-height: 100px;
       padding: 5px; }
-    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select, form.project p input[type=text], form.project p select {
+    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select, form.project p input[type=text], form.project p select, form.payment p input[type=text], form.payment p select {
       width: 260px; }
-    form.agreement p select, form.donor p select, form.project p select {
+    form.agreement p select, form.donor p select, form.project p select, form.payment p select {
       width: 272px; }
-    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"], form.project p i[class^="icon-"] {
+    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"], form.project p i[class^="icon-"], form.payment p i[class^="icon-"] {
       color: #666;
       margin-left: -30px; }
-    form.agreement p input-valid, form.donor p input-valid, form.project p input-valid {
+    form.agreement p input-valid, form.donor p input-valid, form.project p input-valid, form.payment p input-valid {
       position: absolute;
       color: #F44C4C;
       top: 44px;
       left: 70px;
       font-size: 13px; }
-    form.agreement p .files, form.donor p .files, form.project p .files {
+    form.agreement p .files, form.donor p .files, form.project p .files, form.payment p .files {
       display: block;
       padding: 5px 0;
       color: #999; }
-  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select {
+  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select, form.payment .c4 input[type=text], form.payment .c4 select {
     width: 160px; }
-  form.agreement .c4 select, form.donor .c4 select, form.project .c4 select {
+  form.agreement .c4 select, form.donor .c4 select, form.project .c4 select, form.payment .c4 select {
     width: 172px; }
-  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"] {
+  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"], form.payment .c4 i[class^="icon-"] {
     margin-left: 5px; }
-  form.agreement .c2 p, form.donor .c2 p, form.project .c2 p {
+  form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p {
     width: 41.66667%;
     margin-right: 4.16667%; }
-  form.agreement .c1, form.donor .c1, form.project .c1 {
+  form.agreement .c1, form.donor .c1, form.project .c1, form.payment .c1 {
     overflow: hidden;
     padding-bottom: 20px; }
-    form.agreement .c1.btn-line, form.donor .c1.btn-line, form.project .c1.btn-line {
+    form.agreement .c1.btn-line, form.donor .c1.btn-line, form.project .c1.btn-line, form.payment .c1.btn-line {
       text-indent: 70px; }
-      form.agreement .c1.btn-line button, form.donor .c1.btn-line button, form.project .c1.btn-line button {
+      form.agreement .c1.btn-line button, form.donor .c1.btn-line button, form.project .c1.btn-line button, form.payment .c1.btn-line button {
         width: 100px;
         margin-right: 20px; }
-    form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line {
+    form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line {
       width: 91.66667%; }
-    form.agreement .c1 .price-group, form.donor .c1 .price-group, form.project .c1 .price-group {
+    form.agreement .c1 .price-group, form.donor .c1 .price-group, form.project .c1 .price-group, form.payment .c1 .price-group {
       display: inline-block;
       margin-top: 10px; }
-      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select, form.project .c1 .price-group input[type=text], form.project .c1 .price-group select {
+      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select, form.project .c1 .price-group input[type=text], form.project .c1 .price-group select, form.payment .c1 .price-group input[type=text], form.payment .c1 .price-group select {
         min-width: 160px;
         max-width: 160px;
         margin-right: 8px; }
-      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"], form.project .c1 .price-group i[class^="icon-"] {
+      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"], form.project .c1 .price-group i[class^="icon-"], form.payment .c1 .price-group i[class^="icon-"] {
         margin: 0 8px 0 0; }
 
 form.project .top-tab-line {
@@ -994,6 +1004,18 @@ form.project .top-tab-line {
     form.project .top-tab-line a.c4.active {
       color: #222;
       border-bottom: 1px solid #DF3A5E; }
+
+form.payment {
+  box-shadow: none;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 0;
+  position: relative; }
+  form.payment .btn-line-top {
+    position: absolute;
+    right: 0;
+    top: 20px; }
+  form.payment .btn-line {
+    padding-bottom: 0; }
 
 table.base {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -1098,7 +1120,7 @@ table-filter {
       color: #fff;
       font-size: 13.5px;
       height: 36px;
-      line-height: 34px;
+      line-height: 33px;
       border-radius: 3px; }
       table-filter button.main:hover {
         background: #c62044; }
@@ -1107,7 +1129,8 @@ table-filter {
       table-filter button.main[disabled], table-filter button.main:disabled {
         background: #ea7c94;
         border-color: #ea7c94;
-        color: #df3a5e; }
+        color: #df3a5e;
+        cursor: default; }
     table-filter button.gray {
       cursor: pointer;
       background: #E1E1E1;
@@ -1116,7 +1139,7 @@ table-filter {
       color: #999999;
       font-size: 13.5px;
       height: 36px;
-      line-height: 34px;
+      line-height: 33px;
       border-radius: 3px; }
       table-filter button.gray:hover {
         background: #c8c8c8; }
@@ -1125,9 +1148,76 @@ table-filter {
       table-filter button.gray[disabled], table-filter button.gray:disabled {
         background: white;
         border-color: white;
-        color: #e1e1e1; }
+        color: #e1e1e1;
+        cursor: default; }
+      table-filter button.gray[disabled], table-filter button.gray:disabled {
+        background: #eeeeee;
+        border-color: #ddd;
+        color: #ccc; }
   table-filter a {
     margin-left: 10px; }
+
+.project-perform {
+  min-width: 800px; }
+  .project-perform .title {
+    font-size: 20px;
+    margin-left: 8%; }
+  .project-perform .step-box {
+    padding-top: 15px;
+    width: 50px;
+    text-align: center;
+    float: left; }
+  .project-perform .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 34px;
+    background-color: #D1D3D7;
+    color: #fff;
+    text-align: center;
+    line-height: 34px;
+    border: 8px solid #fff; }
+    .project-perform .step-num.active {
+      background-color: #DF3A5E; }
+  .project-perform .step-line {
+    height: 40px;
+    width: 0;
+    border-right: 1px solid #e3e3e3;
+    margin: 0 auto; }
+  .project-perform .process-list {
+    float: left;
+    margin-left: 30px;
+    min-width: 600px;
+    width: 88%;
+    border: 1px solid #ebebeb;
+    border-bottom: none;
+    border-radius: 5px; }
+    .project-perform .process-list .line {
+      height: 90px;
+      border-bottom: 1px solid #ebebeb; }
+      .project-perform .process-list .line.odd {
+        background-color: #fafafa; }
+      .project-perform .process-list .line h4 {
+        font-size: 16px;
+        border: none;
+        font-weight: normal;
+        padding: 18px 18px 0 18px;
+        margin-bottom: 0; }
+      .project-perform .process-list .line p {
+        padding: 0 18px;
+        color: #666; }
+        .project-perform .process-list .line p span, .project-perform .process-list .line p button {
+          float: right;
+          margin: -20px 5px 0 0; }
+        .project-perform .process-list .line p span {
+          display: inline-block;
+          text-align: center;
+          width: 90px;
+          color: #29AE39;
+          margin: -12px 5px 0 0; }
+        .project-perform .process-list .line p button {
+          width: 90px;
+          height: 30px;
+          line-height: 24px; }
 
 main {
   box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2) inset;
@@ -1199,7 +1289,7 @@ main {
         color: #fff;
         font-size: 16.16667px;
         height: 44px;
-        line-height: 42px;
+        line-height: 41px;
         border-radius: 3px;
         margin: 10px 0 0 25px;
         width: 300px; }
@@ -1210,7 +1300,8 @@ main {
         main.login form .btn-line button[disabled], main.login form .btn-line button:disabled {
           background: #ea7c94;
           border-color: #ea7c94;
-          color: #df3a5e; }
+          color: #df3a5e;
+          cursor: default; }
       main.login form .btn-line a {
         color: #575E85;
         font-size: 13px;
@@ -1358,7 +1449,7 @@ upload-formdata button {
   color: #999999;
   font-size: 9.83333px;
   height: 25px;
-  line-height: 23px;
+  line-height: 22px;
   border-radius: 3px; }
   upload-formdata button:hover {
     background: #c8c8c8; }
@@ -1367,4 +1458,9 @@ upload-formdata button {
   upload-formdata button[disabled], upload-formdata button:disabled {
     background: white;
     border-color: white;
-    color: #e1e1e1; }
+    color: #e1e1e1;
+    cursor: default; }
+  upload-formdata button[disabled], upload-formdata button:disabled {
+    background: #eeeeee;
+    border-color: #ddd;
+    color: #ccc; }

@@ -1,3 +1,325 @@
+
+<!-- 项目进度 -->
+<project-perform>
+
+  <div class="project-perform" if="{opts.pid>0}">
+    <h2 class="title">{perform.project_name}项目执行</h2>
+    <div style="overflow: hidden">
+      <div class="step-box">
+        <div each={p, i in perform.process}>
+          <div class="step-num {active: p.status==1}">{i+1}</div>
+          <div if="{i!=5}" class="step-line"/>
+        </div>
+      </div>
+      <div class="process-list">
+        <div class="line {odd:i%2==0}" each={p, i in perform.process}>
+          <h4>{p.title}</h4>
+          <p if={i==0}>
+            创建即立项
+            <span if={p.status==1 && !p.active}>执行中</span>
+            <button type="button" if={p.status==0 && p.active} onclick="{fn.create}" class="btn-main">开始执行</button>
+          </p>
+          <p if={i==1}>
+            本项目已经到款金额{p.payment_sum}元
+            <a if={p.status==1||p.active} href="javascript:;" onclick={fn.checkPayment} class="under-line">查看到款信息</a>
+            <span if={p.status==1 && !p.active}>已确认</span>
+            <button type="button" onclick={fn.CFPayment} if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+          </p>
+          <p if={i==2}>
+            由各执行单位（院系／机构／部门）录入评比结果
+            <a if={p.status==1||p.active} href="javascript:;" class="under-line">下载评审结果</a>
+            <button type="button" if={p.status==1 && !p.active}>重新上传</button>
+            <span if={p.status==1 && !p.active}>已上传</span>
+            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">上传</button>
+          </p>
+          <p if={i==3}>
+            由项目部对评审结果进行审批核实
+            <span if={p.status==1 && !p.active}>已确认</span>
+            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+          </p>
+          <p if={i==4}>
+            请导出评选结果，并发邮件给捐赠方确认
+            <span if={p.status==1 && !p.active}>已确认</span>
+            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+          </p>
+          <p if={i==5}>
+            <a if={p.status==1||p.active} href="javascript:;" class="under-line">查看历史执行</a>
+            <span if={p.status==1 && !p.active}>已确认</span>
+            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+          </p>
+        </div>
+      </div>
+    </div>
+    <br><br>
+  </div>
+  <!-- 没有项目ID提示 -->
+  <div class="warning-box" if="{opts.pid==0}">
+    需要先创建项目后才能编辑此页
+    <a href="#!{app.route.path}?tab=baseinfo">返回创建</a>
+  </div>
+
+  <script>
+  var _this = this;
+  _this.perform = {};
+  _this.fn = {
+    // 确认到账
+    CFPayment: function(e){
+      _this.app.api('POST', 'project/perform/payment?id='+opts.pid)
+      .on('done', function(data){
+        _this.app.alert('确认到账成功', 'success');
+        _this.fn.getPerform();
+      });
+    },
+    // 新建开始执行
+    create: function(e){
+      _this.app.api('POST', 'project/perform/create?id='+opts.pid)
+      .on('done', function(data){
+        _this.app.alert('创建立项成功', 'success');
+        _this.fn.getPerform();
+      });
+    },
+    checkPayment: function(){
+      _this.app.route(_this.app.route.path + '?tab=payment');
+    },
+    getPerform: function(){
+      _this.app.api('GET', 'project/perform/index', {
+        data: { id: opts.pid }
+      }).on('done', function(data){
+        _this.perform = data;
+        _this.update();
+      });
+    }
+  };
+  _this.on('mount', function(){
+    if(opts.pid === 0) return;
+    _this.fn.getPerform();
+  });
+  </script>
+
+</project-perform>
+
+
+<!-- 到款记录 -->
+<project-payment>
+  <style scoped>
+  .filter{
+    text-align: right;
+    border-bottom: 2px dotted #ebebeb;
+    padding-bottom: 10px;
+  }
+  .filter button{ padding-right: 15px;}
+  .payment-list{position: relative; }
+  .animation{
+    animation: fadeInDown .2s;
+  }
+  </style>
+  <div class="project-payment" if="{opts.pid>0}">
+
+    <div class="filter">
+      <button type="button" class="btn-main" onclick={fn.addPayment}>
+        <i class="icon-plus"></i> 添加记录
+      </button>
+    </div>
+
+    <!-- 新建记录 -->
+    <form if="{addMode}" class="payment {animation: addMode}">
+      <h4>添加到款记录</h4>
+      <div class="c2">
+        <div class="row">
+          <p>
+            <label>到款金额(元):</label>
+            <input ref="amount_0" type="text">
+            <input-valid ref="validOnSave_0" rule="required" for="amount_0" msg="请填写到款金额">
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>所属协议:</label>
+            <agreement-select ref="agreement_name_0"/>
+          </p>
+          <p>
+            <label>到款日期:</label>
+            <input type="text" onclick="WdatePicker()" ref="pay_date_0" value="">
+            <i class="icon-calendar"></i>
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>记录人:</label>
+            <input type="text" value="{app.data.user_name}">
+          </p>
+        </div>
+      </div>
+      <div class="c1 btn-line">
+        <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.cancel}</button>
+      </div>
+    </form>
+
+    <form each="{payment, i in paymentList}" class="payment">
+      <h4>到款记录 {i+1<10?'0'+(i+1):i+1}</h4>
+      <p class="btn-line-top">
+        <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
+          <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
+        </a>
+        <a href="javascript:;" aria-label="{app.lang.admin.handles.remove}" class="c-tooltip--top">
+          <i onclick={fn.remove}  class="btn-icon icon-trash"></i>
+        </a>
+      </p>
+      <div class="c2">
+        <div class="row">
+          <p>
+            <label>到款金额(元):</label>
+            <span if="{!payment.editMode}">{payment.amount}</span>
+            <input if="{payment.editMode}" ref="amount_{i+1}" type="text" value="{payment.amount}">
+            <input-valid if="{payment.editMode}" ref="validOnSave_{i+1}" rule="required" for="amount_{i+1}" msg="请填写到款金额">
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>所属协议:</label>
+            <span if="{!payment.editMode}">{payment.agreement_name}</span>
+            <agreement-select if="{payment.editMode}"  ref="agreement_name_{i+1}"/>
+          </p>
+          <p>
+            <label>到款日期:</label>
+            <span if="{!payment.editMode}">{app.utils.time2str(payment.pay_date)}</span>
+            <input if="{payment.editMode}" type="text" onclick="WdatePicker()" ref="pay_date_{i+1}" value="{payment.pay_date && app.utils.time2str(payment.pay_date, {sp:'-'})}">
+            <i if="{payment.editMode}" class="icon-calendar"></i>
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>记录人:</label>
+            <span if="{!payment.editMode}">{payment.operator_name}</span>
+            <input if="{payment.editMode}" type="text" value="{app.data.user_name}">
+          </p>
+        </div>
+      </div>
+      <div class="c1 btn-line" if="{payment.editMode}">
+        <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+        <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.cancel}</button>
+      </div>
+    </form>
+
+    <pagination-number page={page} pages={pages} select="y"/>
+
+    <br><br><br><br>
+
+  </div>
+
+  <!-- 没有项目ID提示 -->
+  <div class="warning-box" if="{opts.pid==0}">
+    需要先创建项目后才能编辑此页
+    <a href="#!{app.route.path}?tab=baseinfo">返回创建</a>
+  </div>
+
+  <!-- 没有到款记录提示 -->
+  <div class="warning-box" if="{!addMode && paymentList&&paymentList.length==0}">
+    该项目还没有到款记录，可点击右上方添加。
+  </div>
+
+  <!-- 删除记录 -->
+  <modal-remove ref="rmmodal"/>
+
+  <script>
+  var _this = this;
+  _this.fn = {
+    // 删除
+    remove: function(e){
+      _this.refs.rmmodal.emit('open').once('ok', function(){
+        _this.app.api('GET', 'project/payment/delete', {
+          data: { id: opts.pid, pk_id: e.item.payment.id }
+        }).on('done', function(){
+          _this.app.alert('删除成功', 'success');
+          _this.fn.getPaymentList();
+        })
+      });
+    },
+    // 添加协议
+    addPayment: function(){
+      _this.addMode = true;
+    },
+    // 保存编辑
+    save: function(e){
+      var p, api, i = 0;
+      if(e.item && e.item.payment){
+        i = (e.item.i+1);
+        api = 'project/payment/update?id='+opts.pid+'&pk_id='+e.item.payment.id;
+      }
+      else{
+        i = 0;
+        api = 'project/payment/create?id='+opts.pid;
+      }
+      _this.app.validAll(
+        [_this.refs['validOnSave_'+i], _this.refs['agreement_name_'+i]]
+      ).then(function(){
+        return _this.app.api('POST', api, {
+          trigger: e.target,
+          data: {
+            data: JSON.stringify({
+              amount: _this.refs['amount_'+i].value,
+              agreement_id: _this.refs['agreement_name_'+i].getId(),
+              pay_date: _this.app.utils.str2time(_this.refs['pay_date_'+i].value)
+            })
+          }
+        }).on('done', function(){
+          _this.fn.getPaymentList();
+          e.item && delete e.item.payment.editMode;
+          _this.addMode = false;
+          _this.app.alert('保存成功', 'success');
+        });
+      }).catch(function(){
+        _this.app.alert('表单有错误请检查', 'warning');
+      });
+    },
+    // 取消编辑
+    cancel: function(e){
+      if(e.item && e.item.payment){
+        delete e.item.payment.editMode;
+      }
+      else{
+        _this.addMode = false;
+      }
+    },
+    // 编辑到款记录
+    edit: function(e){
+      e.item.payment.editMode = true;
+      _this.update();
+      // 设置到款记录显示
+      _this.refs['agreement_name_'+(e.item.i+1)]
+      .emit('set', {
+        id: e.item.payment.agreement_id,
+        name: e.item.payment.agreement_name
+      });
+    },
+    getPaymentList: function(){
+      _this.app.api('GET', 'project/payment/index', {
+        data: {id: opts.pid}
+      }).on('done', function(data){
+        _this.update({
+          paymentList: data.items,
+          page: data.counts.page,
+          pages: data.counts.total_page,
+          items: data.counts.total_items
+        });
+        _this.tags['pagination-number'].emit('render');
+      });
+    }
+  };
+  _this.on('mount', function(){
+    if(opts.pid === 0) return;
+    // 加载日期选择
+    _this.app.addResource('my97');
+    _this.tags['pagination-number'].on('change', function(n){
+      _this.q.page = n;
+      _this.app.query();
+    });
+    _this.fn.getPaymentList();
+  });
+  </script>
+</project-payment>
+
 <!-- 关联协议 -->
 <project-agreement>
 
@@ -135,6 +457,8 @@
         <a href="javascript:;" onclick={fn.tabChange} class="c4 {active: key==parent.formTab}" each={formTabList}>{name}</a>
       </div>
       <project-agreement if={formTab=='agreements'} pid="{project.id}" />
+      <project-payment if={formTab=='payment'} pid="{project.id}" />
+      <project-perform if={formTab=='perform'} pid="{project.id}" />
       <div if={formTab=='baseinfo'}>
         <h4>基本信息</h4>
         <div class="c2">
@@ -259,7 +583,11 @@
       // 修改添加基础信息
       if(_this.formTab === 'baseinfo'){
         _this.app.validAll(
-          _this.refs.validOnSave.concat(_this.refs.organization)
+          _this.refs.validOnSave.concat(
+            _this.refs.project_type,
+            _this.refs.organization,
+            _this.refs.head_name
+          )
         )
         .then(function(){
           if(_this.project.id > 0){
@@ -283,6 +611,7 @@
                 contact_name: _this.refs.contact_name.value,
                 contact_tel: _this.refs.contact_tel.value,
                 contact_email: _this.refs.contact_email.value,
+                head_name: _this.refs.head_name.getName(),
                 head_uid: _this.refs.head_name.getId(),
                 head_tel: _this.refs.head_tel.value,
                 head_email: _this.refs.head_email.value
@@ -316,13 +645,19 @@
           data: { id: _this.project.id }
         }).on('done', function(data){
           _this.project.baseinfo = data;
-          _this.refs.project_type.emit(
-            'set', {
-              id: data.project_types_id
-            }
-          );
-          _this.refs.organization.emit('set', data.organization_id);
           _this.update();
+          // 确保refs能获取争取，设置少许延迟
+          setTimeout(function(){
+            _this.refs.project_type.emit('set', {
+              id: data.project_types_id
+            });
+            _this.refs.head_name.emit('set', {
+              id: data.head_uid,
+              name: data.head_name
+            });
+            _this.refs.organization.emit('set', data.organization_id);
+            _this.update();
+          }, 100);
         });
       }
     }

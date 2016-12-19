@@ -13,12 +13,14 @@
     background: lighten($bg, 15%)
     border-color: lighten($bg, 15%)
     color: rgba($bg, 80%)
+    cursor: default
+
 
 // 自定义高度，字体大小跟随高度改变
 =btn-height($h)
   font-size: $h/3+1.5
   height: $h
-  line-height: $h - 2
+  line-height: $h - 3
 
 
 // 项目级别mixin ~~~~~~~~~~~~~~~~~~~
@@ -36,3 +38,7 @@
   +btn(#E1E1E1, #999999)
   +btn-height($h)
   border-radius: 3px
+  &[disabled], &:disabled
+    background: lighten(#E1E1E1, 5%)
+    border-color: #ddd
+    color: #ccc

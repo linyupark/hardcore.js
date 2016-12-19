@@ -13,7 +13,8 @@ gulp.task('build:fp', () => {
 
   // riot common+component
   gulp.src([
-    './web/static/riot/*.js'
+    './web/static/riot/common.js',
+    './web/static/riot/component.js',
   ]).pipe(uglify('common+component.min.js', {
     mangle: true
   }))
@@ -61,8 +62,12 @@ gulp.task('build:fp', () => {
         f =  f.substring(1);
       }
       f = f.replace(/\?v=.+/, '');
-      f = f + '?v=' + filemd5.sync('./web/' + f);
-      json.pro[i] = f;
+      try{
+        f = f + '?v=' + filemd5.sync('./web/' + f);
+        json.pro[i] = f;
+      } catch(e) {
+        console.log('需要再执行一次');
+      }
     });
     fs.writeFileSync(loaderFile, JSON.stringify(json), 'utf8');
   });

@@ -1461,7 +1461,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return _tmpl;
   }();
 
-  // 3.0.4
+  // 3.0.5
 
   var __TAGS_CACHE = [];
   var __TAG_IMPL = {};
@@ -2026,7 +2026,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var dom = expr.dom,
         attrName = expr.attr,
         isToggle = /^(show|hide)$/.test(attrName),
-        value = isToggle || tmpl(expr.expr, this),
+
+    // the value for the toggle must consider also the parent tag
+    value = isToggle ? tmpl(expr.expr, extend({}, this, this.parent)) : tmpl(expr.expr, this),
         isValueAttr = attrName === 'riot-value',
         isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
         parent = dom && (expr.parent || dom.parentNode),
@@ -2061,7 +2063,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     if (expr.isRtag && value) return updateDataIs(expr, this);
-    if (old === value && !isToggle) return;
+    if (old === value) return;
     // no change, so nothing more to do
     if (isValueAttr && dom.value === value) return;
 
@@ -2095,7 +2097,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       setEventHandler(attrName, value, dom, this);
       // show / hide
     } else if (isToggle) {
-      value = tmpl(expr.expr, extend({}, this, this.parent));
       if (attrName === 'hide') value = !value;
       dom.style.display = value ? '' : 'none';
       // field value
@@ -2108,9 +2109,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       if (value != null) setAttr(dom, attrName, value);
     } else {
       // <select> <option selected={true}> </select>
-      if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
-        // parent.value = dom.value;
-        // NOTE select bug 去掉这个暂时没问题了，坐等修复
+      if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value) {
+        parent.value = dom.value;
       }if (expr.bool) {
         dom[attrName] = value;
         if (!value) return;
@@ -2125,7 +2125,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @this Tag
    * @param { Array } expressions - expression that must be re evaluated
    */
-  function _update(expressions) {
+  function updateAllExpressions(expressions) {
     each(expressions, updateExpression.bind(this));
   }
 
@@ -2163,7 +2163,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.expressions = [];
       }
 
-      if (newValue) _update.call(this.parentTag, this.expressions);
+      if (newValue) updateAllExpressions.call(this.parentTag, this.expressions);
     },
     unmount: function unmount() {
       unmountAll(this.expressions || []);
@@ -2325,7 +2325,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         tagName = getTagName(dom),
         impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
         useRoot = RE_SPECIAL_TAGS.test(tagName),
-        root = dom.parentNode,
+        parentNode = dom.parentNode,
         ref = createDOMPlaceholder(),
         child = getTag(dom),
         ifExpr = getAttr(dom, 'if'),
@@ -2343,26 +2343,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     if (ifExpr) remAttr(dom, 'if');
 
     // insert a marked where the loop tags will be injected
-    root.insertBefore(ref, dom);
-    root.removeChild(dom);
+    parentNode.insertBefore(ref, dom);
+    parentNode.removeChild(dom);
 
     expr.update = function updateEach() {
 
       // get the new items collection
       var items = tmpl(expr.val, parent),
-          parentNode,
-          frag,
-          placeholder;
-
-      root = ref.parentNode;
-
-      if (parentNode) {
-        placeholder = createDOMPlaceholder('');
-        parentNode.insertBefore(placeholder, root);
-        parentNode.removeChild(root);
-      } else {
-        frag = createFrag();
-      }
+          frag = createFrag(),
+          root = ref.parentNode;
 
       // object loop. any changes cause full redraw
       if (!isArray(items)) {
@@ -2454,12 +2443,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       // clone the items array
       oldItems = items.slice();
 
-      if (frag) {
-        root.insertBefore(frag, ref);
-      } else {
-        parentNode.insertBefore(root, placeholder);
-        parentNode.removeChild(placeholder);
-      }
+      root.insertBefore(frag, ref);
     };
 
     expr.unmount = function () {
@@ -2848,7 +2832,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * Update all the tags instances created
    * @returns { Array } all the tags instances
    */
-  function update$1() {
+  function update$$1() {
     return each(__TAGS_CACHE, function (tag$$1) {
       return tag$$1.update();
     });
@@ -2879,7 +2863,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var ctx = !isAnonymous && isLoop ? this : parent || this;
     each(instAttrs, function (attr) {
-      if (attr.expr) _update.call(ctx, [attr.expr]);
+      if (attr.expr) updateAllExpressions.call(ctx, [attr.expr]);
       opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value;
     });
   }
@@ -2932,8 +2916,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     // it could be handy to use it also to improve the virtual dom rendering speed
     defineProperty(this, '_riot_id', ++__uid); // base 1 allows test !t._riot_id
 
-    extend(this, { parent: parent, root: root, opts: opts }, item);
+    extend(this, { root: root, opts: opts }, item);
     // protect the "tags" and "refs" property from being overridden
+    defineProperty(this, 'parent', parent || null);
     defineProperty(this, 'tags', {});
     defineProperty(this, 'refs', {});
 
@@ -2956,7 +2941,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       extend(this, data);
       updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
       if (this.isMounted) this.emit('update', data);
-      _update.call(this, expressions);
+      updateAllExpressions.call(this, expressions);
       if (this.isMounted) this.emit('updated');
 
       return this;
@@ -3220,7 +3205,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         tagName = opts.tagName || getTagName(opts.root, true),
         ptag = getImmediateCustomParentTag(parent);
     // fix for the parent attribute in the looped elements
-    tag.parent = ptag;
+    defineProperty(tag, 'parent', ptag);
     // store the real parent tag
     // in some cases this could be different from the custom parent tag
     // for example in nested loops
@@ -3491,7 +3476,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     tag2: tag2$$1,
     mount: mount$$1,
     mixin: mixin$$1,
-    update: update$1,
+    update: update$$1,
     unregister: unregister$$1
   });
 
