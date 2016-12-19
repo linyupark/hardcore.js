@@ -17,20 +17,19 @@
           <p if={i==0}>
             创建即立项
             <span if={p.status==1 && !p.active}>执行中</span>
-            <button type="button" if={p.status==0 && p.active} onclick="{fn.create}" class="btn-main">开始执行</button>
+            <button type="button" if={p.active} onclick="{fn.create}" class="btn-main">开始执行</button>
           </p>
           <p if={i==1}>
             本项目已经到款金额{p.payment_sum}元
-            <a if={p.status==1||p.active} href="javascript:;" onclick={fn.checkPayment} class="under-line">查看到款信息</a>
+            <a if={p.status==1} href="javascript:;" onclick={fn.checkPayment} class="under-line">查看到款信息</a>
             <span if={p.status==1 && !p.active}>已确认</span>
-            <button type="button" onclick={fn.CFPayment} if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+            <button type="button" onclick={fn.CFPayment} if={p.status!=1||p.active} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
           <p if={i==2}>
             由各执行单位（院系／机构／部门）录入评比结果
-            <a if={p.status==1||p.active} href="javascript:;" class="under-line">下载评审结果</a>
-            <button type="button" if={p.status==1 && !p.active}>重新上传</button>
-            <span if={p.status==1 && !p.active}>已上传</span>
-            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">上传</button>
+            <a if={p.status==1&&p.review_file.length>0} href="javascript:;" class="under-line">下载评审结果</a>
+            <span if={p.status==1&&p.review_file.length>0}>已上传</span>
+            <upload-formdata changeupload="true" ref="upload" name="file[]" if={p.status!=1||p.active} btn="{p.review_file.length>0?'重新上传':'上传'}" disable="{!p.active&&p.review_file.length==0}"/>
           </p>
           <p if={i==3}>
             由项目部对评审结果进行审批核实
@@ -87,6 +86,21 @@
       }).on('done', function(data){
         _this.perform = data;
         _this.update();
+        // 检测上传
+        _this.refs.upload.once('post', function(fd){
+          _this.app.api('POST', 'project/perform/review?id='+opts.pid, {
+            payload: true,
+            showProgress: true,
+            formdata: true,
+            data: fd
+          }).on('done', function(data){
+            _this.app.alert('上传成功', 'success');
+            _this.fn.getPerform();
+          })
+          .on('progress', function(percent){
+            _this.refs.upload.emit('setBtnText', percent == 100 ? '上传完毕': percent+'%');
+          });
+        });
       });
     }
   };

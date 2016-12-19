@@ -432,20 +432,27 @@
 
 <!-- 利用FormData上传数据流 -->
 <upload-formdata>
-  <input type="file" name={name} ref="fileInput" multiple>
-  <button onclick={fn.upload}>上传</button>
+  <input type="file" onchange={fn.uploadOnChange} name={name} ref="fileInput" multiple>
+  <button type="button" ref="btn" onclick={fn.upload} disabled="{opts.disable}">{btnText}</button>
   <script>
     var _this = this;
     _this.name = opts.name || 'file';
+    _this.btnText = opts.btn || '上传';
     _this.uploadFiles = [];
     _this.fn = {
+      uploadOnChange: function(){
+        if(opts.changeupload){
+          console.log(_this.refs.btn)
+          _this.fn.upload(_this.refs.btn);
+        }
+      },
       upload: function(e) {
         _this.uploadFiles = _this.refs.fileInput.files;
         _this.progressList = [];
         if(!_this.uploadFiles.length){
           e.target.innerText = '请选择文件';
           return setTimeout(function(){
-            e.target.innerText = '上传';
+            e.target.innerText = _this.btnText;
           } ,1000);
         }
         var f = document.createElement('form');
@@ -463,6 +470,9 @@
       if('FormData' in window === false){
         alert('Your browser not support FormData!');
       }
+    });
+    _this.on('setBtnText', function(text){
+      _this.refs.btn.innerText = text;
     });
   </script>
 </upload-formdata>
