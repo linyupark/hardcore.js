@@ -1226,7 +1226,9 @@ table-filter {
           right: 22px;
           top: -20px;
           z-index: 44;
-          opacity: 0; }
+          opacity: 0;
+          cursor: pointer;
+          display: block; }
         .project-perform .process-list .line p upload-formdata button {
           cursor: pointer;
           background: #DF3A5E;
