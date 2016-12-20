@@ -28,23 +28,23 @@
           <p if={i==2}>
             由各执行单位（院系／机构／部门）录入评比结果
             <a if={p.status==1&&p.review_file.length>0} href="javascript:;" class="under-line">下载评审结果</a>
-            <span if={p.status==1&&p.review_file.length>0}>已上传</span>
-            <upload-formdata changeupload="true" ref="upload" name="file[]" if={p.status!=1||p.active} btn="{p.review_file.length>0?'重新上传':'上传'}" disable="{!p.active&&p.review_file.length==0}"/>
+            <span if={p.status==1&&!p.active&&p.review_file.length>0}>已上传</span>
+            <upload-formdata changeupload="true" ref="upload" name="file[]" if={p.status!=1||p.active} btn="{p.review_file.length>0?'重新上传':'上传'}" disable="{!p.active}"/>
           </p>
           <p if={i==3}>
             由项目部对评审结果进行审批核实
             <span if={p.status==1 && !p.active}>已确认</span>
-            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+            <button type="button" if={p.status!=1||p.active} onclick="{fn.CFVerify}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
           <p if={i==4}>
             请导出评选结果，并发邮件给捐赠方确认
             <span if={p.status==1 && !p.active}>已确认</span>
-            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+            <button type="button" if={p.status!=1||p.active} onclick="{fn.CFDonor}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
           <p if={i==5}>
             <a if={p.status==1||p.active} href="javascript:;" class="under-line">查看历史执行</a>
             <span if={p.status==1 && !p.active}>已确认</span>
-            <button type="button" if={p.status==0} class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
+            <button type="button" if={p.status!=1||p.active} onclick="{fn.CFIssue}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
         </div>
       </div>
@@ -61,43 +61,86 @@
   var _this = this;
   _this.perform = {};
   _this.fn = {
+    // 发放确认
+    CFIssue: function(e){
+      _this.app.api('POST', 'project/perform/issue?id='+opts.pid, {
+        trigger: e.target
+      })
+      .on('done', function(data){
+        _this.fn.getPerform(function(){
+          _this.app.alert('发放确认成功', 'success');
+        });
+      });
+    },
+    // 捐赠方确认
+    CFDonor: function(e){
+      _this.app.api('POST', 'project/perform/confirm?id='+opts.pid, {
+        trigger: e.target
+      })
+      .on('done', function(data){
+        _this.fn.getPerform(function(){
+          _this.app.alert('捐赠方确认成功', 'success');
+        });
+      });
+    },
+    // 审核确认
+    CFVerify: function(e){
+      _this.app.api('POST', 'project/perform/verify?id='+opts.pid, {
+        trigger: e.target
+      })
+      .on('done', function(data){
+        _this.fn.getPerform(function(){
+          _this.app.alert('确认审核成功', 'success');
+        });
+      });
+    },
     // 确认到账
     CFPayment: function(e){
-      _this.app.api('POST', 'project/perform/payment?id='+opts.pid)
+      _this.app.api('POST', 'project/perform/payment?id='+opts.pid, {
+        trigger: e.target
+      })
       .on('done', function(data){
-        _this.app.alert('确认到账成功', 'success');
-        _this.fn.getPerform();
+        _this.fn.getPerform(function(){
+          _this.app.alert('确认到账成功', 'success');
+        });
       });
     },
     // 新建开始执行
     create: function(e){
-      _this.app.api('POST', 'project/perform/create?id='+opts.pid)
+      _this.app.api('POST', 'project/perform/create?id='+opts.pid, {
+        trigger: e.target
+      })
       .on('done', function(data){
-        _this.app.alert('创建立项成功', 'success');
-        _this.fn.getPerform();
+        _this.fn.getPerform(function(){
+          _this.app.alert('创建立项成功', 'success');
+        });
       });
     },
     checkPayment: function(){
       _this.app.route(_this.app.route.path + '?tab=payment');
     },
-    getPerform: function(){
+    getPerform: function(cb){
       _this.app.api('GET', 'project/perform/index', {
         data: { id: opts.pid }
       }).on('done', function(data){
         _this.perform = data;
         _this.update();
+        cb && cb();
         // 检测上传
-        _this.refs.upload.once('post', function(fd){
+        _this.refs.upload && _this.refs.upload.once('post', function(fd){
           _this.app.api('POST', 'project/perform/review?id='+opts.pid, {
             payload: true,
             showProgress: true,
             formdata: true,
             data: fd
           }).on('done', function(data){
-            _this.app.alert('上传成功', 'success');
-            _this.fn.getPerform();
+            _this.fn.getPerform(function(){
+              _this.app.alert('上传成功', 'success');
+              _this.refs.upload.emit('disable', false);
+            });
           })
           .on('progress', function(percent){
+            _this.refs.upload.emit('disable', true);
             _this.refs.upload.emit('setBtnText', percent == 100 ? '上传完毕': percent+'%');
           });
         });

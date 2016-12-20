@@ -1,1 +1,250 @@
-{"jq":["//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"],"my97":["./static/My97DatePicker/WdatePicker.js"],"pro":["/static/css/fp.min.css?v=5cfa515610210bed9b629ff3f1623148","/static/riot/common+component.min.js?v=a94449f4bb129577784ec74cb7487e32"],"test":["./static/css/fp.css","./static/riot/component.js","./static/riot/common.js"],"dev":["./static/css/fp.css","./static/riot/component.js","./static/riot/common.js"],"lang":{"cn":{"year:number":"几年(阿拉伯数字)","yes":"是","no":"否","header":{"sitename":"浙江大学教育基金会管理后台","userinfo":{"account":"帐号信息","logout":"退出"}},"login":{"out":"成功退出","admin":"管理员登录","user":"捐赠人登录","placehoder":{"username":"请输入账号","password":"请输入密码"},"btn":"登 录","findpass":"忘记密码","fail":"登录失败: 账号密码错误","invalid":"请填写帐号密码","btn:loading":"登 录 中","btn:ok":"登录成功","relogin":"访问失败: 需要重新登录"},"admin":{"sidenav":[{"name":"总览","url":"admin-index","icon":"home"},{"name":"协议","url":"admin-agreement","icon":"agreement"},{"name":"项目","url":"admin-project","icon":"project"},{"name":"捐赠方","url":"admin-donor","icon":"donor"},{"name":"用户","url":"admin-user","icon":"user"},{"name":"日志","url":"admin-log","icon":"log"},{"name":"设置","url":"","icon":"setting","child":[{"name":"密码","url":"admin-setting-password","icon":"password"}]}],"reset":"清空","counts":{"items":"找到记录共: ","unit":"条"},"search":{"condition":"按条件搜索","keyword":{"placehoder":"查询关键字"}},"handle":"操作","handles":{"view":"查看详细","edit":"编辑","remove":"删除"},"deny":"没有相关权限","empty":"没有查询到相关记录","confirm":{"tips":"提示","delete":"确定要删除此条记录吗？"},"form":{"req":"必填"},"btn":{"save":"保存","ok":"确定","cancel":"取消","back":"返回","close":"关闭"},"project":{"id":"序号","number":"项目编号","title":"项目管理","name":"项目名称","type":"项目类型","amount":"总金额","status":"项目状态","createAt":"创建日期","add":"添加项目","isPublic":"是否公开","formTab":[{"name":"项目资料","key":"baseinfo"},{"name":"关联协议","key":"agreements"},{"name":"到款记录","key":"payment"},{"name":"项目进度","key":"perform"}],"filter:range":[{"name":"我的项目","key":"my"},{"name":"所有项目","key":"all"}],"filter:status":[{"name":"已关闭","key":0},{"name":"执行中","key":1},{"name":"已到款","key":2},{"name":"已评审","key":3},{"name":"已审核","key":4},{"name":"已确认","key":5},{"name":"已发放","key":6}]},"donor":{"id":"序号","title":"捐赠方管理","add":"添加内容","edit":"编辑内容","name":"捐赠方","type":"捐赠方性质","contact":"联络人","tel":"联络电话","fax":"传真","baseinfo":"基本信息","company":"单位名称","address":"单位地址","head":"负责人","head:name":"负责人姓名","contact:name":"联络人姓名","email":"邮箱","website":"网站","weibo":"微博","members":"成员信息"},"agreement":{"add":"添加协议","edit":"修改协议","title":"协议管理","id":"序号","number":"协议编号","name":"协议名称","contract":"签约时间","deadline":"执行期限","due":"截止时间","donations":"来自校友捐赠","donor":"捐赠方","donor:select":"查询选择","donor:nature":"捐赠方性质","donor:nature:list":[{"name":"个人","key":0},{"name":"企业","key":1},{"name":"基金会","key":2}],"sources:funding":"资金来源","sources:funding:list":[{"name":"国内","key":0},{"name":"港澳台","key":1},{"name":"海外","key":2}],"project:type":"项目类型","search:types":[{"name":"协议编号","key":"agreement_number"},{"name":"协议名称","key":"agreement_name"},{"name":"捐赠方ID","key":"donor_id"}]}},"footer":{"icp":"浙ICP备1202106号-2","copyright":"2016-2017 usho","address":"联系地址: 浙江省杭州市西湖区浙大科技园C-608","tel":"联系电话: 0571-85121608"}}}}
+{
+  "jq": ["//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"],
+  "my97": ["./static/My97DatePicker/WdatePicker.js"],
+  "pro": ["/static/css/fp.min.css?v=5cfa515610210bed9b629ff3f1623148", "/static/riot/common+component.min.js?v=a94449f4bb129577784ec74cb7487e32"],
+  "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
+  "dev": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
+  "lang": {
+    "cn": {
+      "year:number": "几年(阿拉伯数字)",
+      "yes": "是",
+      "no": "否",
+      "header": {
+        "sitename": "浙江大学教育基金会管理后台",
+        "userinfo": {
+          "account": "帐号信息",
+          "logout": "退出"
+        }
+      },
+      "login": {
+        "out": "成功退出",
+        "admin": "管理员登录",
+        "user": "捐赠人登录",
+        "placehoder": {
+          "username": "请输入账号",
+          "password": "请输入密码"
+        },
+        "btn": "登 录",
+        "findpass": "忘记密码",
+        "fail": "登录失败: 账号密码错误",
+        "invalid": "请填写帐号密码",
+        "btn:loading": "登 录 中",
+        "btn:ok": "登录成功",
+        "relogin": "访问失败: 需要重新登录"
+      },
+      "admin": {
+        "sidenav": [{
+          "name": "总览",
+          "url": "admin-index",
+          "icon": "home-outline"
+        }, {
+          "name": "协议",
+          "url": "admin-agreement",
+          "icon": "clipboard"
+        }, {
+          "name": "项目",
+          "url": "admin-project",
+          "icon": "archive"
+        }, {
+          "name": "捐赠方",
+          "url": "admin-donor",
+          "icon": "heart-empty"
+        }, {
+          "name": "用户",
+          "url": "admin-user",
+          "icon": "user"
+        }, {
+          "name": "日志",
+          "url": "admin-log",
+          "icon": "book"
+        }, {
+          "name": "设置",
+          "url": "admin-setting-\\w",
+          "icon": "sliders",
+          "child": [{
+            "name": "角色管理",
+            "url": "admin-setting-role",
+            "icon": "role"
+          }, {
+            "name": "职务管理",
+            "url": "admin-setting-place",
+            "icon": "place"
+          }, {
+            "name": "系统日志",
+            "url": "admin-setting-log",
+            "icon": "log"
+          }, {
+            "name": "项目类型管理",
+            "url": "admin-setting-pjtype",
+            "icon": "pjtype"
+          }, {
+            "name": "组织机构管理",
+            "url": "admin-setting-org",
+            "icon": "org"
+          }]
+        }],
+        "reset": "清空",
+        "counts": {
+          "items": "找到记录共: ",
+          "unit": "条"
+        },
+        "search": {
+          "condition": "按条件搜索",
+          "keyword": {
+            "placehoder": "查询关键字"
+          }
+        },
+        "handle": "操作",
+        "handles": {
+          "view": "查看详细",
+          "edit": "编辑",
+          "remove": "删除"
+        },
+        "deny": "没有相关权限",
+        "empty": "没有查询到相关记录",
+        "confirm": {
+          "tips": "提示",
+          "delete": "确定要删除此条记录吗？"
+        },
+        "form": {
+          "req": "必填"
+        },
+        "btn": {
+          "save": "保存",
+          "ok": "确定",
+          "cancel": "取消",
+          "back": "返回",
+          "close": "关闭"
+        },
+        "project": {
+          "id": "序号",
+          "number": "项目编号",
+          "title": "项目管理",
+          "name": "项目名称",
+          "type": "项目类型",
+          "amount": "总金额",
+          "status": "项目状态",
+          "createAt": "创建日期",
+          "add": "添加项目",
+          "isPublic": "是否公开",
+          "formTab": [{
+            "name": "项目资料",
+            "key": "baseinfo"
+          }, {
+            "name": "关联协议",
+            "key": "agreements"
+          }, {
+            "name": "到款记录",
+            "key": "payment"
+          }, {
+            "name": "项目进度",
+            "key": "perform"
+          }],
+          "filter:range": [{
+            "name": "我的项目",
+            "key": "my"
+          }, {
+            "name": "所有项目",
+            "key": "all"
+          }],
+          "filter:status": [{
+            "name": "已关闭",
+            "key": 0
+          }, {
+            "name": "执行中",
+            "key": 1
+          }, {
+            "name": "已到款",
+            "key": 2
+          }, {
+            "name": "已评审",
+            "key": 3
+          }, {
+            "name": "已审核",
+            "key": 4
+          }, {
+            "name": "已确认",
+            "key": 5
+          }, {
+            "name": "已发放",
+            "key": 6
+          }]
+        },
+        "donor": {
+          "id": "序号",
+          "title": "捐赠方管理",
+          "add": "添加内容",
+          "edit": "编辑内容",
+          "name": "捐赠方",
+          "type": "捐赠方性质",
+          "contact": "联络人",
+          "tel": "联络电话",
+          "fax": "传真",
+          "baseinfo": "基本信息",
+          "company": "单位名称",
+          "address": "单位地址",
+          "head": "负责人",
+          "head:name": "负责人姓名",
+          "contact:name": "联络人姓名",
+          "email": "邮箱",
+          "website": "网站",
+          "weibo": "微博",
+          "members": "成员信息"
+        },
+        "agreement": {
+          "add": "添加协议",
+          "edit": "修改协议",
+          "title": "协议管理",
+          "id": "序号",
+          "number": "协议编号",
+          "name": "协议名称",
+          "contract": "签约时间",
+          "deadline": "执行期限",
+          "due": "截止时间",
+          "donations": "来自校友捐赠",
+          "donor": "捐赠方",
+          "donor:select": "查询选择",
+          "donor:nature": "捐赠方性质",
+          "donor:nature:list": [{
+            "name": "个人",
+            "key": 0
+          }, {
+            "name": "企业",
+            "key": 1
+          }, {
+            "name": "基金会",
+            "key": 2
+          }],
+          "sources:funding": "资金来源",
+          "sources:funding:list": [{
+            "name": "国内",
+            "key": 0
+          }, {
+            "name": "港澳台",
+            "key": 1
+          }, {
+            "name": "海外",
+            "key": 2
+          }],
+          "project:type": "项目类型",
+          "search:types": [{
+            "name": "协议编号",
+            "key": "agreement_number"
+          }, {
+            "name": "协议名称",
+            "key": "agreement_name"
+          }, {
+            "name": "捐赠方ID",
+            "key": "donor_id"
+          }]
+        }
+      },
+      "footer": {
+        "icp": "浙ICP备1202106号-2",
+        "copyright": "2016-2017 usho",
+        "address": "联系地址: 浙江省杭州市西湖区浙大科技园C-608",
+        "tel": "联系电话: 0571-85121608"
+      }
+    }
+  }
+}

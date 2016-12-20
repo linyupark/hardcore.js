@@ -614,7 +614,8 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) return updateDataIs(expr, this)
-  if (old === value) return
+  // (但riot-value除外)
+  if (old === value && !isValueAttr) return
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) return
 

@@ -197,11 +197,13 @@ admin-sidenav
     padding: 0
     &.child
       margin-top: 0
-      margin-left: 20px
       li
-        &:first-child
-          a
-            // border-top: none
+        a
+          text-indent: 24px
+          font-size: $font-xs
+          border: none
+          &.active
+            background: #353A5A
   li
     height: 38px
     &:first-child
@@ -212,14 +214,16 @@ admin-sidenav
     display: block
     color: rgba(#fff, 0.5)
     height: 38px
-    margin-left: 20px
-    padding-left: 20px
+    margin-left: 15px
+    padding-left: 10px
     line-height: 38px
     &:hover
       color: rgba(#fff, 0.9)
     &.active
       color: rgba(#fff, 0.9)
       background: #333
+    i
+      margin-right: 5px
 
 //
 // input-select

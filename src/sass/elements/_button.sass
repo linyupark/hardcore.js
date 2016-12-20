@@ -9,10 +9,7 @@
     background: darken($bg, 10%)
   &:active
     background: lighten($bg, 10%)
-  &[disabled], &:disabled
-    background: lighten($bg, 15%)
-    border-color: lighten($bg, 15%)
-    color: rgba($bg, 80%)
+  &[disabled]
     cursor: default
 
 
@@ -28,17 +25,25 @@
   +btn(#DF3A5E, #fff)
   +btn-height($h)
   border-radius: 3px
+  &[disabled]
+    background: lighten(#DF3A5E, 35%)
+    border-color: lighten(#DF3A5E, 25%)
+    color: lighten(#DF3A5E, 25%)
 
 =btn-2($h: 35px, $radius: 3px)
   +btn(#FEAD50, #FFF)
   +btn-height($h)
   border-radius: 3px
+  &[disabled]
+    background: lighten(#FEAD50, 15%)
+    border-color: lighten(#FEAD50, 15%)
+    color: rgba(#FEAD50, 80%)
 
 =btn-3($h: 35px, $radius: 3px)
   +btn(#E1E1E1, #999999)
   +btn-height($h)
   border-radius: 3px
-  &[disabled], &:disabled
+  &[disabled]
     background: lighten(#E1E1E1, 5%)
     border-color: #ddd
     color: #ccc

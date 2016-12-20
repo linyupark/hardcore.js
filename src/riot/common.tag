@@ -572,9 +572,9 @@
   </style>
   <ul>
     <li each={m in data}>
-      <a href="{m.url?'#!'+m.url:'javascript:;'}"
+      <a href="{m.child?'javascript:;':'#!'+m.url}"
         onclick={fn.toggle}
-        class={active: parent.url==m.url}>
+        class={active: new RegExp(m.url).test(parent.url)}>
         <i class="icon-{m.icon}"></i>
         {m.name}
         <i class="{
@@ -584,7 +584,7 @@
       </a>
       <ul if={m.child} class="child {unfold: parent.child==m.child}">
         <li each={s in m.child}>
-          <a href="#!{s.url}">
+          <a href="#!{s.url}" class="{active: new RegExp(s.url).test(parent.url)}">
             <i class="icon-{s.icon}"></i>
             {s.name}
           </a>
@@ -611,7 +611,13 @@
   _this.on('mount', function(){
     window.scrollTo(0, 0);
     // 展开，高亮对应的tab
-    _this.url = _this.app.route.params[0] || 'index';
+    _this.url = _this.app.route.params[0] || 'admin-index';
+    // 循环菜单，如果是子菜单的需要显示出来
+    _this.app.lang.admin.sidenav.forEach(function(item){
+      if(new RegExp(item.url).test(_this.url) && item.child){
+        _this.child = item.child;
+      }
+    });
     _this.update();
   });
 

@@ -17,8 +17,7 @@ class FP extends RiotApp {
 
     let
       triggerText,
-      api = this.emitter(),
-      spin = document.createElement('i');
+      api = this.emitter();
 
     // 如果设定了发起请求的元素，则在请求完毕前禁用
     this.__api = this.__api || [];
@@ -35,9 +34,7 @@ class FP extends RiotApp {
 
     if (opts.trigger) {
       triggerText = opts.trigger.innerText;
-      spin.setAttribute('class', 'icon-spin2');
-      opts.trigger.innerText = '';
-      opts.trigger.prepend(spin);
+      opts.trigger.innerText = '处理中';
       opts.trigger.disabled = true;
     }
 

@@ -244,6 +244,7 @@
     }
   };
   _this.on('open', function(){
+    // console.log('open modal');
     _this.open = true;
     document.addEventListener('keydown', function(e){
       if(e.keyCode == 27) _this.fn.close();
@@ -432,17 +433,18 @@
 
 <!-- 利用FormData上传数据流 -->
 <upload-formdata>
-  <input type="file" onchange={fn.uploadOnChange} name={name} ref="fileInput" multiple>
-  <button type="button" ref="btn" onclick={fn.upload} disabled="{opts.disable}">{btnText}</button>
+  <input if="{!disable}" type="file" onchange={fn.uploadOnChange} name={name} ref="fileInput" multiple>
+  <button type="button" ref="btn" onclick={fn.upload} disabled="{disable}">{btnText}</button>
   <script>
     var _this = this;
     _this.name = opts.name || 'file';
     _this.btnText = opts.btn || '上传';
     _this.uploadFiles = [];
+    _this.disable = opts.disable;
     _this.fn = {
       uploadOnChange: function(){
         if(opts.changeupload){
-          console.log(_this.refs.btn)
+          // console.log(_this.refs.btn)
           _this.fn.upload(_this.refs.btn);
         }
       },
@@ -473,6 +475,10 @@
     });
     _this.on('setBtnText', function(text){
       _this.refs.btn.innerText = text;
+    });
+    _this.on('disable', function(flag){
+      _this.disable = flag;
+      _this.update();
     });
   </script>
 </upload-formdata>

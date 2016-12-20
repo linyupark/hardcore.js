@@ -2063,7 +2063,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     if (expr.isRtag && value) return updateDataIs(expr, this);
-    if (old === value) return;
+    // (但riot-value除外)
+    if (old === value && !isValueAttr) return;
     // no change, so nothing more to do
     if (isValueAttr && dom.value === value) return;
 
@@ -4025,8 +4026,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }[this.config.env];
 
         var triggerText = void 0,
-            api = this.emitter(),
-            spin = document.createElement('i');
+            api = this.emitter();
 
         // 如果设定了发起请求的元素，则在请求完毕前禁用
         this.__api = this.__api || [];
@@ -4043,9 +4043,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         if (opts.trigger) {
           triggerText = opts.trigger.innerText;
-          spin.setAttribute('class', 'icon-spin2');
-          opts.trigger.innerText = '';
-          opts.trigger.prepend(spin);
+          opts.trigger.innerText = '处理中';
           opts.trigger.disabled = true;
         }
 
