@@ -6,7 +6,11 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <section>
-        <h2>设置 &gt; 组织机构管理</h2>
+        <h2>设置 &gt; 组织机构管理
+          <span each={parentList}>
+            &gt; <a href="javascript:;" class="under-line" onclick={fn.back}>{name}</a>
+          </span>
+        </h2>
 
         <table-filter for="org">
           <yield to="addon">
@@ -28,7 +32,7 @@
           <tbody>
             <tr each={tableList}>
               <td>{id}</td>
-              <td>{name}</td>
+              <td><a href="javascript:;" onclick="{fn.next}" class="under-line">{name}</a></td>
               <td>{parent_id}</td>
               <td>
                 <!-- 操作 -->
@@ -92,7 +96,23 @@
   var _this = this;
   _this.q = _this.app.route.query;
   _this.org = {};
+  _this.parentList = [
+    {pid: 0, name: '一级组织'}
+  ];
   _this.fn = {
+    back: function(e){
+      var i = _this.parentList.indexOf(e.item);
+      if(i==0) i = 1;
+      _this.parentList.splice(i, _this.parentList.length-i);
+      _this.fn.getOrgList();
+    },
+    next: function(e){
+      _this.parentList.push({
+        pid: e.item.id,
+        name: e.item.name
+      });
+      _this.fn.getOrgList();
+    },
     ok: function(e){
       var api = _this.org.id ?
       'system-setting/organization/update?id='+_this.org.id :
@@ -103,6 +123,7 @@
           trigger: e.target,
           data: {
             data: JSON.stringify({
+              parent_id: _this.parentList.slice(-1)[0].pid,
               name: _this.refs.saveOrg.refs.org_name.value,
               sort: _this.refs.saveOrg.refs.org_sort.value
             })
@@ -130,7 +151,8 @@
     getOrgList: function(){
       _this.app.api('GET', 'system-setting/organization/index', {
         data: {
-          page: _this.q.page || 1
+          page: _this.q.page || 1,
+          parent_id: _this.parentList.slice(-1)[0].pid
         }
       }).on('done', function(data){
         _this.update({
