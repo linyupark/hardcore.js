@@ -118,14 +118,14 @@
     },
     edit: function(e){
       _this.pjtype = e.item;
-      _this.refs.saveType.refs.validType.emit('msg', '');
       _this.refs.saveType.emit('open');
+      _this.refs.saveType.refs.validType.emit('msg', '');
     },
     add: function(){
       _this.pjtype = {};
       // 有遗留的错误信息需要先清除
-      _this.refs.saveType.refs.validType.emit('msg', '');
       _this.refs.saveType.emit('open');
+      _this.refs.saveType.refs.validType.emit('msg', '');
     },
     getTypeList: function(){
       _this.app.api('GET', 'system-setting/project-type/index', {

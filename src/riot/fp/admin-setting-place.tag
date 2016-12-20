@@ -118,14 +118,14 @@
     },
     edit: function(e){
       _this.place = e.item;
-      _this.refs.savePlace.refs.validPlace.emit('msg', '');
       _this.refs.savePlace.emit('open');
+      _this.refs.savePlace.refs.validPlace.emit('msg', '');
     },
     add: function(){
       _this.place = {};
       // 有遗留的错误信息需要先清除
-      _this.refs.savePlace.refs.validPlace.emit('msg', '');
       _this.refs.savePlace.emit('open');
+      _this.refs.savePlace.refs.validPlace.emit('msg', '');
     },
     getPlaceList: function(){
       _this.app.api('GET', 'system-setting/place/index', {

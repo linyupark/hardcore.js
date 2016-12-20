@@ -80,6 +80,7 @@
           pages: data.counts.total_page,
           items: data.counts.total_items
         });
+        _this.refs.modal.refs.page &&
         _this.refs.modal.refs.page.emit('render');
       });
     }
@@ -88,21 +89,25 @@
 
     _this.fn.getList();
 
-    _this.refs.modal.refs.page.on('change', function(n){
-      _this.q.page = n;
-      _this.fn.getList();
-    });
+    _this.on('open', function(){
 
-    _this.refs.modal.refs.filter.on('query', function(q){
-      _this.q = q;
-      _this.fn.getList();
+      _this.refs.modal.emit('open');
+
+      _this.refs.modal.refs.page.on('change', function(n){
+        _this.q.page = n;
+        _this.fn.getList();
+      });
+
+      _this.refs.modal.refs.filter.on('query', function(q){
+        _this.q = q;
+        _this.fn.getList();
+      });
+
     });
 
   });
 
-  _this.on('open', function(){
-    _this.refs.modal.emit('open');
-  });
+
 
   </script>
 </modal-agreement>

@@ -434,11 +434,8 @@
     },
     remove: function(e){
       _this.tags['modal-remove']
-      .on('ok', function(){
-        // 删除操作
-        this.emit('close');
-      })
-      .emit('open');
+      .emit('open').on('ok', function(){
+      });
     },
     getList: function(){
       // 获取协议列表

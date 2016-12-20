@@ -152,7 +152,7 @@
 </input-select>
 
 <!-- 弹出框 -->
-<modal show="{open}">
+<modal>
   <style scoped>
   .modal-mask{
     position: fixed;
@@ -211,7 +211,7 @@
   </style>
 
   <!-- 弹窗主体 -->
-  <div class="modal-container {animation: open}"
+  <div if="{open}" class="modal-container {animation: open}"
     style="width: {opts.w||360}px; height: {opts.h||200}px; z-index: {opts.z?Number(opts.z)+11:22}; top: {opts.top||'30%'}; margin-left: {opts.w?'-'+Number(opts.w/2):-180}px">
     <div class="header">
       <h3><yield from="title"/></h3>
@@ -229,7 +229,7 @@
   </div>
 
   <!-- 遮罩层 -->
-  <div onclick={fn.close}
+  <div if={open} onclick={fn.close}
     style="opacity: {opts.mask}; z-index: {opts.z||11}"
     class="modal-mask"></div>
 

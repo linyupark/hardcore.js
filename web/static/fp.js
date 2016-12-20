@@ -2063,9 +2063,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     if (expr.isRtag && value) return updateDataIs(expr, this);
-    // (但riot-value除外)
-    if (old === value && !isValueAttr) return;
+
+    if (old === value) return;
     // no change, so nothing more to do
+
     if (isValueAttr && dom.value === value) return;
 
     // textarea and text nodes have no attribute name

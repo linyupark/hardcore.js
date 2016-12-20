@@ -139,14 +139,14 @@
     },
     edit: function(e){
       _this.org = e.item;
-      _this.refs.saveOrg.refs.validOrg.emit('msg', '');
       _this.refs.saveOrg.emit('open');
+      _this.refs.saveOrg.refs.validOrg.emit('msg', '');
     },
     add: function(){
       _this.org = {};
       // 有遗留的错误信息需要先清除
-      _this.refs.saveOrg.refs.validOrg.emit('msg', '');
       _this.refs.saveOrg.emit('open');
+      _this.refs.saveOrg.refs.validOrg.emit('msg', '');
     },
     getOrgList: function(){
       _this.app.api('GET', 'system-setting/organization/index', {
