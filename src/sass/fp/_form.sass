@@ -1,5 +1,5 @@
 =form-login()
-  +gridle(10.5 pull 1.5 float right)
+  +gridle(11.5 pull .5 float right)
   max-width: 350px
   min-width: 350px
   height: 320px
@@ -59,8 +59,15 @@
         color: $color-main
         border-color: $color-main
 
-form.agreement, form.donor, form.project, form.payment, form.modal
+form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user
   +shadow-block()
+  position: relative
+  .header-mark
+    position: absolute
+    right: 20px
+    top: 20px
+    font-size: $font-xs
+    color: $color-txt2
   background: #fff
   padding: 30px
   border-radius: 5px
@@ -180,3 +187,24 @@ form.modal
   margin: 0
   padding: 0
   box-shadow: none
+
+.project-view
+  label
+    color: $color-txt1
+    width: 80px
+    margin: 0
+    float: left
+  p
+    padding: 0
+  .txt-success
+    color: $color-success
+  hr
+    margin: 0 0 30px
+  .c1, .c2
+    margin-left: 18px
+  .c1
+    padding: 14px 0
+    p
+      width: 80%
+      float: left
+      margin: 0

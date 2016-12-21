@@ -29,7 +29,7 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="login"></footer>
 
   <script>
 

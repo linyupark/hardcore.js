@@ -25,7 +25,7 @@
             <tr>
               <th width="20%">编号</th>
               <th width="40%">组织名称</th>
-              <th width="20%">子类</th>
+              <th width="20%">排序</th>
               <th width="20%">{app.lang.admin.handle}</th>
             </tr>
           </thead>
@@ -33,7 +33,7 @@
             <tr each={tableList}>
               <td>{id}</td>
               <td><a href="javascript:;" onclick="{fn.next}" class="under-line">{name}</a></td>
-              <td>{parent_id}</td>
+              <td>{sort}</td>
               <td>
                 <!-- 操作 -->
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">

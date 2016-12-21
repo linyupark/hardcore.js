@@ -108,13 +108,16 @@ header
   h1
     +gridle(11 prefix 0.5)
     color: $color-txt1
-    background-image: url(../img/fp/header-logo.jpg)
+    background-image: url(../img/fp/header-logo.png)
     background-position: left center
     background-repeat: no-repeat
     background-size: 50px 50px
     height: 80px
     line-height: 80px
     text-indent: 60px
+  +gridle_state(mobile)
+    h1
+      font-size: $font-m
 
 
 
@@ -133,9 +136,10 @@ main
       +gridle(10 prefix 1)
   // 登录页
   &.login
-    background: #F2EDEF
+    background: #F2EDEF url(../img/fp/login-banner.png) no-repeat center
     form
       +form-login()
+      +shadow-block()
 
 
 
@@ -165,6 +169,14 @@ footer
     color: $color-txt2
     font-size: $font-xs
     margin-top: 30px
+  +gridle_state(mobile)
+    .info
+      font-size: $font-xs
+      padding: 10px
+      margin-top: 10px
+  &.login
+    .container
+      +gridle(grid-centered)
   &.admin
     .info
       +gridle(9 push 2.3 prefix 0)

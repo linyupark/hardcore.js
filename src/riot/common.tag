@@ -445,6 +445,65 @@
   </script>
 </project-type-select>
 
+
+<!-- 角色权限 -->
+<role-select>
+  <input-select name="description" ref="description" placeholder="搜索选择" value=""/>
+  <input type="hidden" ref="name" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validRole" for="name" rule="required" msg="请选角色"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getDescription = function(){
+    return _this.refs.description.value;
+  };
+  _this.getName = function(){
+    return _this.refs.name.value;
+  };
+  _this.on('mount', function(){
+
+    // 请求角色数据
+    _this.refs.description.on('pull', function(keyword){
+      _this.refs.validRole.emit('msg', '');
+      if(_this.keywordCache[keyword]){
+        return _this.refs.description.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'role-manager/default/search', {
+        data: { keyword: keyword }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.description.emit('push', data.items);
+      });
+
+    });
+    // 选择了职务
+    _this.refs.description.on('select', function(item){
+      _this.refs.name.value = item.name || '';
+      _this.refs.description.value = item.description || '';
+    });
+  });
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validRole
+    .on('valid', function(){
+      _this.emit('valid');
+    }).on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+  // 设置默认显示值
+  _this.on('set', function(item){
+    _this.refs.name.value = item.name;
+    _this.refs.description.value = item.description;
+    _this.refs.description.emit('value', item.description || ' ');
+  });
+  </script>
+</role-select>
+
 <!-- 职务查询 -->
 <place-select>
   <input-select name="place_name" ref="place_name" placeholder="搜索选择" value=""/>

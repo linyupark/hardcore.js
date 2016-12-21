@@ -1,4 +1,181 @@
 
+<!-- 项目详情 -->
+<project-view>
+  <section>
+    <h2>
+      {app.lang.admin.project.title} &gt; 项目详细
+    </h2>
+    <div class="project-view">
+      <span class="header-mark">
+        项目起止日期:
+        {project.perform.created_at?app.utils.time2str(project.perform.created_at):'未开始'} ~ {project.perform.finished_at?app.utils.time2str(project.perform.finished_at):'未结束'}
+      </span>
+      <h4>基本信息</h4>
+      <div class="c2">
+        <div class="row">
+          <p>
+            <label>项目名称:</label>
+            {project['base-info'].name}
+          </p>
+          <p>
+            <label>项目编号:</label>
+            {project['base-info'].number}
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>项目类型:</label>
+            {project['base-info'].project_types_name}
+          </p>
+          <p>
+            <label>项目状态:</label>
+            <span class="txt-success">{app.getProjectStatus(project['base-info'].status)}</span>
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>项目总金额:</label>
+            {project['base-info'].amount}
+          </p>
+          <p>
+            <label>公开项目:</label>
+            {project['base-info'].is_public==1?'是':'否'}
+          </p>
+        </div>
+      </div>
+      <div class="c1">
+        <label>项目简介:</label>
+        <p>
+          {project['base-info'].description}
+        </p>
+      </div>
+      <br>
+      <hr>
+      <h4>执行信息</h4>
+      <div class="c1">
+        <label>执行单位:</label>
+        <p>
+          {project.performer.organization_name}
+        </p>
+      </div>
+      <div class="c2">
+        <div class="row">
+          <p>
+            <label>单位负责人:</label>
+            {project.performer.head_name}
+          </p>
+          <p>
+            <label>联系电话:</label>
+            {project.performer.head_tel}
+          </p>
+        </div>
+        <div class="row">
+          <p>
+            <label>项目联络人:</label>
+            {project.performer.contact_name}
+          </p>
+          <p>
+            <label>联系电话:</label>
+            {project.performer.contact_tel}
+          </p>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <div each={ag, i in project.agreement}>
+        <h4>项目关联协议({i+1})</h4>
+        <div class="c2">
+          <div class="row">
+            <p>
+              <label>协议名称:</label>
+              {ag.agreement_name}
+            </p>
+            <p>
+              <label>协议编号:</label>
+              {ag.agreement_number}
+            </p>
+          </div>
+          <div class="row">
+            <p>
+              <label>关联时间:</label>
+              {app.utils.time2str(ag.create_date)}
+            </p>
+          </div>
+        </div>
+        <br>
+        <hr>
+      </div>
+      <h4>到款状态</h4>
+      <div class="c1">
+        <label>是否已到款:</label>
+        <p>
+          {project.payment_status?'是':'否'}
+        </p>
+      </div>
+      <br>
+      <hr>
+      <h4>项目执行</h4>
+      <div class="row-step">
+        <div class="step-box">
+          <div class="step-num {active:project.perform.create_status==1}">1</div>
+          <div class="step-line"></div>
+          <div class="step-num {active:project.perform.payment_status==1}">2</div>
+          <div class="step-line"></div>
+          <div class="step-num {active:project.perform.review_status==1}">3</div>
+          <div class="step-line"></div>
+          <div class="step-num {active:project.perform.verify_status==1}">4</div>
+          <div class="step-line"></div>
+          <div class="step-num {active:project.perform.confirm_status==1}">5</div>
+          <div class="step-line"></div>
+          <div class="step-num {active:project.perform.issue_status==1}">6</div>
+        </div>
+        <div class="text-box">
+          <p>立项</p>
+          <p>确认到款</p>
+          <p>录入评审结果</p>
+          <p>项目部审核</p>
+          <p>捐赠方确认</p>
+          <p>发放完成</p>
+        </div>
+      </div>
+
+      <br>
+      <hr>
+      <div class="c1 btn-line" style="text-indent: 0; text-align: center">
+        <button type="button" onclick={fn.back} class="btn-gray">{app.lang.admin.btn.back}</button>
+      </div>
+    </div>
+  </section>
+  <script>
+  var _this= this;
+  _this.pid = _this.app.route.params[2];
+  _this.project = {
+    'base-info': {},
+    perform: {},
+    performer: {},
+    agreement: []
+  };
+  _this.fn = {
+    back: function(){
+      history.back();
+    },
+    getDetail: function(){
+      _this.app.api('GET', 'project/default/view', {
+        data: { id: _this.pid }
+      }).on('done', function(data){
+        _this.update({
+          project: data
+        });
+      });
+    }
+  };
+  _this.on('mount', function(){
+    _this.fn.getDetail();
+  });
+  </script>
+</project-view>
+
+
 <!-- 项目进度 -->
 <project-perform>
 
@@ -42,7 +219,7 @@
             <button type="button" if={p.status!=1||p.active} onclick="{fn.CFDonor}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
           <p if={i==5}>
-            <a if={p.status==1||p.active} href="javascript:;" class="under-line">查看历史执行</a>
+            <a if={p.status==1||p.active} href="javascript:;" class="under-line" onclick="{fn.view}">查看历史执行</a>
             <span if={p.status==1 && !p.active}>已确认</span>
             <button type="button" if={p.status!=1||p.active} onclick="{fn.CFIssue}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
@@ -61,6 +238,9 @@
   var _this = this;
   _this.perform = {};
   _this.fn = {
+    view: function(e){
+      _this.app.route(_this.app.route.params[0]+'/view/'+_this.app.route.params[2]);
+    },
     // 发放确认
     CFIssue: function(e){
       _this.app.api('POST', 'project/perform/issue?id='+opts.pid, {
@@ -734,6 +914,7 @@
   <main class="admin">
     <div class="container">
       <admin-sidenav></admin-sidenav>
+      <project-view if={section=='view'}/>
       <project-form if={section=='add'}/>
       <project-form if={section=='edit'}/>
       <section if={section=='index'}>
@@ -816,6 +997,10 @@
   // 项目过滤(我的、全部)
   _this.filterRange = _this.app.lang.admin.project['filter:range'];
   _this.fn = {
+    // 查看项目
+    view: function(e){
+      _this.app.route(_this.app.route.path + '/view/' + e.item.id);
+    },
     // 添加项目
     add: function(){
       _this.app.route(_this.app.route.path + '/add');
