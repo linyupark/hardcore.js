@@ -8,17 +8,20 @@
         <div class="row">
           <p>
             <label style="text-align: center;">帐号</label>
-            <input type="text" ref="username" value="{user.username}" placeholder="帐号必须是数字或字母，长度6-50">
+            <input type="text" ref="username" value="{user.username}" placeholder="数字或字母，长度6-50">
+            <input-valid ref="validOnSave" for="username" reg="[\d|\w]\{6,50\}" msg="数字或字母，长度6-50"/>
           </p>
         </div>
         <div class="row">
           <p>
             <label style="text-align: center;">密码</label>
             <input type="text" ref="password" value="{user.password}" placeholder="6-20个英文字母数字或符号，不能纯数字">
+            <input-valid ref="validOnSave" for="password" reg="(?!\d+$).\{6,20\}" msg="6-20个英文字母数字或符号，不能纯数字"/>
           </p>
           <p>
             <label>确认密码</label>
-            <input type="text" ref="confirm_password" value="" placeholder="">
+            <input type="text" ref="confirm_password" value="" placeholder="跟密码保持一致">
+            <input-valid ref="validCFPassword" for="confirm_password" rule="required" msg=""/>
           </p>
         </div>
         <div class="row">
@@ -55,12 +58,13 @@
           <p>
             <label style="text-align: center">姓名</label>
             <input type="text" ref="real_name" value="{user.real_name}" placeholder="必填">
+            <input-valid for="real_name" rule="required" msg="必填"/>
           </p>
           <p>
             <label style="text-align: center">性别</label>
             <select ref="sex">
-              <option value="男" checked="{user.sex=='男'}">男</option>
-              <option value="女" checked="{user.sex=='女'}">女</option>
+              <option value="1" selected="{user.sex==1}">男</option>
+              <option value="0" selected="{user.sex==0}">女</option>
             </select>
           </p>
         </div>
@@ -69,6 +73,10 @@
             <label style="text-align: center">职务</label>
             <place-select ref="place"/>
           </p>
+          <p>
+            <label style="text-align: center">电话</label>
+            <input ref="tel" type="text" value="{user.tel}">
+          </p>
         </div>
         <div class="row">
           <p>
@@ -76,10 +84,9 @@
             <input ref="company" type="text" value="{user.company}">
           </p>
           <p>
-            <label>联系电话</label>
+            <label>公司电话</label>
             <input ref="company_tel" type="text" value="{user.company_tel}">
           </p>
-
         </div>
         <div class="row">
           <p>
@@ -126,6 +133,53 @@
   _this.user = {};
   _this.uid = _this.app.route.params[2];
   _this.fn = {
+    cancel: function(){
+      history.back();
+    },
+    save: function(e){
+      var api = 'user-manager/default/create';
+      if(_this.uid)
+        api = 'user-manager/default/update?id=' + _this.uid;
+      // 校验数据
+      _this.app.validAll(_this.refs.validOnSave)
+      .then(function(){
+        // 确认密码校验
+        if(_this.refs.confirm_password.value != _this.refs.password.value){
+          _this.refs.validCFPassword.emit('msg', '确认密码与密码不一致');
+          return _this.app.alert('请检查表单', 'warning');
+        }
+        _this.app.api('POST', api, {
+          trigger: e.target,
+          data: {
+            data: JSON.stringify({
+              address: _this.refs.address.value,
+              company: _this.refs.company.value,
+              company_fax: _this.refs.company_fax.value,
+              company_tel: _this.refs.company_tel.value,
+              password: _this.refs.password.value,
+              confirm_password: _this.refs.confirm_password.value,
+              donor_id: _this.refs.donor.getId(),
+              email: _this.refs.email.value,
+              is_manager: _this.refs.is_manager.checked?1:0,
+              organization_id: _this.refs.organization.getId(),
+              place_id: _this.refs.place.getId(),
+              profile: _this.refs.profile.value,
+              qq: _this.refs.qq.value,
+              real_name: _this.refs.real_name.value,
+              role_name: _this.refs.role.getName(),
+              sex: _this.refs.sex.value,
+              tel: _this.refs.tel.value,
+              username: _this.refs.username.value,
+              we_chat: _this.refs.we_chat.value
+            })
+          }
+        }).on('done', function(){
+          _this.app.alert('用户信息保存成功', 'success');
+        });
+      }).catch(function(){
+        _this.app.alert('请检查表单', 'warning');
+      });
+    },
     getUserDetail: function(){
       // 获取用户帐号信息
       _this.app.api('GET', 'user-manager/default/update', {
@@ -145,9 +199,7 @@
           description: data.role_description
         });
         // 组织
-        _this.refs.organization.emit('set', {
-          id: data.organization_id
-        });
+        _this.refs.organization.trap('set', data.organization_id);
         // 职务
         _this.refs.place.emit('set', {
           id: data.place_id,

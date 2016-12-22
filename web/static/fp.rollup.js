@@ -3963,9 +3963,9 @@ class FP extends RiotApp {
     let promiseList = [];
     validList.forEach(valid => {
       promiseList.push(new this.Promise((resolve, reject) => {
-        valid.on('valid', () => {
+        valid.once('valid', () => {
           resolve();
-        }).on('invalid', () => {
+        }).once('invalid', () => {
           reject();
         }).emit('check');
       }));

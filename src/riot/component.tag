@@ -63,7 +63,7 @@
       onclick={fn.pull}
       onkeyup={fn.keyup}
       onblur={fn.blur}>
-    <ul if={items&&items.length > 0}>
+    <ul ref="list" if={items&&items.length > 0}>
       <li each={item, i in items} class="{active: i==selectIndex-1}" onclick={fn.select}>
         {item[parent.opts.name]}
       </li>
@@ -75,6 +75,8 @@
   _this.selected = {};
   _this.selectIndex = 0;
   _this.inputValue = opts.value;
+  // 一次能展示的个数，超过就要开始自动下滚
+  _this.displayNum = opts.num || 6;
   _this.fn = {
     blur: function(e){
       setTimeout(function(){
@@ -88,7 +90,7 @@
           _this.emit("select", _this.selected);
           _this.update();
         }
-      }, 500);
+      }, 200);
     },
     pull: function(e){
       e.target.value = '';
@@ -107,10 +109,15 @@
       clearTimeout(_this.timer);
       // 上
       if(e.keyCode == 38 && _this.selectIndex > 0){
+        if(_this.items.length-_this.displayNum+1 >= _this.selectIndex)
+          _this.refs.list.scrollTop -= _this.refs.keyword.clientHeight-3;
         return _this.selectIndex--;
       }
       // 下
       if(e.keyCode == 40 && _this.items && _this.selectIndex < _this.items.length){
+        // 滚动
+        if(_this.displayNum <= _this.selectIndex)
+          _this.refs.list.scrollTop += _this.refs.keyword.clientHeight-3;
         return _this.selectIndex++;
       }
       // 回车
@@ -321,104 +328,113 @@
   //   rule='一些校验规则用, 分隔'
   //   reg='正则规则' flag='正则的flag'
   //   msg='如果不符合的报错信息'>
-  var _this = this, target = [], invalid;
-
-  this.on('mount', function(){
-
-    try{
-      for(var i in opts.for.split(',')){
-        target[i] = _this.parent.refs[opts.for.split(',')[i]];
-        if(target[i] instanceof Array){
-          target[i] = target[opts.index || 0];
-        }
-      }
-      if(typeof target[0] === 'undefined'){
-        throw new Error();
-      }
-    }
-    catch(e){
-      return _this.update({
-        message: '属性for所指定的校验对象没找到.'
-      });
-    }
-
-    if(typeof target[0] === 'undefined'){
-      return _this.update({
-        message: '属性for所指定的校验对象没找到.'
-      });
-    }
-
-    if(!opts.rule && !opts.reg){
-      return _this.update({
-        message: '请指定校验规则，添加rule或reg属性.'
-      });
-    }
-
-    // 改变值得时候清空校验结果信息
-    var focusFn = function(){
+  var _this = this;
+  _this.fn = {
+    focusFn: function(){
       _this.update({
         message: ''
       });
-    };
-    for(var i in target){
-      if(target[i] instanceof Array){
-        target[i].forEach(function(t){
-          t.addEventListener('focus', focusFn, false);
+    },
+    fetchValues: function(){
+      _this.target = [];
+      try{
+        for(var i in opts.for.split(',')){
+          _this.target[i] = _this.parent.refs[opts.for.split(',')[i]];
+          if(_this.target[i] instanceof Array){
+            _this.target[i] = _this.target[opts.index || 0];
+          }
+        }
+        if(typeof _this.target[0] === 'undefined'){
+          throw new Error();
+        }
+      }
+      catch(e){
+        return _this.update({
+          message: '属性for所指定的校验对象没找到.'
         });
       }
-      else{
-        target[i].addEventListener('focus', focusFn, false);
+      if(typeof _this.target[0] === 'undefined'){
+        return _this.update({
+          message: '属性for所指定的校验对象没找到.'
+        });
+      }
+
+      if(!opts.rule && !opts.reg){
+        return _this.update({
+          message: '请指定校验规则，添加rule或reg属性.'
+        });
+      }
+
+      for(var i in _this.target){
+        if(_this.target[i] instanceof Array){
+          _this.target[i].forEach(function(t){
+            t.addEventListener('focus', _this.fn.focusFn, {once: true});
+          });
+        }
+        else{
+          _this.target[i].addEventListener('focus', _this.fn.focusFn, {once: true});
+        }
       }
     }
-  });
+  };
+
+  this.on('mount', function(){});
 
   _this.on('check', function(){
 
-    invalid = false;
+    _this.invalid = false;
+    _this.fn.fetchValues();
+    if(!opts.rule) opts.rule = '';
 
     // 必填
     if(opts.rule.split(',').indexOf('required') !== -1){
       // console.log('check required');
-      for(var i in target){
-        if(target[i].value.replace(/\s/g, '') === '') invalid = true;
+      for(var i in _this.target){
+        // console.log(_this.target[i].value);
+        if(_this.target[i].value.replace(/\s/g, '') === '')
+          _this.invalid = true;
       }
     }
     // 数字
-    if(!invalid && opts.rule.split(',').indexOf('number') !== -1){
+    if(!_this.invalid && opts.rule.split(',').indexOf('number') !== -1){
       // console.log('check number');
-      for(var i in target){
-        if(Number(target[i].value) != target[i].value) invalid = true;
+      for(var i in _this.target){
+        if(Number(_this.target[i].value) != _this.target[i].value)
+          _this.invalid = true;
       }
     }
     // 正整数
-    if(!invalid && opts.rule.split(',').indexOf('+int') !== -1){
+    if(!_this.invalid && opts.rule.split(',').indexOf('+int') !== -1){
       // console.log('check +int');
-      for(var i in target){
-        if(parseInt(target[i].value, 10) < 1) invalid = true;
+      for(var i in _this.target){
+        if(parseInt(_this.target[i].value, 10) < 1)
+          _this.invalid = true;
       }
     }
     // 邮箱
-    if(!invalid && opts.rule.split(',').indexOf('email') !== -1){
+    if(!_this.invalid && opts.rule.split(',').indexOf('email') !== -1){
       // console.log('email +int');
-      for(var i in target){
-        if(/[^@]+@[^@]+\.[^@]+/.test(target[i].value) === false) invalid = true;
+      for(var i in _this.target){
+        if(/[^@]+@[^@]+\.[^@]+/.test(_this.target[i].value) === false)
+          _this.invalid = true;
       }
     }
     // 正则
-    if(!invalid && opts.reg){
+    if(!_this.invalid && opts.reg){
       var reg = new RegExp(opts.reg, opts.flag);
-      for(var i in target){
-        invalid = reg.test(target[i].value) === false;
+      for(var i in _this.target){
+        // console.log(reg, target[i].value);
+        _this.invalid = reg.test(_this.target[i].value) === false;
       }
     }
-    if(invalid){
-      _this.emit('invalid', target);
+    if(_this.invalid){
+      _this.emit('invalid', _this.target);
       _this.update({
         message: opts.msg
       });
     }
     else{
-      _this.emit('valid', target);
+      _this.emit('valid', _this.target);
     }
   });
 

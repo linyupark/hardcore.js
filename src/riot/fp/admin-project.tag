@@ -1017,6 +1017,7 @@
       // all: 全部、0已关闭、1执行中、2已到款、3已评审、4已审核、5已确认、6已发放
       _this.app.api('GET', 'project/default/' + _this.q.range, {
         data: {
+          page: _this.q.page || 1,
           condition: _this.q.status == 'all' ? '' : _this.q.status
         }
       })

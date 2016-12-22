@@ -517,17 +517,17 @@ template {
   content: '\f1f8'; }
 
 /* '' */
-.row:before, form.agreement .row:before, form.donor .row:before, form.project .row:before, form.payment .row:before, form.modal .row:before, .project-view .row:before, form.user .row:before, .row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after, form.modal .row:after, .project-view .row:after, form.user .row:after {
+.row:before, form.agreement .row:before, form.donor .row:before, form.project .row:before, form.payment .row:before, form.modal .row:before, .project-view .row:before, form.user .row:before, form.user-daily .row:before, .row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after, form.modal .row:after, .project-view .row:after, form.user .row:after, form.user-daily .row:after {
   content: "";
   display: table; }
 
-.row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after, form.modal .row:after, .project-view .row:after, form.user .row:after {
+.row:after, form.agreement .row:after, form.donor .row:after, form.project .row:after, form.payment .row:after, form.modal .row:after, .project-view .row:after, form.user .row:after, form.user-daily .row:after {
   clear: both; }
 
-.row, form.agreement .row, form.donor .row, form.project .row, form.payment .row, form.modal .row, .project-view .row, form.user .row {
+.row, form.agreement .row, form.donor .row, form.project .row, form.payment .row, form.modal .row, .project-view .row, form.user .row, form.user-daily .row {
   zoom: 1; }
 
-userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
+userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p, form.user-daily .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line, form.user-daily .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -911,131 +911,131 @@ header h1 {
   header h1 {
     font-size: 16px; } }
 
-form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user {
+form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user, form.user-daily {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   position: relative;
   background: #fff;
   padding: 30px;
   border-radius: 5px;
   margin: 0 5px 5px 0; }
-  form.agreement .header-mark, form.donor .header-mark, form.project .header-mark, form.payment .header-mark, form.modal .header-mark, .project-view .header-mark, form.user .header-mark {
+  form.agreement .header-mark, form.donor .header-mark, form.project .header-mark, form.payment .header-mark, form.modal .header-mark, .project-view .header-mark, form.user .header-mark, form.user-daily .header-mark {
     position: absolute;
     right: 20px;
     top: 20px;
     font-size: 13px;
     color: #999; }
-  form.agreement h4, form.donor h4, form.project h4, form.payment h4, form.modal h4, .project-view h4, form.user h4 {
+  form.agreement h4, form.donor h4, form.project h4, form.payment h4, form.modal h4, .project-view h4, form.user h4, form.user-daily h4 {
     margin: 0 0 15px 0;
     padding: 0 15px;
     font-size: 16px;
     border-left: 2px solid #DF3A5E; }
-  form.agreement .row, form.donor .row, form.project .row, form.payment .row, form.modal .row, .project-view .row, form.user .row {
+  form.agreement .row, form.donor .row, form.project .row, form.payment .row, form.modal .row, .project-view .row, form.user .row, form.user-daily .row {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: -0;
     margin-right: -0; }
-    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row, [class*="no-gutter"] > form.project .row, [class*="no-gutter"] > form.payment .row, [class*="no-gutter"] > form.modal .row, [class*="no-gutter"] > .project-view .row, [class*="no-gutter"] > form.user .row {
+    [class*="no-gutter"] > form.agreement .row, [class*="no-gutter"] > form.donor .row, [class*="no-gutter"] > form.project .row, [class*="no-gutter"] > form.payment .row, [class*="no-gutter"] > form.modal .row, [class*="no-gutter"] > .project-view .row, [class*="no-gutter"] > form.user .row, [class*="no-gutter"] > form.user-daily .row {
       margin-left: 0 !important;
       margin-right: 0 !important; }
-    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row {
+    form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.agreement .row form.user-daily .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.donor .row form.user-daily .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.project .row form.user-daily .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.payment .row form.user-daily .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, form.modal .row form.user-daily .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, .project-view .row form.user-daily .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row, form.user .row form.user-daily .row, form.user-daily .row form.agreement .row, form.user-daily .row form.donor .row, form.user-daily .row form.project .row, form.user-daily .row form.payment .row, form.user-daily .row form.modal .row, form.user-daily .row .project-view .row, form.user-daily .row form.user .row, form.user-daily .row form.user-daily .row {
       margin-left: -0;
       margin-right: -0; }
     @media screen and (min-width: 960px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.agreement .row form.user-daily .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.donor .row form.user-daily .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.project .row form.user-daily .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.payment .row form.user-daily .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, form.modal .row form.user-daily .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, .project-view .row form.user-daily .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row, form.user .row form.user-daily .row, form.user-daily .row form.agreement .row, form.user-daily .row form.donor .row, form.user-daily .row form.project .row, form.user-daily .row form.payment .row, form.user-daily .row form.modal .row, form.user-daily .row .project-view .row, form.user-daily .row form.user .row, form.user-daily .row form.user-daily .row {
         margin-left: -0;
         margin-right: -0; } }
     @media screen and (max-width: 480px) {
-      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row {
+      form.agreement .row form.agreement .row, form.agreement .row form.donor .row, form.agreement .row form.project .row, form.agreement .row form.payment .row, form.agreement .row form.modal .row, form.agreement .row .project-view .row, form.agreement .row form.user .row, form.agreement .row form.user-daily .row, form.donor .row form.agreement .row, form.donor .row form.donor .row, form.donor .row form.project .row, form.donor .row form.payment .row, form.donor .row form.modal .row, form.donor .row .project-view .row, form.donor .row form.user .row, form.donor .row form.user-daily .row, form.project .row form.agreement .row, form.project .row form.donor .row, form.project .row form.project .row, form.project .row form.payment .row, form.project .row form.modal .row, form.project .row .project-view .row, form.project .row form.user .row, form.project .row form.user-daily .row, form.payment .row form.agreement .row, form.payment .row form.donor .row, form.payment .row form.project .row, form.payment .row form.payment .row, form.payment .row form.modal .row, form.payment .row .project-view .row, form.payment .row form.user .row, form.payment .row form.user-daily .row, form.modal .row form.agreement .row, form.modal .row form.donor .row, form.modal .row form.project .row, form.modal .row form.payment .row, form.modal .row form.modal .row, form.modal .row .project-view .row, form.modal .row form.user .row, form.modal .row form.user-daily .row, .project-view .row form.agreement .row, .project-view .row form.donor .row, .project-view .row form.project .row, .project-view .row form.payment .row, .project-view .row form.modal .row, .project-view .row .project-view .row, .project-view .row form.user .row, .project-view .row form.user-daily .row, form.user .row form.agreement .row, form.user .row form.donor .row, form.user .row form.project .row, form.user .row form.payment .row, form.user .row form.modal .row, form.user .row .project-view .row, form.user .row form.user .row, form.user .row form.user-daily .row, form.user-daily .row form.agreement .row, form.user-daily .row form.donor .row, form.user-daily .row form.project .row, form.user-daily .row form.payment .row, form.user-daily .row form.modal .row, form.user-daily .row .project-view .row, form.user-daily .row form.user .row, form.user-daily .row form.user-daily .row {
         margin-left: -0;
         margin-right: -0; } }
-  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select, form.project input[type=text], form.project select, form.payment input[type=text], form.payment select, form.modal input[type=text], form.modal select, .project-view input[type=text], .project-view select, form.user input[type=text], form.user select {
+  form.agreement input[type=text], form.agreement select, form.donor input[type=text], form.donor select, form.project input[type=text], form.project select, form.payment input[type=text], form.payment select, form.modal input[type=text], form.modal select, .project-view input[type=text], .project-view select, form.user input[type=text], form.user select, form.user-daily input[type=text], form.user-daily select {
     height: 36px;
     padding: 0 5px;
     border-radius: 3px;
     border: 1px solid #E3E3E3; }
-    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus, form.project input[type=text]:focus, form.project select:focus, form.payment input[type=text]:focus, form.payment select:focus, form.modal input[type=text]:focus, form.modal select:focus, .project-view input[type=text]:focus, .project-view select:focus, form.user input[type=text]:focus, form.user select:focus {
+    form.agreement input[type=text]:focus, form.agreement select:focus, form.donor input[type=text]:focus, form.donor select:focus, form.project input[type=text]:focus, form.project select:focus, form.payment input[type=text]:focus, form.payment select:focus, form.modal input[type=text]:focus, form.modal select:focus, .project-view input[type=text]:focus, .project-view select:focus, form.user input[type=text]:focus, form.user select:focus, form.user-daily input[type=text]:focus, form.user-daily select:focus {
       outline: none;
       border-radius: 3px;
       box-shadow: 0 0 0 1px rgba(223, 58, 94, 0.5) inset; }
-    form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled], form.payment input[type=text][disabled], form.payment select[disabled], form.modal input[type=text][disabled], form.modal select[disabled], .project-view input[type=text][disabled], .project-view select[disabled], form.user input[type=text][disabled], form.user select[disabled] {
+    form.agreement input[type=text][disabled], form.agreement select[disabled], form.donor input[type=text][disabled], form.donor select[disabled], form.project input[type=text][disabled], form.project select[disabled], form.payment input[type=text][disabled], form.payment select[disabled], form.modal input[type=text][disabled], form.modal select[disabled], .project-view input[type=text][disabled], .project-view select[disabled], form.user input[type=text][disabled], form.user select[disabled], form.user-daily input[type=text][disabled], form.user-daily select[disabled] {
       background: #fff;
       border-color: #fff;
       border-bottom: 1px solid #E3E3E3; }
-  form.agreement label, form.donor label, form.project label, form.payment label, form.modal label, .project-view label, form.user label {
+  form.agreement label, form.donor label, form.project label, form.payment label, form.modal label, .project-view label, form.user label, form.user-daily label {
     width: 66px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 5px; }
-    form.agreement label.center, form.donor label.center, form.project label.center, form.payment label.center, form.modal label.center, .project-view label.center, form.user label.center {
+    form.agreement label.center, form.donor label.center, form.project label.center, form.payment label.center, form.modal label.center, .project-view label.center, form.user label.center, form.user-daily label.center {
       text-align: center; }
-    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox, form.project label.radio, form.project label.checkbox, form.payment label.radio, form.payment label.checkbox, form.modal label.radio, form.modal label.checkbox, .project-view label.radio, .project-view label.checkbox, form.user label.radio, form.user label.checkbox {
+    form.agreement label.radio, form.agreement label.checkbox, form.donor label.radio, form.donor label.checkbox, form.project label.radio, form.project label.checkbox, form.payment label.radio, form.payment label.checkbox, form.modal label.radio, form.modal label.checkbox, .project-view label.radio, .project-view label.checkbox, form.user label.radio, form.user label.checkbox, form.user-daily label.radio, form.user-daily label.checkbox {
       height: 38px;
       margin-right: 20px;
       line-height: 38px; }
-    form.agreement label.top, form.donor label.top, form.project label.top, form.payment label.top, form.modal label.top, .project-view label.top, form.user label.top {
+    form.agreement label.top, form.donor label.top, form.project label.top, form.payment label.top, form.modal label.top, .project-view label.top, form.user label.top, form.user-daily label.top {
       float: left;
       padding-top: 18px; }
-  form.agreement p, form.donor p, form.project p, form.payment p, form.modal p, .project-view p, form.user p {
+  form.agreement p, form.donor p, form.project p, form.payment p, form.modal p, .project-view p, form.user p, form.user-daily p {
     padding-bottom: 10px;
     position: relative; }
-    form.agreement p textarea, form.donor p textarea, form.project p textarea, form.payment p textarea, form.modal p textarea, .project-view p textarea, form.user p textarea {
+    form.agreement p textarea, form.donor p textarea, form.project p textarea, form.payment p textarea, form.modal p textarea, .project-view p textarea, form.user p textarea, form.user-daily p textarea {
       width: 77%;
       border-color: #ebebeb;
       border-radius: 5px;
       min-height: 100px;
       padding: 5px; }
-    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select, form.project p input[type=text], form.project p select, form.payment p input[type=text], form.payment p select, form.modal p input[type=text], form.modal p select, .project-view p input[type=text], .project-view p select, form.user p input[type=text], form.user p select {
+    form.agreement p input[type=text], form.agreement p select, form.donor p input[type=text], form.donor p select, form.project p input[type=text], form.project p select, form.payment p input[type=text], form.payment p select, form.modal p input[type=text], form.modal p select, .project-view p input[type=text], .project-view p select, form.user p input[type=text], form.user p select, form.user-daily p input[type=text], form.user-daily p select {
       width: 260px; }
-    form.agreement p select, form.donor p select, form.project p select, form.payment p select, form.modal p select, .project-view p select, form.user p select {
+    form.agreement p select, form.donor p select, form.project p select, form.payment p select, form.modal p select, .project-view p select, form.user p select, form.user-daily p select {
       width: 272px; }
-    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"], form.project p i[class^="icon-"], form.payment p i[class^="icon-"], form.modal p i[class^="icon-"], .project-view p i[class^="icon-"], form.user p i[class^="icon-"] {
+    form.agreement p i[class^="icon-"], form.donor p i[class^="icon-"], form.project p i[class^="icon-"], form.payment p i[class^="icon-"], form.modal p i[class^="icon-"], .project-view p i[class^="icon-"], form.user p i[class^="icon-"], form.user-daily p i[class^="icon-"] {
       color: #666;
       margin-left: -30px; }
-    form.agreement p input-valid, form.donor p input-valid, form.project p input-valid, form.payment p input-valid, form.modal p input-valid, .project-view p input-valid, form.user p input-valid {
+    form.agreement p input-valid, form.donor p input-valid, form.project p input-valid, form.payment p input-valid, form.modal p input-valid, .project-view p input-valid, form.user p input-valid, form.user-daily p input-valid {
       position: absolute;
       color: #F44C4C;
       top: 44px;
       left: 70px;
       font-size: 13px; }
-    form.agreement p .files, form.donor p .files, form.project p .files, form.payment p .files, form.modal p .files, .project-view p .files, form.user p .files {
+    form.agreement p .files, form.donor p .files, form.project p .files, form.payment p .files, form.modal p .files, .project-view p .files, form.user p .files, form.user-daily p .files {
       display: block;
       padding: 5px 0;
       color: #999; }
-  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select, form.payment .c4 input[type=text], form.payment .c4 select, form.modal .c4 input[type=text], form.modal .c4 select, .project-view .c4 input[type=text], .project-view .c4 select, form.user .c4 input[type=text], form.user .c4 select {
+  form.agreement .c4 input[type=text], form.agreement .c4 select, form.donor .c4 input[type=text], form.donor .c4 select, form.project .c4 input[type=text], form.project .c4 select, form.payment .c4 input[type=text], form.payment .c4 select, form.modal .c4 input[type=text], form.modal .c4 select, .project-view .c4 input[type=text], .project-view .c4 select, form.user .c4 input[type=text], form.user .c4 select, form.user-daily .c4 input[type=text], form.user-daily .c4 select {
     width: 160px; }
-  form.agreement .c4 select, form.donor .c4 select, form.project .c4 select, form.payment .c4 select, form.modal .c4 select, .project-view .c4 select, form.user .c4 select {
+  form.agreement .c4 select, form.donor .c4 select, form.project .c4 select, form.payment .c4 select, form.modal .c4 select, .project-view .c4 select, form.user .c4 select, form.user-daily .c4 select {
     width: 172px; }
-  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"], form.payment .c4 i[class^="icon-"], form.modal .c4 i[class^="icon-"], .project-view .c4 i[class^="icon-"], form.user .c4 i[class^="icon-"] {
+  form.agreement .c4 i[class^="icon-"], form.donor .c4 i[class^="icon-"], form.project .c4 i[class^="icon-"], form.payment .c4 i[class^="icon-"], form.modal .c4 i[class^="icon-"], .project-view .c4 i[class^="icon-"], form.user .c4 i[class^="icon-"], form.user-daily .c4 i[class^="icon-"] {
     margin-left: 5px; }
-  form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p {
+  form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p, form.user-daily .c2 p {
     width: 41.66667%;
     margin-right: 4.16667%; }
-  form.agreement .c1, form.donor .c1, form.project .c1, form.payment .c1, form.modal .c1, .project-view .c1, form.user .c1 {
+  form.agreement .c1, form.donor .c1, form.project .c1, form.payment .c1, form.modal .c1, .project-view .c1, form.user .c1, form.user-daily .c1 {
     overflow: hidden;
     padding-bottom: 20px; }
-    form.agreement .c1.btn-line, form.donor .c1.btn-line, form.project .c1.btn-line, form.payment .c1.btn-line, form.modal .c1.btn-line, .project-view .c1.btn-line, form.user .c1.btn-line {
+    form.agreement .c1.btn-line, form.donor .c1.btn-line, form.project .c1.btn-line, form.payment .c1.btn-line, form.modal .c1.btn-line, .project-view .c1.btn-line, form.user .c1.btn-line, form.user-daily .c1.btn-line {
       text-indent: 70px; }
-      form.agreement .c1.btn-line button, form.donor .c1.btn-line button, form.project .c1.btn-line button, form.payment .c1.btn-line button, form.modal .c1.btn-line button, .project-view .c1.btn-line button, form.user .c1.btn-line button {
+      form.agreement .c1.btn-line button, form.donor .c1.btn-line button, form.project .c1.btn-line button, form.payment .c1.btn-line button, form.modal .c1.btn-line button, .project-view .c1.btn-line button, form.user .c1.btn-line button, form.user-daily .c1.btn-line button {
         width: 100px;
         margin-right: 20px; }
-    form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line {
+    form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line, form.user-daily .c1 .line {
       width: 91.66667%; }
-    form.agreement .c1 .price-group, form.donor .c1 .price-group, form.project .c1 .price-group, form.payment .c1 .price-group, form.modal .c1 .price-group, .project-view .c1 .price-group, form.user .c1 .price-group {
+    form.agreement .c1 .price-group, form.donor .c1 .price-group, form.project .c1 .price-group, form.payment .c1 .price-group, form.modal .c1 .price-group, .project-view .c1 .price-group, form.user .c1 .price-group, form.user-daily .c1 .price-group {
       display: inline-block;
       margin-top: 10px; }
-      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select, form.project .c1 .price-group input[type=text], form.project .c1 .price-group select, form.payment .c1 .price-group input[type=text], form.payment .c1 .price-group select, form.modal .c1 .price-group input[type=text], form.modal .c1 .price-group select, .project-view .c1 .price-group input[type=text], .project-view .c1 .price-group select, form.user .c1 .price-group input[type=text], form.user .c1 .price-group select {
+      form.agreement .c1 .price-group input[type=text], form.agreement .c1 .price-group select, form.donor .c1 .price-group input[type=text], form.donor .c1 .price-group select, form.project .c1 .price-group input[type=text], form.project .c1 .price-group select, form.payment .c1 .price-group input[type=text], form.payment .c1 .price-group select, form.modal .c1 .price-group input[type=text], form.modal .c1 .price-group select, .project-view .c1 .price-group input[type=text], .project-view .c1 .price-group select, form.user .c1 .price-group input[type=text], form.user .c1 .price-group select, form.user-daily .c1 .price-group input[type=text], form.user-daily .c1 .price-group select {
         min-width: 160px;
         max-width: 160px;
         margin-right: 8px; }
-      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"], form.project .c1 .price-group i[class^="icon-"], form.payment .c1 .price-group i[class^="icon-"], form.modal .c1 .price-group i[class^="icon-"], .project-view .c1 .price-group i[class^="icon-"], form.user .c1 .price-group i[class^="icon-"] {
+      form.agreement .c1 .price-group i[class^="icon-"], form.donor .c1 .price-group i[class^="icon-"], form.project .c1 .price-group i[class^="icon-"], form.payment .c1 .price-group i[class^="icon-"], form.modal .c1 .price-group i[class^="icon-"], .project-view .c1 .price-group i[class^="icon-"], form.user .c1 .price-group i[class^="icon-"], form.user-daily .c1 .price-group i[class^="icon-"] {
         margin: 0 8px 0 0; }
 
-form.project .top-tab-line {
+form.project .top-tab-line, form.user-daily .top-tab-line {
   margin: -30px -30px 30px -30px;
   height: 55px;
   text-align: center;
   line-height: 55px; }
-  form.project .top-tab-line a.c4 {
+  form.project .top-tab-line a.c4, form.user-daily .top-tab-line a.c4 {
     width: 25%;
     display: block;
     float: left;
@@ -1043,7 +1043,7 @@ form.project .top-tab-line {
     color: #999;
     font-size: 16px;
     border-bottom: 1px solid #ebebeb; }
-    form.project .top-tab-line a.c4.active {
+    form.project .top-tab-line a.c4.active, form.user-daily .top-tab-line a.c4.active {
       color: #222;
       border-bottom: 1px solid #DF3A5E; }
 
@@ -1088,6 +1088,136 @@ form.modal {
     width: 80%;
     float: left;
     margin: 0; }
+
+form.user-daily .top-tab-line {
+  border-bottom: 1px solid #ebebeb; }
+  form.user-daily .top-tab-line a.c4 {
+    width: 12%; }
+
+form.user-daily table-filter {
+  margin-top: -25px;
+  border-bottom: 2px dotted #ebebeb; }
+  form.user-daily table-filter div {
+    margin: 10px 0 8px 0; }
+
+.daily-box {
+  border-bottom: 1px solid #ebebeb;
+  overflow: hidden;
+  padding-bottom: 20px; }
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0.5; }
+  to {
+    opacity: 1; } }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.5; }
+  to {
+    opacity: 1; } }
+  .daily-box:last-child {
+    border: none;
+    padding-bottom: 0; }
+  .daily-box .user-date {
+    margin: 15px 0 0; }
+    .daily-box .user-date strong {
+      font-size: 14px; }
+    .daily-box .user-date span {
+      font-size: 13px;
+      color: #999;
+      margin-left: 10px; }
+  .daily-box .content {
+    margin: 0 0 15px;
+    width: 90%;
+    line-height: 150%; }
+  .daily-box .handle-line {
+    float: right;
+    margin-right: 10%; }
+    .daily-box .handle-line a {
+      color: #999;
+      margin-left: 15px; }
+  .daily-box .comment {
+    padding: 10px 0 0;
+    clear: both; }
+    .daily-box .comment input[type=text] {
+      width: 79%;
+      height: 30px; }
+    .daily-box .comment button {
+      cursor: pointer;
+      background: #FEAD50;
+      border: 1px solid #fe951d;
+      text-align: center;
+      color: #FFF;
+      font-size: 11.5px;
+      height: 30px;
+      line-height: 27px;
+      border-radius: 3px;
+      margin-left: 5px; }
+      .daily-box .comment button:hover {
+        background: #fe951d; }
+      .daily-box .comment button:active {
+        background: #fec583; }
+      .daily-box .comment button[disabled] {
+        cursor: default; }
+      .daily-box .comment button[disabled] {
+        background: #fed19c;
+        border-color: #fed19c;
+        color: #fead50; }
+  .daily-box .comment-list {
+    line-height: 160%;
+    list-style: none;
+    padding-left: 0; }
+    .daily-box .comment-list li {
+      list-style: none;
+      vertical-align: top; }
+      .daily-box .comment-list li p {
+        position: relative;
+        margin: 0;
+        width: 900px;
+        padding: 5px 5px 5px 20px;
+        border-radius: 5px; }
+        .daily-box .comment-list li p:hover {
+          background: #F5F7F8; }
+          .daily-box .comment-list li p:hover .c-rm i {
+            display: block; }
+      .daily-box .comment-list li .child {
+        padding-left: 0; }
+      .daily-box .comment-list li .c-name, .daily-box .comment-list li .c-name a, .daily-box .comment-list li .c-reply {
+        vertical-align: top; }
+      .daily-box .comment-list li .c-content {
+        display: inline-block;
+        padding: 0 10px;
+        border-radius: 3px;
+        width: 400px;
+        color: #666;
+        font-size: 13px; }
+      .daily-box .comment-list li .c-time {
+        float: right;
+        margin-right: 12%;
+        color: #999;
+        font-size: 13px; }
+      .daily-box .comment-list li .c-rm {
+        position: absolute;
+        right: 8%;
+        top: 5px; }
+        .daily-box .comment-list li .c-rm i {
+          color: #ccc;
+          display: none; }
+    .daily-box .comment-list .c-reply {
+      color: #999; }
+    .daily-box .comment-list .blank_1 {
+      display: inline-block;
+      width: 10px; }
+    .daily-box .comment-list .blank_2 {
+      display: inline-block;
+      width: 20px; }
+    .daily-box .comment-list .blank_3 {
+      display: inline-block;
+      width: 30px; }
+    .daily-box .comment-list .blank_4 {
+      display: inline-block;
+      width: 40px; }
 
 table.base {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);

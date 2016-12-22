@@ -23,7 +23,7 @@
         <p class="btn-line">
           <button ref="login" onclick={fn.login}>{app.lang.login.btn}</button>
           <br>
-          <a href="#!findpass">{app.lang.login.findpass}</a>
+          <a aria-label="请拨打联系电话找回密码" class="c-tooltip--top" href="javascript:;">{app.lang.login.findpass}</a>
         </p>
       </form>
     </div>

@@ -346,6 +346,7 @@
     }
     _this.app.api('GET', 'system-setting/organization/search')
     .on('done', function(data) {
+      _this.app.data.orgList = data.items;
       _this.orgList = data.items;
       _this.fn.scan();
       _this.update();
@@ -363,6 +364,7 @@
   // 设置值
   _this.on('set', function(value){
     _this.selectValue = [0].concat((''+value).split(','));
+    _this.update();
   });
   </script>
 </org-select>
@@ -436,6 +438,7 @@
     .on('done', function(data){
       data.items.forEach(function(item){
         if(item.id == id){
+          _this.refs.project_type &&
           _this.refs.project_type.emit('value', item.name);
         }
       });
@@ -690,6 +693,13 @@
 
 <!-- table筛选过滤 -->
 <table-filter>
+  <!-- 工作日志 -->
+  <div if={opts.for=='daily'&&app.route.query.range=='all'}>
+    关键词:
+    <input type="text" ref="keyword" style="width: 250px" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="输入部门、院系名称进行搜索">
+    <button onclick={fn.search} type="button" class="btn-gray"><i class="icon-search"></i></button>
+    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.dailyReset}>{app.lang.admin.reset}</a>
+  </div>
   <!-- 项目管理 -->
   <div if={opts.for=='project'}>
   按条件筛选：
@@ -737,7 +747,12 @@
       }
     },
     search: function(){
+      if(opts.for === 'daily'){
+        // 日志
+        
+      }
       if(opts.for === 'agreement'){
+        // 协议
         _this.app.route.query.type =
         _this.refs.agreement.value || '';
         _this.app.route.query.keyword =  _this.refs.keyword.value || '';
@@ -852,6 +867,17 @@
       {app.lang.footer.tel}
     </p>
   </div>
+  <script>
+  var _this = this;
+  _this.on('mount', function(){
+    // 将input长度都限制50以内
+    var inputs = document.getElementsByTagName('input') || [];
+    for(var i in inputs){
+      if(inputs[i].maxLength === -1)
+        inputs[i].maxLength = 50;
+    }
+  });
+  </script>
 </footer>
 
 <!-- header -->

@@ -55,7 +55,7 @@
           "icon": "user"
         }, {
           "name": "日志",
-          "url": "admin-log",
+          "url": "admin-daily",
           "icon": "book"
         }, {
           "name": "设置",

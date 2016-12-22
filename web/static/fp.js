@@ -4193,9 +4193,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var promiseList = [];
         validList.forEach(function (valid) {
           promiseList.push(new _this18.Promise(function (resolve, reject) {
-            valid.on('valid', function () {
+            valid.once('valid', function () {
               resolve();
-            }).on('invalid', function () {
+            }).once('invalid', function () {
               reject();
             }).emit('check');
           }));
