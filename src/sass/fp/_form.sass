@@ -232,7 +232,7 @@ form.user-daily
     border: none
     padding-bottom: 0
   .user-date
-    margin: 15px 0 0
+    margin: 25px 0 0
     strong
       font-size: $font-s
     span
@@ -250,14 +250,15 @@ form.user-daily
       color: $color-txt2
       margin-left: 15px
   .comment
-    padding: 10px 0 0
+    padding: 20px 0 0
     clear: both
     input[type=text]
-      width: 79%
+      width: 85%
       height: 30px
     button
       +btn-2(30px)
-      margin-left: 5px
+      width: 9%
+      margin-left: 1%
   .comment-list
     line-height: 160%
     list-style: none
@@ -268,15 +269,13 @@ form.user-daily
       p
         position: relative
         margin: 0
-        width: 900px
+        width: 100%
         padding: 5px 5px 5px 20px
         border-radius: 5px
         &:hover
           background: #F5F7F8
           .c-rm i
             display: block
-      .child
-        padding-left: 0
       .c-name, .c-name a, .c-reply
         vertical-align: top
       .c-content
@@ -288,27 +287,17 @@ form.user-daily
         font-size: $font-xs
       .c-time
         float: right
-        margin-right: 12%
+        margin-right: 5%
         color: $color-txt2
         font-size: $font-xs
       .c-rm
         position: absolute
-        right: 8%
+        right: 2%
         top: 5px
         i
           color: #ccc
           display: none
     .c-reply
       color: $color-txt2
-    .blank_1
+    .blank
       display: inline-block
-      width: 10px
-    .blank_2
-      display: inline-block
-      width: 20px
-    .blank_3
-      display: inline-block
-      width: 30px
-    .blank_4
-      display: inline-block
-      width: 40px

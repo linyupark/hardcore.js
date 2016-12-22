@@ -1120,7 +1120,7 @@ form.user-daily table-filter {
     border: none;
     padding-bottom: 0; }
   .daily-box .user-date {
-    margin: 15px 0 0; }
+    margin: 25px 0 0; }
     .daily-box .user-date strong {
       font-size: 14px; }
     .daily-box .user-date span {
@@ -1138,10 +1138,10 @@ form.user-daily table-filter {
       color: #999;
       margin-left: 15px; }
   .daily-box .comment {
-    padding: 10px 0 0;
+    padding: 20px 0 0;
     clear: both; }
     .daily-box .comment input[type=text] {
-      width: 79%;
+      width: 85%;
       height: 30px; }
     .daily-box .comment button {
       cursor: pointer;
@@ -1153,7 +1153,8 @@ form.user-daily table-filter {
       height: 30px;
       line-height: 27px;
       border-radius: 3px;
-      margin-left: 5px; }
+      width: 9%;
+      margin-left: 1%; }
       .daily-box .comment button:hover {
         background: #fe951d; }
       .daily-box .comment button:active {
@@ -1174,15 +1175,13 @@ form.user-daily table-filter {
       .daily-box .comment-list li p {
         position: relative;
         margin: 0;
-        width: 900px;
+        width: 100%;
         padding: 5px 5px 5px 20px;
         border-radius: 5px; }
         .daily-box .comment-list li p:hover {
           background: #F5F7F8; }
           .daily-box .comment-list li p:hover .c-rm i {
             display: block; }
-      .daily-box .comment-list li .child {
-        padding-left: 0; }
       .daily-box .comment-list li .c-name, .daily-box .comment-list li .c-name a, .daily-box .comment-list li .c-reply {
         vertical-align: top; }
       .daily-box .comment-list li .c-content {
@@ -1194,30 +1193,20 @@ form.user-daily table-filter {
         font-size: 13px; }
       .daily-box .comment-list li .c-time {
         float: right;
-        margin-right: 12%;
+        margin-right: 5%;
         color: #999;
         font-size: 13px; }
       .daily-box .comment-list li .c-rm {
         position: absolute;
-        right: 8%;
+        right: 2%;
         top: 5px; }
         .daily-box .comment-list li .c-rm i {
           color: #ccc;
           display: none; }
     .daily-box .comment-list .c-reply {
       color: #999; }
-    .daily-box .comment-list .blank_1 {
-      display: inline-block;
-      width: 10px; }
-    .daily-box .comment-list .blank_2 {
-      display: inline-block;
-      width: 20px; }
-    .daily-box .comment-list .blank_3 {
-      display: inline-block;
-      width: 30px; }
-    .daily-box .comment-list .blank_4 {
-      display: inline-block;
-      width: 40px; }
+    .daily-box .comment-list .blank {
+      display: inline-block; }
 
 table.base {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);

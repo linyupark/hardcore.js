@@ -17,7 +17,7 @@
       <daily-form if={section=='edit'}/>
       <section if={section=='index'}>
         <h2>工作日志</h2>
-        <form class="user-daily">
+        <form class="user-daily" onsubmit="return false">
           <div class="top-tab-line">
             <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}</a>
           </div>
@@ -46,43 +46,28 @@
             </div>
             <div class="handle-line">
               <a href="javascript:;" if={q.range=='information'}>标为已读</a>
-              <a href="javascript:;" onclick="{fn.checkMsg}">评论({message.length})</a>
+              <a href="javascript:;" onclick="{fn.checkMsg}">评论({msgList[id].length})</a>
               <a href="javascript:;">修改</a>
             </div>
             <div class="{fadein: checkMsgId==id}" if={checkMsgId==id}>
               <div class="comment">
                 <input ref="comment" type="text" placeholder="回复 {msg.user_name}: {msg.content}">
                 <input-valid ref="validComment" for="comment" rule="required" msg=""/>
-                <button type="button" onclick="{fn.send}">发送 (Ctrl+Enter)</button>
+                <button type="button" onclick="{fn.send}">发送</button>
               </div>
               <ul class="comment-list">
-                <li each={message}>
+                <li each={msgList[id]}>
                   <p>
+                    <span class="blank" style="width: {Number(lv)*10}px"></span>
                     <span class="c-name">
-                      <a href="javascript:;" onclick={fn.reply} class="under-line">{user_name}</a>
-                    </span>:
-                    <span class="c-content">{content}</span>
-                    <span class="c-time">
-                      {app.utils.time2str(created_at, {showtime:1})}
+                      <a href="javascript:;" onclick={fn.reply}  class="under-line">{data.user_name}</a>
                     </span>
+                    <span if={lv>0} class="c-reply"> 回复 </span>
+                    <span class="c-name">{pname}:</span>
+                    <span class="c-content">{data.content}</span>
+                    <span class="c-time">{app.utils.time2str(data.created_at, {showtime:1})}</span>
                     <a href="javascript:;" class="c-rm" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
                   </p>
-
-                  <ul class="child">
-                    <li each={fn.scanChild(child, 1)}>
-                      <p>
-                        <span class="blank_{lv}"></span>
-                        <span class="c-name">
-                          <a href="javascript:;" onclick={fn.reply}  class="under-line">{data.user_name}</a>
-                        </span>
-                        <span class="c-reply"> 回复 </span>
-                        <span class="c-name">{pname}:</span>
-                        <span class="c-content">{data.content}</span>
-                        <span class="c-time">{app.utils.time2str(data.created_at, {showtime:1})}</span>
-                        <a href="javascript:;" class="c-rm" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
-                      </p>
-                    </li>
-                  </ul>
                 </li>
               </ul>
             </div>
@@ -105,6 +90,7 @@
   _this.section = this.app.route.params[1] || 'index';
   _this.checkMsgId = 0;
   _this.msg = {};
+  _this.msgList = {};
   _this.rangeList = [
     {k: 'my', name: '与我相关'},
     {k: 'information', name: '新消息'},
@@ -140,28 +126,23 @@
       _this.checkMsgId =
       _this.checkMsgId == e.item.id ? 0 : e.item.id;
       _this.msg = e.item;
-      // setTimeout(function(){
-      //   _this.dailyList[1].message.push({
-      //     id: 6, child: [{
-      //       id: 7, user_name: 'dalin', content: '呵呵', child:[], created_at: 0
-      //     }], user_name: 'xiaolin', content: '哈哈哈', created_at: 0
-      //   });
-      //   _this.update();
-      // }, 2000);
     },
-    scanChild: function(child, lv){
-      var childList = [];
-      // 扫描所有子评论
-      child.forEach(function(c, i){
-        if(c.child.length > 0){
-          _this.fn.scanChild(c.child, lv+1);
-        }
-        childList.push({
-          data: c, lv: lv
+    /**
+     * 扫描评论层次
+     * @param  {[type]} did 日志id
+     * @param  {[type]} child 子数据
+     * @param  {[type]} lv 层级
+     */
+    scanMessage: function(did, child, lv, pname){
+      _this.msgList[did] = _this.msgList[did] || [];
+      child.forEach(function(c){
+        _this.msgList[did].push({
+          lv: lv, data: c, pname: pname || ''
         });
+        if(c.child.length > 0){
+          _this.fn.scanMessage(did, c.child, lv+1, c.user_name);
+        }
       });
-
-      return childList;
     },
     rangeChange: function(e){
       _this.q.range = e.item.k;
@@ -174,12 +155,15 @@
           page: _this.q.page || 1
         }
       }).on('done', function(data){
-        _this.update({
-          dailyList: data.items,
-          page: data.counts.page,
-          pages: data.counts.total_page,
-          items: data.counts.total_items
+        _this.dailyList = data.items;
+        _this.page = data.counts.page;
+        _this.pages = data.counts.total_page;
+        _this.items = data.counts.total_items;
+        _this.msgList = {};
+        data.items.forEach(function(daily){
+          _this.fn.scanMessage(daily.id, daily.message, 0);
         });
+        _this.update()
         _this.tags['pagination-number'].emit('render');
         _this.msg.content = '';
       });
