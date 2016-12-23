@@ -37,16 +37,18 @@
   _this.role = 'admin';
   _this.pwd = 'hide';
   _this.ref = _this.app.route.query.ref;
-
+  _this.api = 'backend/default/login';
   _this.fn = {
     login: function(e){
       _this.tags['input-valid'].emit('check');
     },
     loginAdmin: function(){
       _this.role = 'admin';
+      _this.api = 'backend/default/login';
     },
     loginUser: function(){
       _this.role = 'user';
+      _this.api = 'frontend/default/login'
     },
     // 切换密码显示隐藏
     pwdToggle: function(){
@@ -68,7 +70,7 @@
 
     _this.tags['input-valid'].on('valid', function(target){
       // 尝试登录
-      _this.app.api('POST', 'login/default/index', {
+      _this.app.api('POST', _this.api, {
         withCredentials: true,
         data: {
           data: JSON.stringify({

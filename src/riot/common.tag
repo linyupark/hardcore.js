@@ -932,10 +932,11 @@
   var _this = this;
 
   _this.active = false;
-
+  _this.api = opts.role == 'user' ?
+  'frontend/default/logout' : 'backend/default/logout';
   _this.fn = {
     logout: function(){
-      _this.app.api('GET', 'login/default/logout')
+      _this.app.api('GET', _this.api)
       .on('done', function(data){
         _this.app.alert(_this.app.lang.login.out, 'success');
         _this.app.route(_this.app.config.loginPage);
@@ -1035,7 +1036,7 @@
       <h1>
         {app.lang.header.sitename}
       </h1>
-      <userinfo></userinfo>
+      <userinfo role="user"></userinfo>
     </div>
 
     <!-- 管理员header -->
@@ -1043,7 +1044,7 @@
       <h1>
         {app.lang.header.sitename}
       </h1>
-      <userinfo></userinfo>
+      <userinfo role="admin"></userinfo>
     </div>
 
   </div>
