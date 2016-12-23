@@ -245,7 +245,14 @@ export const tagRemove = (tag, str) => {
   return str.replace(new RegExp(`<${tag}(.|\\s)*?\\/${tag}>`, "g"), "");
 };
 
-
+/**
+ * 过滤html标签返回纯净文本
+ * @param  {[type]} html [description]
+ * @return {[type]}      [description]
+ */
+export const pureText = (html) => {
+  return html.replace(/<.*?>/g,"");
+}
 
 /**
  * 解析字符串中的标签内容

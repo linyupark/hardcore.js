@@ -1,4 +1,12 @@
-
+<raw>
+  <script>
+  var _this = this;
+  _this.fn = {};
+  _this.on('mount', function(){
+    _this.root.innerHTML = opts.content;
+  });
+  </script>
+</raw>
 
 <!-- 警示信息 -->
 <alert class="{type}">

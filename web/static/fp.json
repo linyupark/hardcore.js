@@ -1,5 +1,5 @@
 {
-  "jq": ["//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"],
+  "tinymce": ["./static/tinymce/tinymce.min.js"],
   "my97": ["./static/My97DatePicker/WdatePicker.js"],
   "pro": ["/static/css/fp.min.css?v=5cfa515610210bed9b629ff3f1623148", "/static/riot/common+component.min.js?v=a94449f4bb129577784ec74cb7487e32"],
   "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],

@@ -245,6 +245,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    */
 
   /**
+   * 过滤html标签返回纯净文本
+   * @param  {[type]} html [description]
+   * @return {[type]}      [description]
+   */
+  var pureText = function pureText(html) {
+    return html.replace(/<.*?>/g, "");
+  };
+
+  /**
    * 解析字符串中的标签内容
    * @param  {string} tag 标签名称
    * @param  {string} 解析字符串
@@ -3851,7 +3860,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           str2time: phpstr2time,
           time2str: phptime2str,
           time: mkphptime,
-          serialize: serialize
+          serialize: serialize,
+          pureText: pureText
         };
         // 初始化操作
         this.init();

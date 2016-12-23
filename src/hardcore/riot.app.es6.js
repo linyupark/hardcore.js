@@ -1,4 +1,4 @@
-import { xhr, assign, cacheJSON, search2obj, serialize, cookie, phpstr2time, phptime2str, mkphptime } from './utils.es6.js';
+import { xhr, assign, cacheJSON, search2obj, serialize, cookie, phpstr2time, phptime2str, mkphptime, pureText } from './utils.es6.js';
 import { Loader } from './loader.es6.js';
 import { emitter } from './emitter.es6.js';
 import { Promise } from './promise.es6.js';
@@ -41,7 +41,8 @@ export class RiotApp {
         str2time: phpstr2time,
         time2str: phptime2str,
         time: mkphptime,
-        serialize: serialize
+        serialize: serialize,
+        pureText: pureText
       };
       // 初始化操作
       this.init();

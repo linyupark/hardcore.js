@@ -238,7 +238,14 @@ const xhr = (url, options = {}) => {
  */
 
 
-
+/**
+ * 过滤html标签返回纯净文本
+ * @param  {[type]} html [description]
+ * @return {[type]}      [description]
+ */
+const pureText = (html) => {
+  return html.replace(/<.*?>/g,"");
+};
 
 /**
  * 解析字符串中的标签内容
@@ -3671,7 +3678,8 @@ class RiotApp {
         str2time: phpstr2time,
         time2str: phptime2str,
         time: mkphptime,
-        serialize: serialize
+        serialize: serialize,
+        pureText: pureText
       };
       // 初始化操作
       this.init();

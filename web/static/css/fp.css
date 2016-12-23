@@ -1120,17 +1120,30 @@ form.user-daily table-filter {
     border: none;
     padding-bottom: 0; }
   .daily-box .user-date {
-    margin: 25px 0 0; }
+    margin: 25px 0 10px; }
     .daily-box .user-date strong {
-      font-size: 14px; }
+      font-size: 16px; }
     .daily-box .user-date span {
       font-size: 13px;
       color: #999;
       margin-left: 10px; }
+  .daily-box .rel {
+    padding: 0;
+    margin: -15px 0 20px;
+    font-size: 13px;
+    color: #666; }
+    .daily-box .rel span {
+      color: #37ACE6;
+      font-size: 12px;
+      margin-right: 5px; }
+      .daily-box .rel span b {
+        color: #eee; }
   .daily-box .content {
     margin: 0 0 15px;
     width: 90%;
     line-height: 150%; }
+    .daily-box .content img {
+      max-width: 90%; }
   .daily-box .handle-line {
     float: right;
     margin-right: 10%; }

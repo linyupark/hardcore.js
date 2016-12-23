@@ -1,4 +1,60 @@
 
+
+<!-- 日志编辑器 -->
+<tinymce-editor>
+
+  <style scoped>
+  [aria-label]:hover:after, [aria-label]:focus:after {
+    display: none;
+  }
+  </style>
+
+  <textarea></textarea>
+
+  <script>
+  var _this = this;
+  _this.getContent = function(){
+    return tinymce.activeEditor.getContent();
+  };
+  _this.fn = {};
+  _this.on('mount', function(){
+    _this.app.addResource('tinymce').then(function(){
+      tinymce.init({
+        selector: "textarea",
+        width: opts.w,
+        height: opts.h,
+        language: "zh_CN",
+        menubar: false,
+        statusbar: false,
+        init_instance_callback: function(ed){
+          _this.trap('inited', ed);
+          ed.on('keyup', function(e){
+            var pos = ed.selection.getRng().getClientRects()[0];
+            _this.emit('keyup', e, {
+              pos: {
+                x: pos && pos.left || 0,
+                y: pos && pos.top || 0
+              }
+            });
+          });
+        }
+      });
+    });
+  });
+  // 覆盖全部内容
+  _this.on('setContent', function(content){
+    var eda = tinymce.activeEditor;
+    eda.setContent(content);
+    eda.selection.select(eda.getBody(), true);
+    eda.selection.collapse(false);
+  });
+  _this.on('insertContent', function(content){
+    tinymce.activeEditor.insertContent(content);
+  });
+  </script>
+</tinymce-editor>
+
+
 <!-- 关联协议 -->
 <modal-agreement>
   <modal ref="modal" w="640" h="520" top="15%">
@@ -143,7 +199,7 @@
 
 <!-- 协议搜索 -->
 <agreement-select>
-  <input-select name="agreement_name" ref="agreement_name" placeholder="搜索选择" value=""/>
+  <input-select name="agreement_name" ref="agreement_name" placeholder="搜索协议" value=""/>
   <input type="hidden" ref="agreement_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validAgreement" for="agreement_id" rule="required" msg="请选择协议"/>
   <script>
@@ -212,7 +268,7 @@
 
 <!-- 用户搜索 -->
 <user-select>
-  <input-select name="real_name" ref="user_name" placeholder="搜索选择" value=""/>
+  <input-select name="real_name" ref="user_name" placeholder="搜索选择用户" value=""/>
   <input type="hidden" ref="user_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validUser" for="user_id" rule="required" msg="请选择用户"/>
   <script>
@@ -249,6 +305,7 @@
         }
       }).on('done', function(data){
         _this.keywordCache[keyword] = data.items;
+        _this.refs.user_name &&
         _this.refs.user_name.emit('push', data.items);
       });
 
@@ -257,6 +314,10 @@
     _this.refs.user_name.on('select', function(item){
       _this.refs.user_id.value = item.user_id || '';
       _this.refs.user_name.value = item.real_name || '';
+      _this.emit('select', {
+        user_id: _this.refs.user_id.value,
+        real_name: _this.refs.user_name.value
+      });
     });
   });
   // 检查数据
@@ -274,6 +335,9 @@
   _this.on('set', function(item){
     _this.refs.user_id.value = item.id;
     _this.refs.user_name.emit('value', item.name);
+  });
+  _this.on('focus', function(){
+    _this.refs.user_name.refs.keyword.focus();
   });
   </script>
 </user-select>
@@ -325,7 +389,7 @@
       var parentId = id || 0;
       var level = lv || 0;
       var list = [{
-        lv: level, id: -1, name: '--请选择--'
+        lv: level, id: -1, name: '--选择结构--'
       }];
       var orgList = data || _this.orgList;
       orgList.forEach(function(org, i){
@@ -370,9 +434,80 @@
 </org-select>
 
 
+<!-- 项目查询 -->
+<project-select>
+  <input-select name="name" ref="project" placeholder="搜索项目" value=""/>
+  <input type="hidden" ref="project_id" value=""/>
+  <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validProject" for="project_id" rule="required" msg="请选择项目"/>
+  <script>
+  var _this = this;
+  _this.keywordCache = {};
+  // 外露函数
+  _this.getId = function(){
+    return _this.refs.project_id.value;
+  };
+  _this.getName = function(){
+    return _this.refs.project.value;
+  };
+  _this.on('mount', function(){
+
+    if(opts.disable == 1){
+      _this.refs.project.emit('disable');
+      return;
+    }
+
+    // 请求数据
+    _this.refs.project.on('pull', function(keyword){
+
+      _this.refs.validProject.emit('msg', '');
+
+      if(_this.keywordCache[keyword]){
+        return _this.refs.project.emit(
+          'push', _this.keywordCache[keyword]
+        );
+      }
+      _this.app.api('GET', 'project/default/search', {
+        data: { keyword: keyword }
+      }).on('done', function(data){
+        _this.keywordCache[keyword] = data.items;
+        _this.refs.project.emit('push', data.items);
+      });
+
+    });
+
+    // 选择了
+    _this.refs.project.on('select', function(item){
+      _this.refs.project_id.value = item.id || '';
+      _this.refs.project.value = item.name || '';
+    });
+
+  });
+
+  // 检查数据
+  _this.on('check', function(){
+    _this.refs.validProject
+    .on('valid', function(){
+      _this.emit('valid');
+    })
+    .on('invalid', function(){
+      _this.emit('invalid');
+    })
+    .emit('check');
+  });
+
+  // 设置默认显示值
+  _this.on('set', function(item){
+    _this.refs.project_id.value = item.id || '';
+    _this.refs.project.value = item.name || '';
+    _this.refs.project.emit('value', item.name || '');
+  });
+
+  </script>
+</project-select>
+
 <!-- 项目类型 -->
 <project-type-select>
-  <input-select name="name" ref="project_type" placeholder="搜索选择" value=""/>
+  <input-select name="name" ref="project_type" placeholder="搜索项目类型" value=""/>
   <input type="hidden" ref="project_type_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validProjectType" for="project_type_id" rule="required" msg="请选择项目类型"/>
   <script>
@@ -451,7 +586,7 @@
 
 <!-- 角色权限 -->
 <role-select>
-  <input-select name="description" ref="description" placeholder="搜索选择" value=""/>
+  <input-select name="description" ref="description" placeholder="搜索选择角色" value=""/>
   <input type="hidden" ref="name" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validRole" for="name" rule="required" msg="请选角色"/>
   <script>
@@ -509,7 +644,7 @@
 
 <!-- 职务查询 -->
 <place-select>
-  <input-select name="place_name" ref="place_name" placeholder="搜索选择" value=""/>
+  <input-select name="place_name" ref="place_name" placeholder="搜索选择职务" value=""/>
   <input type="hidden" ref="place_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validPlace" for="place_id" rule="required" msg="请选择职务"/>
   <script>
@@ -570,7 +705,7 @@
 
 <!-- 捐赠方下拉选择 -->
 <donor-select>
-  <input-select name="donor_name" ref="donor_name" placeholder="搜索选择" value=""/>
+  <input-select name="donor_name" ref="donor_name" placeholder="搜索捐赠方" value=""/>
   <input type="hidden" ref="donor_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"/>
   <script>
@@ -749,7 +884,7 @@
     search: function(){
       if(opts.for === 'daily'){
         // 日志
-        
+
       }
       if(opts.for === 'agreement'){
         // 协议
