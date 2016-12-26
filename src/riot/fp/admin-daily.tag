@@ -40,7 +40,7 @@
           <label class="top">详细内容</label>
           <tinymce-editor ref="edit" style="float: left" w="700px" h="300px" />
         </p>
-        <user-select style="position: absolute; left: {pos.x+70||0}px; top: {pos.y+43||0}px;display: {pos.x?'block':'none'}" ref="user"/>
+        <user-select if={pos.x} style="position: absolute; left: {pos.x+70||0}px; top: {pos.y+43||0}px;" ref="user"/>
       </div>
       <br><br>
       <div class="c1 btn-line">
@@ -129,7 +129,14 @@
       _this.fn.getDaily();
     }
     _this.refs.edit.on('keyup', function(e, data){
-      if(e.shiftKey && e.keyCode ==50){
+      if(e.keyCode == 8){
+        // 删除的时候
+        if(data.edit.selection.getNode().getAttribute('class') === 'atuser'){
+          data.edit.selection.select(data.edit.selection.getNode());
+        }
+      }
+      if(e.shiftKey && e.keyCode == 50){
+        var content = _this.refs.edit.getContent().slice(0, -1);
         // @弹出用户下拉
         _this.update({
           pos: data.pos
@@ -137,7 +144,7 @@
         _this.refs.user
         .emit('focus')
         .once('select', function(user){
-          _this.refs.edit.emit('insertContent', user.real_name+' ');
+          _this.refs.edit.emit('setContent', content+'<span class="atuser">@'+user.real_name+'</span>&nbsp;');
           _this.update({ pos: {} });
         });
       }
@@ -152,6 +159,20 @@
   .fadein{
     animation: fadeIn .5s;
   }
+  .top-tab-line i{
+    font-size: 12px;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    border-radius: 18px;
+    background: #E01B46;
+    line-height: 18px;
+    color: #fff;
+    vertical-align: text-bottom;
+    font-style: normal;
+    text-align: center;
+    margin-left: 6px;
+  }
   </style>
 
   <header for="admin"></header>
@@ -165,7 +186,7 @@
         <h2>工作日志</h2>
         <form class="user-daily" onsubmit="return false">
           <div class="top-tab-line">
-            <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}</a>
+            <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}<i if="{k=='information'}">{app.data.unread}</i></a>
           </div>
           <table-filter for="daily">
             <yield to="addon">
@@ -198,13 +219,16 @@
               <a class="under-line" onclick="{fn.unfold}" href="javascript:;">{unfold?'收起':'展开'}</a>
             </div>
             <div class="handle-line">
-              <a href="javascript:;" if={q.range=='information'}>标为已读</a>
+              <a href="javascript:;" onclick="{fn.read}" if={q.range=='information'}>标为已读</a>
               <a href="javascript:;" onclick="{fn.checkMsg}">评论({msgList[id].length})</a>
               <a href="javascript:;" onclick="{fn.edit}">修改</a>
             </div>
             <div class="{fadein: checkMsgId==id}" if={checkMsgId==id}>
               <div class="comment">
-                <input ref="comment" type="text" placeholder="评论 {msg.user_name}: {msg.content}">
+                <input ref="comment" type="text" placeholder="评论 {msg.user_name}: {msg.content}" onkeyup="{fn.cmtKeyup}" maxlength="100">
+                <!-- 复制内容获取坐标前的内容 -->
+                <user-select if={parent.atX} style="position: absolute; left: {parent.atX}px; top: 20px;" ref="atuser"/>
+                <span class="count-px" ref="cloneTxt">{parent.cloneTxt}</span>
                 <input-valid ref="validComment" for="comment" rule="required" msg=""/>
                 <button type="button" onclick="{fn.send}">发送</button>
               </div>
@@ -251,6 +275,37 @@
     {k: 'department', name: '本部门'}
   ];
   _this.fn = {
+    cmtKeyup: function(e){
+      _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);
+      if(e.shiftKey && e.keyCode == 50){
+        _this.atX = (_this.refs.cloneTxt.clientWidth >
+        _this.refs.comment.clientWidth ? _this.refs.comment.clientWidth : _this.refs.cloneTxt.clientWidth)+22;
+        _this.update();
+        _this.refs.atuser
+        .emit('focus')
+        .once('select', function(user){
+          _this.refs.comment.value =
+          _this.refs.comment.value.replace(
+            _this.cloneTxt,
+            _this.cloneTxt+user.real_name+' '
+          );
+          _this.refs.comment.focus();
+          _this.update({ atX: 0 });
+        });
+      }
+    },
+    read: function(e){
+      _this.app.api('GET', 'daily-manager/default/information', {
+        trigger: e.target,
+        data: {
+          read: e.item.id
+        }
+      }).on('done', function(){
+        _this.dailyList.splice(_this.dailyList.indexOf(e.item), 1);
+        _this.app.data.unread -= 1;
+        _this.update();
+      });
+    },
     unfold: function(e){
       e.item.unfold = !!!e.item.unfold;
     },
@@ -315,6 +370,16 @@
       _this.q.range = e.item.k;
       _this.app.query();
     },
+    getUnread: function(){
+      // 获取未读新消息的数量
+      if(_this.app.data.unread)
+        return _this.app.data.unread;
+      _this.app.api('GET', 'daily-manager/default/information')
+      .on('done', function(data){
+        _this.app.data.unread = data.counts.total_items;
+        _this.update();
+      });
+    },
     getDailyList: function(e){
       var api = 'daily-manager/default/'+_this.q.range;
       _this.app.api('GET', api, {
@@ -327,6 +392,9 @@
         _this.pages = data.counts.total_page;
         _this.items = data.counts.total_items;
         _this.msgList = {};
+        if(_this.q.range === 'information'){
+          _this.app.data.unread = data.counts.total_items;
+        }
         data.items.forEach(function(daily){
           _this.fn.scanMessage(daily.id, daily.message, 0);
         });
@@ -344,6 +412,7 @@
       _this.app.query();
     });
     _this.fn.getDailyList();
+    _this.fn.getUnread();
   });
   </script>
 

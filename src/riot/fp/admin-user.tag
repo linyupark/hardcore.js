@@ -145,7 +145,8 @@
       .then(function(){
         // 确认密码校验
         if(_this.refs.confirm_password.value != _this.refs.password.value){
-          _this.refs.validCFPassword.emit('msg', '确认密码与密码不一致');
+          _this.refs.validCFPassword.emit('check')
+          .emit('msg', '确认密码与密码不一致');
           return _this.app.alert('请检查表单', 'warning');
         }
         _this.app.api('POST', api, {

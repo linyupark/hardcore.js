@@ -3,6 +3,10 @@
   <section>
     <h2>{app.lang.admin.agreement[app.route.params[1]]}</h2>
     <form class="agreement">
+      <span if={form.update_at} class="header-mark">
+        最后更新:
+        {form.update_at?app.utils.time2str(form.update_at):'-'} 操作人: {form.operator_user_name||'-'}
+      </span>
       <h4>帐号信息</h4>
       <div class="c2">
         <div class="row">

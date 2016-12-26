@@ -96,7 +96,7 @@
           e.target.value = '';
           delete _this.items;
           _this.emit("select", _this.selected);
-          _this.update();
+          // _this.update();
         }
       }, 200);
     },
@@ -115,6 +115,10 @@
     },
     keyup: function(e){
       clearTimeout(_this.timer);
+      // 取消
+      if(e.keyCode == 27){
+        _this.fn.blur(e);
+      }
       // 上
       if(e.keyCode == 38 && _this.selectIndex > 0){
         if(_this.items.length-_this.displayNum+1 >= _this.selectIndex)
@@ -131,6 +135,7 @@
       // 回车
       if(e.keyCode == 13 && _this.selectIndex > 0){
         _this.selected = _this.items[_this.selectIndex-1];
+        if(_this.selected.id === -1) return;
         _this.refs.keyword.value = _this.selected[opts.name];
         _this.selectIndex = 0;
         delete _this.items;

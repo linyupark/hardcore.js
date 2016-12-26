@@ -4,6 +4,7 @@
   "pro": ["/static/css/fp.min.css?v=5cfa515610210bed9b629ff3f1623148", "/static/riot/common+component.min.js?v=a94449f4bb129577784ec74cb7487e32"],
   "test": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
   "dev": ["./static/css/fp.css", "./static/riot/component.js", "./static/riot/common.js"],
+  "solider": "static/img/fp/donor-banner.png",
   "lang": {
     "cn": {
       "year:number": "几年(阿拉伯数字)",

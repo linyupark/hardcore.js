@@ -4072,9 +4072,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             api.emit('done', resp.data || {});
           } else {
             // 403无权限
-            if (resp.errno == 403) window.location.replace(_this15.config.routeBase + '/admin-deny');
+            if (resp.errno == 403) window.location.replace(_this15.config.routeBase + 'admin-deny');
             // 401要求重新登录
-            if (resp.errno == 401) window.location.replace(_this15.config.routeBase + '/' + _this15.config.lologinPage + '?ref=' + location.href);
+            if (resp.errno == 401) {
+              window.location.replace('' + _this15.config.routeBase + _this15.config.lologinPage + '?ref=' + location.href);
+              // 删除cookie
+              _this15.utils.cookie.remove('user_name');
+              _this15.utils.cookie.remove('user_id');
+              _this15.utils.cookie.remove('role');
+            }
             // this.log('api fail');
             api.emit('error', {
               code: resp.errno || '',

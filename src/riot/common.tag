@@ -26,11 +26,15 @@
         language: "zh_CN",
         menubar: false,
         statusbar: false,
+        forced_root_block : "",
+        force_br_newlines : true,
+        force_p_newlines : false,
         init_instance_callback: function(ed){
           _this.trap('inited', ed);
           ed.on('keyup', function(e){
             var pos = ed.selection.getRng().getClientRects()[0];
             _this.emit('keyup', e, {
+              edit: ed,
               pos: {
                 x: pos && pos.left || 0,
                 y: pos && pos.top || 0
@@ -833,7 +837,7 @@
     关键词:
     <input type="text" ref="keyword" style="width: 250px" value={keyword} onclick="this.select()" onkeyup={fn.enter} placeholder="输入部门、院系名称进行搜索">
     <button onclick={fn.search} type="button" class="btn-gray"><i class="icon-search"></i></button>
-    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.dailyReset}>{app.lang.admin.reset}</a>
+    <a show={app.route.query.keyword} href="javascript:;" onclick={fn.dailyReset}>{app.route.query.keyword}x</a>
   </div>
   <!-- 项目管理 -->
   <div if={opts.for=='project'}>
@@ -863,6 +867,10 @@
       _this.app.route.query.status = e.item.key;
       _this.app.query();
     },
+    dailyReset: function(){
+      _this.app.route.query.keyword = '';
+      _this.app.query();
+    },
     agreementReset: function(){
       _this.refs.agreement.value = 'agreement_number';
       _this.app.route.query.page = 1;
@@ -884,7 +892,7 @@
     search: function(){
       if(opts.for === 'daily'){
         // 日志
-
+        _this.app.route.query.keyword =  _this.refs.keyword.value || '';
       }
       if(opts.for === 'agreement'){
         // 协议
@@ -902,6 +910,9 @@
   _this.on('mount', function(){
     if(opts.for === 'agreement'){
       _this.type = _this.app.route.query.type;
+      _this.keyword = _this.app.route.query.keyword;
+    }
+    if(opts.for === 'daily'){
       _this.keyword = _this.app.route.query.keyword;
     }
     if(opts.for === 'project'){
@@ -922,7 +933,7 @@
     </a>
     <dl class="menu {active: active}" onmouseenter={fn.active}
       onmouseover={fn.active} onmouseleave={fn.hidden}>
-      <dd><a href="javascript:;">{app.lang.header.userinfo.account}</a></dd>
+      <dd><a href="#!account">{app.lang.header.userinfo.account}</a></dd>
       <dd><a href="javascript:;" onclick={fn.logout}>{app.lang.header.userinfo.logout}</a></dd>
     </dl>
   </div>
@@ -932,12 +943,19 @@
   var _this = this;
 
   _this.active = false;
-  _this.api = opts.role == 'user' ?
+  _this.logoutApi = opts.role == 'user' ?
   'frontend/default/logout' : 'backend/default/logout';
+  _this.infoApi = opts.role == 'user' ?
+  'frontend/default/user-info' : 'backend/default/user-info';
   _this.fn = {
-    logout: function(){
-      _this.app.api('GET', _this.api)
+    logout: function(e){
+      _this.app.api('GET', _this.logoutApi, {
+        trigger: e.target,
+      })
       .on('done', function(data){
+        _this.app.utils.cookie.remove('user_name');
+        _this.app.utils.cookie.remove('user_id');
+        _this.app.utils.cookie.remove('role');
         _this.app.alert(_this.app.lang.login.out, 'success');
         _this.app.route(_this.app.config.loginPage);
       });
@@ -973,7 +991,7 @@
     }
     else{
       // 获取资料信息
-      _this.app.api('GET', 'login/default/user-info')
+      _this.app.api('GET', _this.infoApi)
       .on('done', function(data){
         _this.app.data.user_name = data.user_name;
         _this.app.data.user_id = data.user_id;

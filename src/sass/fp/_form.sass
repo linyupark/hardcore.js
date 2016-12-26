@@ -59,7 +59,7 @@
         color: $color-main
         border-color: $color-main
 
-form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user, form.user-daily
+form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user, form.user-daily, form.account
   +shadow-block()
   position: relative
   .header-mark
@@ -79,7 +79,7 @@ form.agreement, form.donor, form.project, form.payment, form.modal, .project-vie
     border-left: 2px solid $color-main
   .row
     +gridle(row)
-  input[type=text], select
+  input[type=text], input[type=password], select
     +input-text(36px, 0 5px)
   label
     width: 66px
@@ -104,7 +104,7 @@ form.agreement, form.donor, form.project, form.payment, form.modal, .project-vie
       border-radius: 5px
       min-height: 100px
       padding: 5px
-    input[type=text], select
+    input[type=text], input[type=password], select
       width: 260px
     select
       width: 272px
@@ -263,8 +263,14 @@ form.user-daily
       color: $color-txt2
       margin-left: 15px
   .comment
+    position: relative
     padding: 20px 0 0
     clear: both
+    .count-px
+      position: absolute
+      left: 6px
+      top: 9px
+      visibility: hidden
     input[type=text]
       width: 85%
       height: 30px
@@ -314,3 +320,12 @@ form.user-daily
       color: $color-txt2
     .blank
       display: inline-block
+
+form.account
+  margin: 4% 4% 0
+  h4
+    font-size: $font-l
+    margin-bottom: 0
+  p
+    margin: 30px 0 30px 15px
+    padding: 0

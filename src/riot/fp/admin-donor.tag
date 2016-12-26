@@ -260,10 +260,10 @@
           <thead>
             <tr>
               <th width="10%">{app.lang.admin.donor.id}</th>
-              <th width="30%">{app.lang.admin.donor.name}</th>
+              <th width="40%">{app.lang.admin.donor.name}</th>
+              <th width="10%">{app.lang.admin.donor.type}</th>
               <th width="10%">{app.lang.admin.donor.contact}</th>
               <th width="20%">{app.lang.admin.donor.tel}</th>
-              <th width="20%">{app.lang.admin.donor.email}</th>
               <th width="10%">{app.lang.admin.handle}</th>
             </tr>
           </thead>
@@ -271,10 +271,9 @@
             <tr each={tableList}>
               <td>{id}</td>
               <td class="left">{donor_name}</td>
-              <!-- <td>{app.getNatureName(type)}</td> -->
+              <td>{app.getNatureName(type)}</td>
               <td>{contact||'-'}</td>
-              <td>{tel||'-'}</td>
-              <td>{email||'-'}</td>
+              <td>{tel}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
                   <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>

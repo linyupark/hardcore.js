@@ -54,10 +54,15 @@ class FP extends RiotApp {
       else {
         // 403无权限
         if(resp.errno == 403)
-          window.location.replace(`${this.config.routeBase}/admin-deny`);
+          window.location.replace(`${this.config.routeBase}admin-deny`);
         // 401要求重新登录
-        if(resp.errno == 401)
-          window.location.replace(`${this.config.routeBase}/${this.config.lologinPage}?ref=${location.href}`);
+        if(resp.errno == 401){
+          window.location.replace(`${this.config.routeBase}${this.config.lologinPage}?ref=${location.href}`);
+          // 删除cookie
+          this.utils.cookie.remove('user_name');
+          this.utils.cookie.remove('user_id');
+          this.utils.cookie.remove('role');
+        }
         // this.log('api fail');
         api.emit('error', {
           code: resp.errno || '',

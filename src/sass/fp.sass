@@ -28,7 +28,7 @@ $font-primary: "Arial", "SimHei", "STHeiti"
 =shadow-block()
   box-shadow: 0 2px 4px rgba(#000, 0.08)
 =shadow-main()
-  box-shadow: 0 4px 4px -2px rgba(#000, .2) inset
+  box-shadow: 0 4px 4px -2px rgba(#000, .15) inset
 
 // global
 *
@@ -39,8 +39,23 @@ body
   color: #222
   font-family: $font-primary
   font-size: $font-s
-  &.admin
+  &.admin, &.user
     background: #F3F3F3
+  &.user
+    .solider-banner
+      position: absolute
+      top: 80px
+      z-index: -1
+      width: 100%
+      .gradient
+        height: 100px
+        width: 100%
+        position: absolute
+        bottom: 0
+        background: linear-gradient(to top, rgba(244,244,244, 1), rgba(244,244,244, 0) 100px)
+      img
+        width: 100%
+        min-width: 1200px
 
 a
   text-decoration: none
@@ -174,7 +189,7 @@ footer
       font-size: $font-xs
       padding: 10px
       margin-top: 10px
-  &.login
+  &.login, &.user
     .container
       +gridle(grid-centered)
   &.admin
