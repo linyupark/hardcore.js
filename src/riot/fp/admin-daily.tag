@@ -66,16 +66,8 @@
       history.back();
     },
     save: function(e){
-      var api = 'daily-manager/default/create', relData = [];
-      if(_this.did) api = 'daily-manager/default/update?id=' + _this.did;
-      // 检查数据
-      _this.app.validAll([].concat(_this.refs.relValue)).then(function(){
-        // 获取关联信息
-        _this.rels.forEach(function(r, i){
-          var v = _this.refs.relValue[i] || _this.refs.relValue;
-          _this.rels[i].value_id = v.getId();
-          relData.push(_this.rels[i]);
-        });
+      var api = 'daily-manager/default/create', relData = [],
+      saveHandle = function(){
         _this.app.api('POST', api, {
           trigger: e.target,
           data: {
@@ -87,6 +79,20 @@
         }).on('done', function(){
           _this.app.alert('日志保存成功', 'success');
         });
+      };
+      if(_this.did) api = 'daily-manager/default/update?id=' + _this.did;
+      if(!_this.refs.relValue){
+        return saveHandle();
+      }
+      // 检查数据
+      _this.app.validAll([].concat(_this.refs.relValue)).then(function(){
+        // 获取关联信息
+        _this.rels.forEach(function(r, i){
+          var v = _this.refs.relValue[i] || _this.refs.relValue;
+          _this.rels[i].value_id = v.getId();
+          relData.push(_this.rels[i]);
+        });
+        saveHandle();
       }).catch(function(){
         _this.app.alert('请检查表单数据', 'warning');
       });
@@ -150,7 +156,8 @@
         _this.refs.user
         .emit('focus')
         .once('select', function(user){
-          _this.refs.edit.emit('setContent', content+'<span class="atuser">@'+user.real_name+'</span>&nbsp;');
+          _this.refs.edit.emit('setContent', content);
+          _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>&nbsp;');
           _this.update({ pos: {} });
         });
       }
