@@ -4,7 +4,7 @@
 <!-- 添加编辑日志 -->
 <daily-form>
   <style scoped>
-  .relList{width: 92%; float: right; margin-bottom: 10px}
+  .relList{width: 92%; float: right; margin-bottom: 25px; position: relative;}
   </style>
   <section>
     <h2>工作日志 &gt; {did?'修改':'新增'}日志</h2>
@@ -66,23 +66,29 @@
       history.back();
     },
     save: function(e){
-      var api = 'daily-manager/default/create';
+      var api = 'daily-manager/default/create', relData = [];
       if(_this.did) api = 'daily-manager/default/update?id=' + _this.did;
-      // 获取关联信息
-      _this.rels.forEach(function(r, i){
-        var v = _this.refs.relValue[i] || _this.refs.relValue;
-        _this.rels[i].value_id = v.getId();
-      });
-      _this.app.api('POST', api, {
-        trigger: e.target,
-        data: {
-          data: JSON.stringify({
-            relation: _this.rels,
-            content: _this.refs.edit.getContent()
-          })
-        }
-      }).on('done', function(){
-        _this.app.alert('日志保存成功', 'success');
+      // 检查数据
+      _this.app.validAll([].concat(_this.refs.relValue)).then(function(){
+        // 获取关联信息
+        _this.rels.forEach(function(r, i){
+          var v = _this.refs.relValue[i] || _this.refs.relValue;
+          _this.rels[i].value_id = v.getId();
+          relData.push(_this.rels[i]);
+        });
+        _this.app.api('POST', api, {
+          trigger: e.target,
+          data: {
+            data: JSON.stringify({
+              relation: relData,
+              content: _this.refs.edit.getContent()
+            })
+          }
+        }).on('done', function(){
+          _this.app.alert('日志保存成功', 'success');
+        });
+      }).catch(function(){
+        _this.app.alert('请检查表单数据', 'warning');
       });
     },
     changeRelType: function(e){
