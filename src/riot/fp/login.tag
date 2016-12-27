@@ -86,6 +86,7 @@
         _this.app.utils.cookie.set('role', _this.role, {
           'max-age': 3600*24*7
         });
+        _this.app.alert('登录成功', 'success');
         // 如果有来源页
         if(_this.ref){
           location.href = _this.ref;

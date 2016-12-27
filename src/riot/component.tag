@@ -583,15 +583,15 @@
 <pagination-number>
 
   <ul class="pagination">
-    <li if={hasPrevPage}>
+    <li show={hasPrevPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>1</a>
     </li>
-    <li if={hasPrevPage}>
+    <li show={hasPrevPage}>
       <a href="javascript:;" onclick={fn.prevPage}>
         &lt;
       </a>
     </li>
-    <li if={hasPrevSpan}>...</li>
+    <li show={hasPrevSpan}>...</li>
     <li each={p in prevPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
@@ -601,25 +601,31 @@
     <li each={p in nextPages}>
       <a href="javascript:;" onclick={fn.jumpPage}>{p}</a>
     </li>
-    <li if={hasNextSpan}>...</li>
+    <li show={hasNextSpan}>...</li>
     <li if={hasNextPage}>
       <a href="javascript:;" onclick={fn.nextPage}>
         &gt;
       </a>
     </li>
-    <li if={hasNextPage}>
+    <li show={hasNextPage}>
       <a href="javascript:;" onclick={fn.jumpPage}>{pages}</a>
     </li>
-    <li class="select" if={opts.select=='y'}>
+    <li class="select" if="{opts.select=='y'}">
       跳转至
-      <select onchange="{fn.jumpPage}">
-        <option each="{p in pageList}" value="{p}" selected="{p==page}">{p}</option>
-      </select> / {pages}页
+      <span if="{pageList.length<100}">
+        <select onchange="{fn.jumpPage}">
+          <option each="{p in pageList}" value="{p}" selected="{p==page}">{p}</option>
+        </select>
+      </span>
+      <input if="{pageList.length>=100}"
+        onchange="{fn.jumpPage}" type="number" value="{page}">
+       / {pages}页
     </li>
   </ul>
   <script>
   var _this = this;
   _this.pageSpan = 4;
+  _this.pageList = [];
   _this.fn = {
     pageList: function() {
       _this.pageList = [];

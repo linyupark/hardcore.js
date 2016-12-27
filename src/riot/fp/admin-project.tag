@@ -204,7 +204,7 @@
           </p>
           <p if={i==2}>
             由各执行单位（院系／机构／部门）录入评比结果
-            <a if={p.status==1&&p.review_file.length>0} href="javascript:;" class="under-line">下载评审结果</a>
+            <a if={p.status==1&&p.review_file.length>0} href="javascript:;" onclick="{fn.download}" class="under-line">下载评审结果</a>
             <span if={p.status==1&&!p.active&&p.review_file.length>0}>已上传</span>
             <upload-formdata changeupload="true" ref="upload" name="file[]" if={p.status!=1||p.active} btn="{p.review_file.length>0?'重新上传':'上传'}" disable="{!p.active}"/>
           </p>
@@ -238,6 +238,11 @@
   var _this = this;
   _this.perform = {};
   _this.fn = {
+    download: function(e){
+      e.item.p.review_file.forEach(function(f){
+        window.open(f.file_path);
+      });
+    },
     view: function(e){
       _this.app.route(_this.app.route.params[0]+'/view/'+_this.app.route.params[2]);
     },

@@ -7,7 +7,7 @@
       <admin-sidenav></admin-sidenav>
       <section>
         <h2>设置 &gt; 系统日志</h2>
-        <table class="base">
+        <table class="base" style="min-height: 634px">
           <thead>
             <tr>
               <th width="20%">日期</th>

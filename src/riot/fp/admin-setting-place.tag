@@ -65,7 +65,7 @@
   <!-- 添加修改组织机构 -->
   <modal ref="savePlace" w="400" h="260">
     <yield to="title">
-      {parent.place.id?'添加':'修改'}内容
+      {parent.place.id?'修改':'添加'}内容
     </yield>
     <yield to="content">
       <form class="modal">

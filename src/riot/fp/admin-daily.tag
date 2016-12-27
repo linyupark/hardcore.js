@@ -210,6 +210,10 @@
           </table-filter>
 
           <!-- 日志列表 -->
+          <div if={!dailyList} class="daily-box">
+            <br><br>
+            <spinner-dot/>
+          </div>
           <div each={dailyList} class="daily-box">
             <p class="user-date">
               <strong>{user_name}</strong>

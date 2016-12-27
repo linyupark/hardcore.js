@@ -59,7 +59,7 @@
         color: $color-main
         border-color: $color-main
 
-form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user, form.user-daily, form.account
+form.agreement, form.donor, form.project, form.payment, form.modal, .project-view, form.user, form.user-daily, form.account, form.role
   +shadow-block()
   position: relative
   .header-mark
@@ -329,3 +329,15 @@ form.account
   p
     margin: 30px 0 30px 15px
     padding: 0
+
+
+form.role
+  .roles
+    margin-left: 6px
+    h5
+      font-size: $font-s
+      margin:  20px 0 8px 0
+    .child
+      padding: 5px 0 5px 3%
+      label
+        width: 20%

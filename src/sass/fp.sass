@@ -203,8 +203,15 @@ footer
 .pagination
   +gridle(float right)
   +pagination-ul-select(#fff, #222, $color-main)
-  a, select
-    +shadow-block()
+  a, select, input
+    +shadow-block
+  input
+    height: 30px
+    line-height: 30px
+    border: none
+    width: 50px
+    text-align: center
+    border-radius: 3px
 
 //
 // sidenav
