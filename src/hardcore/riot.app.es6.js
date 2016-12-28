@@ -171,4 +171,8 @@ export class RiotApp {
     return Loader.alias(this.data, [existRes]);
   }
 
+  addResources(batchName){
+    return Loader.depend.apply(Loader, this.data[batchName]);
+  }
+
 }

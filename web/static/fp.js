@@ -4002,6 +4002,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (this.data[resName]) existRes = resName;else if (this.data[resName + '.' + this.config.env]) existRes = resName + '.' + this.config.env;
         return Loader.alias(this.data, [existRes]);
       }
+    }, {
+      key: 'addResources',
+      value: function addResources(batchName) {
+        return Loader.depend.apply(Loader, this.data[batchName]);
+      }
     }]);
 
     return RiotApp;

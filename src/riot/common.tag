@@ -1,4 +1,84 @@
-
+<!-- 圆饼图里面带文字 -->
+<hc-pie-text>
+  <style scoped>
+    .wrapper{position: relative;}
+    .wrapper .text{position: absolute;}
+  </style>
+  <div class="wrapper">
+    <div ref="pie" style="width: {opts.w}px; height: {opts.h}px"></div>
+    <div class="text">
+      <yield></yield>
+    </div>
+  </div>
+  <script>
+  var _this = this;
+  _this.colors = {
+    'orange': {
+      radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
+      stops: [
+        [0, '#FF8055'],
+        [1, '#FB6366']
+      ]
+    },
+    'blue': {
+      radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
+      stops: [
+        [0, '#58B6ED'],
+        [1, '#3494F4']
+      ]
+    }
+  };
+  _this.fn = {};
+  _this.on('mount', function(){
+    Highcharts.chart(_this.refs.pie, {
+      chart: {
+        type: 'solidgauge',
+        backgroundColor: 'none'
+      },
+      credits: false,
+      title: {
+        text: ''
+      },
+      pane: {
+        startAngle: 0,
+        endAngle: 360,
+        background: [{
+          outerRadius: '118%',
+          innerRadius: '88%',
+          backgroundColor: opts.bgcolor||'#f3f3f3',
+          borderWidth: 0
+        }]
+      },
+      yAxis: {
+        min: 0,
+        max: 100,
+        lineWidth: 0,
+        tickPositions: []
+      },
+      plotOptions: {
+        solidgauge: {
+          borderWidth: '13px',
+          dataLabels: {
+            enabled: false
+          },
+          stickyTracking: false
+        }
+      },
+      tooltip: {
+        enabled: false
+      },
+      series: [{
+        borderColor: _this.colors[opts.color||'orange'],
+        data: [{
+          radius: '100%',
+          innerRadius: '100%',
+          y: Number(opts.percent)||0
+        }]
+      }]
+    });
+  });
+  </script>
+</hc-pie-text>
 
 <!-- 日志编辑器 -->
 <tinymce-editor>

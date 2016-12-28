@@ -527,7 +527,7 @@ template {
 .row, form.agreement .row, form.donor .row, form.project .row, form.payment .row, form.modal .row, .project-view .row, form.user .row, form.user-daily .row, form.account .row, form.role .row {
   zoom: 1; }
 
-userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p, form.user-daily .c2 p, form.account .c2 p, form.role .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line, form.user-daily .c1 .line, form.account .c1 .line, form.role .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav {
+userinfo, header.user h1, header.admin h1, header h1, form.agreement .c2 p, form.donor .c2 p, form.project .c2 p, form.payment .c2 p, form.modal .c2 p, .project-view .c2 p, form.user .c2 p, form.user-daily .c2 p, form.account .c2 p, form.role .c2 p, form.agreement .c1 .line, form.donor .c1 .line, form.project .c1 .line, form.payment .c1 .line, form.modal .c1 .line, .project-view .c1 .line, form.user .c1 .line, form.user-daily .c1 .line, form.account .c1 .line, form.role .c1 .line, main.user h1, main.login form, footer.admin .info, admin-sidenav, main.admin .summary .amount, main.admin .summary .logs, main.admin .summary .pies, main.admin .summary .donor-n, main.admin .summary .pay-n, main.admin .summary .ag-n {
   display: inline-block;
   min-height: 1px;
   float: left;
@@ -1808,3 +1808,62 @@ upload-formdata button {
     background: #eeeeee;
     border-color: #ddd;
     color: #ccc; }
+
+main.admin .summary .amount, main.admin .summary .logs {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  width: 66.66667%;
+  background: #fff;
+  height: 320px;
+  border-radius: 5px; }
+
+main.admin .summary .logs {
+  width: 31.66667%;
+  margin-left: 1.66667%; }
+
+main.admin .summary .pies {
+  width: 37.5%;
+  height: 178px;
+  border-right: 1px solid #ebebeb;
+  border-bottom: 1px solid #ebebeb; }
+  main.admin .summary .pies .wrapper {
+    margin: 0 0 0 24%; }
+    main.admin .summary .pies .wrapper .text {
+      width: 100px;
+      text-align: center;
+      top: 34%;
+      left: 16px;
+      color: #999;
+      font-size: 13px;
+      line-height: 150%; }
+      main.admin .summary .pies .wrapper .text strong {
+        color: #666;
+        font-size: 20px;
+        letter-spacing: 2px; }
+      main.admin .summary .pies .wrapper .text span {
+        color: #ccc; }
+
+main.admin .summary .donor-n {
+  width: 25%;
+  height: 178px;
+  border-bottom: 1px solid #ebebeb; }
+
+main.admin .summary .pay-n, main.admin .summary .ag-n {
+  width: 37.5%;
+  height: 142px;
+  border-right: 1px solid #ebebeb; }
+
+main.admin .summary .ag-n {
+  width: 62.5%;
+  border: none; }
+
+main.admin .summary .title {
+  font-size: 14px;
+  padding: 12px;
+  margin: 0; }
+
+main.admin .summary .large-n {
+  font-weight: normal;
+  display: block;
+  font-size: 30px;
+  text-align: center;
+  color: #666; }

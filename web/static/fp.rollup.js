@@ -3808,6 +3808,10 @@ class RiotApp {
     return Loader.alias(this.data, [existRes]);
   }
 
+  addResources(batchName){
+    return Loader.depend.apply(Loader, this.data[batchName]);
+  }
+
 }
 
 class FP extends RiotApp {

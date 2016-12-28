@@ -292,3 +292,58 @@ upload-formdata
     color: #ccc
   button
     +btn-3(25px)
+
+
+// 总览页面
+main.admin .summary
+  .amount, .logs
+    +shadow-block
+    +gridle(8)
+    background: #fff
+    height: 320px
+    border-radius: 5px
+  .logs
+    +gridle(3.8 prefix .2)
+  .pies
+    +gridle(4.5)
+    height: 178px
+    border-right: 1px solid $color-line1
+    border-bottom: 1px solid $color-line1
+    .wrapper
+      margin: 0 0 0 24%
+      .text
+        width: 100px
+        text-align: center
+        top: 34%
+        left: 16px
+        color: $color-txt2
+        font-size: $font-xs
+        line-height: 150%
+        strong
+          color: $color-txt1
+          font-size: $font-l
+          letter-spacing: 2px
+        span
+          color: #ccc
+
+  .donor-n
+    +gridle(3)
+    height: 178px
+    border-bottom: 1px solid $color-line1
+  .pay-n, .ag-n
+    +gridle(4.5)
+    height: 320-178px
+    border-right: 1px solid $color-line1
+  .ag-n
+    +gridle(7.5)
+    border: none
+  .title
+    font-size: $font-s
+    padding: 12px
+    margin: 0
+  .large-n
+    font-weight: normal
+    display: block
+    font-size: 30px
+    text-align: center
+    color: $color-txt1
