@@ -1,7 +1,11 @@
 <!-- 协议表单内页 -->
 <agreement-form>
   <section>
-    <h2>{app.lang.admin.agreement[app.route.params[1]]}</h2>
+    <h2>
+      管理后台 &gt;
+      {app.lang.admin.agreement.title} &gt;
+      {app.lang.admin.agreement[app.route.params[1]]}
+    </h2>
     <form class="agreement">
       <span if={form.update_at} class="header-mark">
         最后更新:
@@ -363,7 +367,7 @@
       <agreement-form if={section=='edit'}/>
       <!-- 列表页面 -->
       <section if={section=='index'}>
-        <h2>{app.lang.admin.agreement.title}</h2>
+        <h2>管理后台 &gt; {app.lang.admin.agreement.title}</h2>
         <table-filter for="agreement">
           <yield to="addon">
             <button class="main" onclick={parent.fn.add}>
@@ -439,6 +443,7 @@
     remove: function(e){
       _this.tags['modal-remove']
       .emit('open').on('ok', function(){
+        // 删除操作
       });
     },
     getList: function(){

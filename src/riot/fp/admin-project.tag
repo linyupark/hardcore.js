@@ -3,6 +3,7 @@
 <project-view>
   <section>
     <h2>
+      管理后台 &gt;
       {app.lang.admin.project.title} &gt; 项目详细
     </h2>
     <div class="project-view">
@@ -691,6 +692,7 @@
 <project-form>
   <section>
     <h2>
+      管理后台 &gt;
       {app.lang.admin.project.title} &gt;
       <span if={key==parent.formTab} each={formTabList}>{name}</span>
     </h2>
@@ -923,7 +925,10 @@
       <project-form if={section=='add'}/>
       <project-form if={section=='edit'}/>
       <section if={section=='index'}>
-        <h2>{app.lang.admin.project.title}</h2>
+        <h2>
+          管理后台 &gt;
+          {app.lang.admin.project.title}
+        </h2>
         <!-- 我的项目、所有项目 -->
         <div class="table-tab">
           <a href="javascript:;" onclick={fn.filterRange} each={filterRange} class={active:q.range==key}>{name}</a>
@@ -991,7 +996,12 @@
     </div>
   </main>
 
+
+
   <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <script>
   var _this = this;
@@ -1002,6 +1012,12 @@
   // 项目过滤(我的、全部)
   _this.filterRange = _this.app.lang.admin.project['filter:range'];
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     // 查看项目
     view: function(e){
       _this.app.route(_this.app.route.path + '/view/' + e.item.id);

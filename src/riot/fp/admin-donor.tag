@@ -3,6 +3,7 @@
 
   <section>
     <h2>
+      管理后台 &gt;
       {app.lang.admin.donor.title} &gt;
       {app.lang.admin.donor[app.route.params[1]]}
     </h2>
@@ -246,7 +247,9 @@
       <!-- 列表页面 -->
       <section if={section=='index'}>
 
-        <h2>{app.lang.admin.donor.title}</h2>
+        <h2>
+          管理后台 &gt;
+          {app.lang.admin.donor.title}</h2>
 
         <table-filter for="donor">
           <yield to="addon">
@@ -306,11 +309,20 @@
 
   <footer class="admin"></footer>
 
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
+
   <script>
   var _this = this;
   _this.q = _this.app.route.query;
   _this.section = _this.app.route.params[1] || 'index';
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     add: function(){
       _this.app.route(_this.app.route.path + '/add');
     },

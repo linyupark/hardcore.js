@@ -6,7 +6,7 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <section>
-        <h2>设置 &gt; 职务管理</h2>
+        <h2>管理后台 &gt; 设置 &gt; 职务管理</h2>
 
         <table-filter for="place">
           <yield to="addon">
@@ -60,7 +60,10 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <!-- 添加修改组织机构 -->
   <modal ref="savePlace" w="400" h="260">
@@ -93,6 +96,12 @@
   _this.q = _this.app.route.query;
   _this.place = {};
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     ok: function(e){
       var api = _this.place.id ?
       'system-setting/place/update?id='+_this.place.id :

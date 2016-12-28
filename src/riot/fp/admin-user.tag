@@ -1,7 +1,7 @@
 
 <user-form>
   <section>
-    <h2>用户管理 &gt; {uid?'修改':'新增'}用户信息</h2>
+    <h2>管理后台 &gt; 用户管理 &gt; {uid?'修改':'新增'}用户信息</h2>
     <form class="user">
       <h4>帐号及权限</h4>
       <div class="c2">
@@ -228,7 +228,7 @@
       <user-form if={section=='add'}/>
       <user-form if={section=='edit'}/>
       <section if={section=='index'}>
-        <h2>用户管理</h2>
+        <h2>管理后台 &gt; 用户管理</h2>
 
         <table-filter for="user">
           <yield to="addon">
@@ -290,13 +290,22 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <script>
   var _this = this;
   _this.q = _this.app.route.query;
   _this.section = _this.app.route.params[1] || 'index';
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     // 编辑用户
     edit: function(e){
       _this.app.route(_this.app.route.path + '/edit/' + e.item.id);

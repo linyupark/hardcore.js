@@ -6,7 +6,7 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <section>
-        <h2>设置 &gt; 组织机构管理
+        <h2>管理后台 &gt; 设置 &gt; 组织机构管理
           <span each={parentList}>
             &gt; <a href="javascript:;" class="under-line" onclick={fn.back}>{name}</a>
           </span>
@@ -64,12 +64,15 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <!-- 添加修改组织机构 -->
   <modal ref="saveOrg" w="400" h="260">
     <yield to="title">
-      {parent.org.id?'添加':'修改'}内容
+      {parent.org.id?'修改':'添加'}内容
     </yield>
     <yield to="content">
       <form class="modal">
@@ -100,6 +103,12 @@
     {pid: 0, name: '一级组织'}
   ];
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     back: function(e){
       var i = _this.parentList.indexOf(e.item);
       if(i==0) i = 1;

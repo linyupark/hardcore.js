@@ -3,7 +3,7 @@
 <role-form>
 
   <section>
-    <h2>设置 &gt; 角色管理 &gt; {role.name?'修改':'添加'}角色</h2>
+    <h2>管理后台 &gt; 设置 &gt; 角色管理 &gt; {role.name?'修改':'添加'}角色</h2>
     <form class="role">
       <!-- 基础信息 -->
       <h4>基础信息</h4>
@@ -140,7 +140,7 @@
       <role-form if={section=='add'}/>
       <role-form if={section=='edit'}/>
       <section if={section=='index'}>
-        <h2>设置 &gt; 角色管理</h2>
+        <h2>管理后台 &gt; 设置 &gt; 角色管理</h2>
         <table-filter for="role">
           <yield to="addon">
             <button class="main" onclick={parent.fn.add}>
@@ -191,13 +191,22 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <script>
   var _this = this;
   _this.q = _this.app.route.query;
   _this.section = _this.app.route.params[1] || 'index';
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     add: function(){
       _this.app.route(_this.app.route.path + '/add');
     },

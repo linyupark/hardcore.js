@@ -6,7 +6,7 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <section>
-        <h2>设置 &gt; 系统日志</h2>
+        <h2>管理后台 &gt; 设置 &gt; 系统日志</h2>
         <table class="base" style="min-height: 634px">
           <thead>
             <tr>

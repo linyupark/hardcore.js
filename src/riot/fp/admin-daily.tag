@@ -7,7 +7,7 @@
   .relList{width: 92%; float: right; margin-bottom: 25px; position: relative;}
   </style>
   <section>
-    <h2>工作日志 &gt; {did?'修改':'新增'}日志</h2>
+    <h2>管理后台 &gt; 工作日志 &gt; {did?'修改':'新增'}日志</h2>
     <form class="user-daily" onsubmit="return false">
       <h4>{did?'修改':'新增'}日志</h4>
       <div class="row c4">
@@ -196,7 +196,7 @@
       <daily-form if={section=='add'}/>
       <daily-form if={section=='edit'}/>
       <section if={section=='index'}>
-        <h2>工作日志</h2>
+        <h2>管理后台 &gt; 工作日志</h2>
         <form class="user-daily" onsubmit="return false">
           <div class="top-tab-line">
             <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}<i if="{k=='information'}">{app.data.unread}</i></a>
@@ -277,6 +277,9 @@
 
   <footer class="admin"></footer>
 
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
+
   <script>
   var _this = this;
   _this.q = _this.app.route.query;
@@ -292,6 +295,12 @@
     {k: 'department', name: '本部门'}
   ];
   _this.fn = {
+    rmCmt: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     cmtKeyup: function(e){
       _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);
       if(e.shiftKey && e.keyCode == 50){

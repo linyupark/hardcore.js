@@ -6,7 +6,7 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <section>
-        <h2>设置 &gt; 项目类型管理</h2>
+        <h2>管理后台 &gt; 设置 &gt; 项目类型管理</h2>
 
         <table-filter for="pjtype">
           <yield to="addon">
@@ -60,12 +60,15 @@
     </div>
   </main>
 
-  <footer></footer>
+  <footer class="admin"></footer>
+
+  <!-- 删除记录弹窗 -->
+  <modal-remove/>
 
   <!-- 添加修改组织机构 -->
   <modal ref="saveType" w="400" h="260">
     <yield to="title">
-      {parent.pjtype.id?'添加':'修改'}项目类型
+      {parent.pjtype.id?'修改':'添加'}项目类型
     </yield>
     <yield to="content">
       <form class="modal">
@@ -93,6 +96,12 @@
   _this.q = _this.app.route.query;
   _this.pjtype = {};
   _this.fn = {
+    remove: function(e){
+      _this.tags['modal-remove']
+      .emit('open').on('ok', function(){
+        // 删除操作
+      });
+    },
     ok: function(e){
       var api = _this.pjtype.id ?
       'system-setting/project-type/update?id='+_this.pjtype.id :
