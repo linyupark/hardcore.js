@@ -28,14 +28,29 @@
             </div>
             <div class="donor-n">
               <p class="title">捐赠方总数</p>
-              <br><br><br>
+              <br><br>
               <strong style="font-family: HelveticaNeue-Light" class="large-n">{summary.donor_total}</strong>
             </div>
             <div class="pay-n">
               <p class="title">今年到款总金额</p>
+              <br>
+              <strong class="large-n" style="font-family: HelveticaNeue-Light; text-align: left; text-indent: 12px">
+                <small>￥</small>
+                {summary.payment_current_year_total}
+              </strong>
             </div>
             <div class="ag-n">
               <p class="title">今年签约总金额</p>
+              <p class="cell">
+                <span each="{summary.sign_current_year_price}">
+                  <label>{label}:</label>
+                  {amount}
+                </span>
+                <span each="{summary.sign_current_year_price}">
+                  <label>{label}:</label>
+                  {amount}
+                </span>
+              </p>
             </div>
           </div>
           <div class="logs">

@@ -1867,3 +1867,20 @@ main.admin .summary .large-n {
   font-size: 30px;
   text-align: center;
   color: #666; }
+  main.admin .summary .large-n small {
+    font-size: 13px;
+    color: #999; }
+
+main.admin .summary .cell {
+  display: table-cell;
+  vertical-align: top;
+  width: 330px;
+  height: 90px; }
+  main.admin .summary .cell span {
+    display: inline-block;
+    width: 40%;
+    margin: 3px 0 0 12px; }
+    main.admin .summary .cell span label {
+      display: inline-block;
+      width: 50px;
+      color: #999; }
