@@ -278,7 +278,7 @@
               <td class="left">{donor_name}</td>
               <td>{app.getNatureName(type)}</td>
               <td>{contact||'-'}</td>
-              <td>{tel}</td>
+              <td>{contact_tel||'-'}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
                   <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
