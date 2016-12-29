@@ -730,7 +730,13 @@
             <p>
               <label>{app.lang.admin.project.status}</label>
               <select ref="status">
-                <option each={app.lang.admin.project['filter:status']} selected="{project.baseinfo.status==key}" value={key}>{name}</option>
+                <option each={[{
+                  "name": "已结束",
+                  "key": 0
+                }, {
+                  "name": "执行中",
+                  "key": 1
+                }]} selected="{project.baseinfo.status==key}" value={key}>{name}</option>
               </select>
             </p>
           </div>

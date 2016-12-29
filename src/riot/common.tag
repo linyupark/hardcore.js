@@ -919,7 +919,6 @@
   </div>
   <!-- 项目管理 -->
   <div if={opts.for=='project'}>
-  按条件筛选：
   <a class="tab-sub {active: app.route.query.status==key}" href="javascript:;" onclick={fn.tab} each={projectStatusList}>{name}</a>
   </div>
   <!-- 协议管理 -->
