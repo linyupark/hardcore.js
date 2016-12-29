@@ -75,10 +75,10 @@
               </tr>
               <tr>
                 <th width="20%">类型</th>
-                <th width="20%">本月协议（个）</th>
-                <th width="20%">上月协议（个）</th>
-                <th width="20%">本年协议（个）</th>
-                <th width="20%">历年协议（个）</th>
+                <th width="20%">本月协议（份）</th>
+                <th width="20%">上月协议（份）</th>
+                <th width="20%">本年协议（份）</th>
+                <th width="20%">历年协议（份）</th>
               </tr>
             </thead>
             <tbody>
@@ -113,11 +113,11 @@
               </tr>
               <tr>
                 <th width="20%">类型</th>
-                <th width="16%">今年执行项目</th>
-                <th width="16%">已结束</th>
-                <th width="16%">进行中</th>
-                <th width="16%">未执行</th>
-                <th width="16%">历年项目数</th>
+                <th width="16%">今年执行项目（个）</th>
+                <th width="16%">已结束（个）</th>
+                <th width="16%">进行中（个）</th>
+                <th width="16%">未执行（个）</th>
+                <th width="16%">历年项目数（个）</th>
               </tr>
             </thead>
             <tbody>
