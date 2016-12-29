@@ -1902,10 +1902,11 @@ main.admin .summary table.base {
   height: auto;
   margin: 10px 0 5px;
   padding: 8px; }
-  main.admin .summary table.base th, main.admin .summary table.base td {
-    font-weight: normal; }
-    main.admin .summary table.base th:last-child, main.admin .summary table.base td:last-child {
-      border-right: none; }
+  main.admin .summary table.base th:last-child, main.admin .summary table.base td:last-child {
+    border-right: none; }
+  main.admin .summary table.base tr:last-child td {
+    font-weight: bold;
+    border-top: 1px solid #ebebeb; }
   main.admin .summary table.base .title {
     background: #fff;
     text-align: left;

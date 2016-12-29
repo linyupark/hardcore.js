@@ -380,9 +380,11 @@ main.admin .summary
     margin: 10px 0 5px
     padding: 8px
     th, td
-      font-weight: normal
       &:last-child
         border-right: none
+    tr:last-child td
+      font-weight: bold
+      border-top: 1px solid $color-line1
     .title
       background: #fff
       text-align: left
