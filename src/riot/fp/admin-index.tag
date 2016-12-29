@@ -59,9 +59,9 @@
             <spinner-dot if="{!mounted}" top="50"/>
             <ul class="item">
               <li each="{summary.system_logs}">
-                <span style="width: 32%"  class="date">{app.utils.time2str(created_at,{showtime:2})}</span>
-                <span class="user" style="width: 25%">{user_name}</span>
-                <span class="desc" style="width: 43%">{app.subText(description, 7)}</span>
+                <span style="width: 25%; font-size: 11px"  class="date">{app.utils.time2str(created_at,{showtime:2})}</span>
+                <span class="user" style="width: 25%; font-size: 13px">{user_name}</span>
+                <span class="desc" style="width: 49%;  font-size: 13px">{app.subText(description, 10)}</span>
               </li>
             </ul>
           </div>

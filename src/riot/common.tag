@@ -98,31 +98,29 @@
   };
   _this.fn = {};
   _this.on('mount', function(){
-    _this.app.addResource('tinymce').then(function(){
-      tinymce.init({
-        selector: "textarea",
-        width: opts.w,
-        height: opts.h,
-        language: "zh_CN",
-        menubar: false,
-        statusbar: false,
-        forced_root_block : "",
-        force_br_newlines : true,
-        force_p_newlines : false,
-        init_instance_callback: function(ed){
-          _this.trap('inited', ed);
-          ed.on('keyup', function(e){
-            var pos = ed.selection.getRng().getClientRects()[0];
-            _this.emit('keyup', e, {
-              edit: ed,
-              pos: {
-                x: pos && pos.left || 0,
-                y: pos && pos.top || 0
-              }
-            });
+    tinymce.init({
+      selector: "textarea",
+      width: opts.w,
+      height: opts.h,
+      language: "zh_CN",
+      menubar: false,
+      statusbar: false,
+      forced_root_block : "",
+      force_br_newlines : true,
+      force_p_newlines : false,
+      init_instance_callback: function(ed){
+        _this.trap('inited', ed);
+        ed.on('keyup', function(e){
+          var pos = ed.selection.getRng().getClientRects()[0];
+          _this.emit('keyup', e, {
+            edit: ed,
+            pos: {
+              x: pos && pos.left || 0,
+              y: pos && pos.top || 0
+            }
           });
-        }
-      });
+        });
+      }
     });
   });
   // 覆盖全部内容

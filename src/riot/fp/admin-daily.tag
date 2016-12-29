@@ -38,7 +38,7 @@
       <div class="row" style="position: relative">
         <p>
           <label class="top">详细内容</label>
-          <tinymce-editor ref="edit" style="float: left" w="700px" h="300px" />
+          <tinymce-editor if="{editInited}" ref="edit" style="float: left" w="700px" h="300px" />
         </p>
         <user-select if={pos.x} style="position: absolute; left: {pos.x+70||0}px; top: {pos.y+43||0}px;" ref="user"/>
       </div>
@@ -137,30 +137,35 @@
     }
   };
   _this.on('mount', function(){
-    if(_this.did){
-      _this.fn.getDaily();
-    }
-    _this.refs.edit.on('keyup', function(e, data){
-      if(e.keyCode == 8){
-        // 删除的时候
-        if(data.edit.selection.getNode().getAttribute('class') === 'atuser'){
-          data.edit.selection.select(data.edit.selection.getNode());
+    // 加载编辑器资源
+    _this.app.addResource('tinymce')
+    .then(function(){
+      _this.editInited = true;
+      if(_this.did){
+        _this.fn.getDaily();
+      }
+      _this.refs.edit.on('keyup', function(e, data){
+        if(e.keyCode == 8){
+          // 删除的时候
+          if(data.edit.selection.getNode().getAttribute('class') === 'atuser'){
+            data.edit.selection.select(data.edit.selection.getNode());
+          }
         }
-      }
-      if(e.shiftKey && e.keyCode == 50){
-        var content = _this.refs.edit.getContent().slice(0, -1);
-        // @弹出用户下拉
-        _this.update({
-          pos: data.pos
-        });
-        _this.refs.user
-        .emit('focus')
-        .once('select', function(user){
-          _this.refs.edit.emit('setContent', content);
-          _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>&nbsp;');
-          _this.update({ pos: {} });
-        });
-      }
+        if(e.shiftKey && e.keyCode == 50){
+          var content = _this.refs.edit.getContent().slice(0, -1);
+          // @弹出用户下拉
+          _this.update({
+            pos: data.pos
+          });
+          _this.refs.user
+          .emit('focus')
+          .once('select', function(user){
+            _this.refs.edit.emit('setContent', content);
+            _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>&nbsp;');
+            _this.update({ pos: {} });
+          });
+        }
+      });
     });
   });
   </script>
@@ -301,9 +306,9 @@
       _this.tags['modal-remove']
       .emit('open').once('ok', function(){
         _this.app.api('GET', 'daily-manager/default/delete', {
-          data: { id: e.item.id }
+          data: { id: e.item.id||e.item.data.id }
         }).on('done', function(){
-          _this.app.alert(name||'日志'+'删除成功', 'success');
+          _this.app.alert((name||'日志')+'删除成功', 'success');
           _this.fn.getDailyList();
         })
       });
