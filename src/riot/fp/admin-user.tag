@@ -16,12 +16,14 @@
           <p>
             <label style="text-align: center;">密码</label>
             <input type="text" ref="password" value="{user.password}" placeholder="6-20个英文字母数字或符号，不能纯数字">
-            <input-valid ref="validOnSave" for="password" reg="(?!\d+$).\{6,20\}" msg="6-20个英文字母数字或符号，不能纯数字"/>
+            <input-valid if="{uid}" ref="validOnSave" for="password" reg="^$|(?!\d+$).\{6,20\}" msg="6-20个英文字母数字或符号，不能纯数字"/>
+            <input-valid if="{!uid}" ref="validOnSave" for="password" reg="(?!\d+$).\{6,20\}" msg="6-20个英文字母数字或符号，不能纯数字"/>
           </p>
           <p>
             <label>确认密码</label>
             <input type="text" ref="confirm_password" value="" placeholder="跟密码保持一致">
-            <input-valid ref="validCFPassword" for="confirm_password" rule="required" msg=""/>
+            <input-valid if="{uid}" ref="validCFPassword" for="confirm_password" reg="^$|(?!\d+$).\{6,20\}" msg=""/>
+            <input-valid if="{!uid}" ref="validCFPassword" for="confirm_password" reg="^(?!\d+$).\{6,20\}" msg=""/>
           </p>
         </div>
         <div class="row">
