@@ -206,7 +206,7 @@
         <h2>管理后台 &gt; 工作日志</h2>
         <form class="user-daily" onsubmit="return false">
           <div class="top-tab-line">
-            <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}<i if="{k=='information'}">{app.data.unread}</i></a>
+            <a href="javascript:;" onclick={fn.rangeChange} class="c4 {active: k==parent.q.range}" each={rangeList}>{name}<i if="{k=='information'&&app.data.unread>0}">{app.data.unread}</i></a>
           </div>
           <table-filter for="daily">
             <yield to="addon">
@@ -220,6 +220,10 @@
           <div if={!dailyList} class="daily-box">
             <br><br>
             <spinner-dot/>
+          </div>
+          <div if={dailyList&&dailyList.length==0} class="daily-box">
+            <br><br>
+            <p style="text-align: center">没有相关日志</p>
           </div>
           <div each={dailyList} class="daily-box">
             <p class="user-date">

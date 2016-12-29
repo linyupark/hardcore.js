@@ -1,3 +1,76 @@
+<!-- 项目历史 -->
+<project-history>
+  <section>
+    <h2>
+      管理后台 &gt;
+      {app.lang.admin.project.title} &gt; 项目执行历史
+    </h2>
+    <table class="base">
+      <thead>
+        <tr>
+          <th width="10%">序号</th>
+          <th width="10%">项目编号</th>
+          <th width="50%">名称</th>
+          <th width="20%">项目起止日期</th>
+          <th width="10%">{app.lang.admin.handle}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr each={tableList}>
+          <td>{id}</td>
+          <td>{project_number}</td>
+          <td>{project_name}</td>
+          <td>{app.utils.time2str(created_at)} ~ {finished_at?app.utils.time2str(finished_at):'未结束'}</td>
+          <td><a href="#!admin-project/view/{parent.pid}?id={id}" class="under-line">查看详情</a></td>
+        </tr>
+        <tr if={!tableList}>
+          <td colspan="5"><spinner-dot/></td>
+        </tr>
+      </tbody>
+      <tfoot if={tableList}>
+        <tr>
+          <td class="left" colspan="5">
+            {app.lang.admin.counts.items}
+            <b>{items}</b>
+            {app.lang.admin.counts.unit}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <pagination-number page={page} pages={pages} select="y"/>
+  </section>
+  <script>
+  var _this = this;
+  _this.q = _this.app.route.query;
+  _this.pid = _this.app.route.params[2];
+  _this.fn = {
+    getHistory: function(){
+      _this.app.api('GET', 'project/default/history', {
+        data: {
+          page: _this.q.page || 1,
+          id: _this.pid
+        }
+      }).on('done', function(data){
+        _this.update({
+          tableList: data.items,
+          page: data.counts.page,
+          pages: data.counts.total_page,
+          items: data.counts.total_items
+        });
+        _this.tags['pagination-number'].emit('render');
+      });
+    }
+  };
+  _this.on('mount', function(){
+    _this.fn.getHistory();
+    _this.tags['pagination-number'].on('change', function(n){
+      _this.q.page = n;
+      _this.app.query();
+    });
+  });
+  </script>
+</project-history>
+
 
 <!-- 项目详情 -->
 <project-view>
@@ -150,6 +223,7 @@
   <script>
   var _this= this;
   _this.pid = _this.app.route.params[2];
+  _this.pk_id = _this.app.route.query.id;
   _this.project = {
     'base-info': {},
     perform: {},
@@ -162,7 +236,7 @@
     },
     getDetail: function(){
       _this.app.api('GET', 'project/default/view', {
-        data: { id: _this.pid }
+        data: { id: _this.pid, pk_id: _this.pk_id }
       }).on('done', function(data){
         _this.update({
           project: data
@@ -220,7 +294,7 @@
             <button type="button" if={p.status!=1||p.active} onclick="{fn.CFDonor}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
           <p if={i==5}>
-            <a if={p.status==1||p.active} href="javascript:;" class="under-line" onclick="{fn.view}">查看历史执行</a>
+            <a href="javascript:;" class="under-line" onclick="{fn.history}">查看历史执行</a>
             <span if={p.status==1 && !p.active}>已确认</span>
             <button type="button" if={p.status!=1||p.active} onclick="{fn.CFIssue}" class="{'btn-gray':!p.active, 'btn-main':p.active}" disabled="{!p.active}">确认</button>
           </p>
@@ -244,8 +318,9 @@
         window.open(f.file_path);
       });
     },
-    view: function(e){
-      _this.app.route(_this.app.route.params[0]+'/view/'+_this.app.route.params[2]);
+    history: function(e){
+      // 查看历史执行
+      _this.app.route(_this.app.route.params[0]+'/history/'+_this.app.route.params[2]);
     },
     // 发放确认
     CFIssue: function(e){
@@ -930,6 +1005,7 @@
     <div class="container">
       <admin-sidenav></admin-sidenav>
       <project-view if={section=='view'}/>
+      <project-history if={section=='history'}/>
       <project-form if={section=='add'}/>
       <project-form if={section=='edit'}/>
       <section if={section=='index'}>
@@ -972,9 +1048,6 @@
               <td>{app.getProjectStatus(status)}</td>
               <td>{createAt&&app.utils.time2str(createAt)||'-'}</td>
               <td>
-                <a href="javascript:;" aria-label="{app.lang.admin.handles.view}" class="c-tooltip--top">
-                  <i onclick={fn.view}  class="btn-icon icon-menu"></i>
-                </a>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
                   <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
                 </a>
@@ -1030,10 +1103,6 @@
           _this.fn.getProjectList();
         })
       });
-    },
-    // 查看项目
-    view: function(e){
-      _this.app.route(_this.app.route.path + '/view/' + e.item.id);
     },
     // 添加项目
     add: function(){
