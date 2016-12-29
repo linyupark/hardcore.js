@@ -153,16 +153,16 @@
         <table class="base">
           <thead>
             <tr>
-              <th width="30%">角色名</th>
-              <th width="30%">描述</th>
+              <th width="30%">角色</th>
+              <th width="30%">代码</th>
               <th width="10%">数量</th>
               <th width="20%">{app.lang.admin.handle}</th>
             </tr>
           </thead>
           <tbody>
             <tr each={tableList}>
-              <td>{name}</td>
               <td>{description}</td>
+              <td>{name}</td>
               <td>{sum}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">

@@ -143,6 +143,7 @@
     _this.app.addResource('tinymce')
     .then(function(){
       _this.editInited = true;
+      _this.update();
       if(_this.did){
         _this.fn.getDaily();
       }
