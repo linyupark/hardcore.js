@@ -58,7 +58,7 @@
           <p>
             <label style="text-align: center">姓名</label>
             <input type="text" ref="real_name" value="{user.real_name}" placeholder="必填">
-            <input-valid for="real_name" rule="required" msg="必填"/>
+            <input-valid ref="validOnSave" for="real_name" rule="required" msg="必填"/>
           </p>
           <p>
             <label style="text-align: center">性别</label>

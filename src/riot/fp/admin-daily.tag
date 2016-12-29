@@ -266,7 +266,7 @@
                     <span class="c-name">{pname}:</span>
                     <span class="c-content">{data.content}</span>
                     <span class="c-time">{app.utils.time2str(data.created_at, {showtime:1})}</span>
-                    <a href="javascript:;" class="c-rm" if="{myself}" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
+                    <a href="javascript:;" class="c-rm" if="{myself&&data.is_deleted==0}" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
                   </p>
                 </li>
               </ul>

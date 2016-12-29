@@ -96,7 +96,7 @@
           e.target.value = '';
           delete _this.items;
           _this.emit("select", _this.selected);
-          // _this.update();
+          _this.update();
         }
       }, 200);
     },
