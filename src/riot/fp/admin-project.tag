@@ -769,10 +769,10 @@
     <h2>
       管理后台 &gt;
       {app.lang.admin.project.title} &gt;
-      <span if={key==parent.formTab} each={formTabList}>{name}</span>
+      {project.id?'修改':'添加'}<span if={key==parent.formTab} each={formTabList}>{name}</span>
     </h2>
     <form class="project">
-      <div class="top-tab-line">
+      <div class="top-tab-line" if="{project.id}">
         <a href="javascript:;" onclick={fn.tabChange} class="c4 {active: key==parent.formTab}" each={formTabList}>{name}</a>
       </div>
       <project-agreement if={formTab=='agreements'} pid="{project.id}" />

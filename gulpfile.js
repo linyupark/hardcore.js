@@ -53,22 +53,23 @@ gulp.task('build:fp', () => {
     let json;
     if(err) throw err;
     json = JSON.parse(data);
-    // 只给pro加后缀
-    if(!json.pro){
-      throw 'production files not found in json file:' + name+'.json';
+    for(let n of ['pro', 'test', 'dev']){
+      if(!json[n]){
+        throw 'production files not found in json file:' + name+'.json';
+      }
+      json[n].forEach((f, i) => {
+        if(f.split('/')[0] === '.'){
+          f =  f.substring(1);
+        }
+        f = f.replace(/\?v=.+/, '');
+        try{
+          f = f + '?v=' + filemd5.sync('./web/' + f);
+          json[n][i] = f;
+        } catch(e) {
+          console.log('需要再执行一次');
+        }
+      });
     }
-    json.pro.forEach((f, i) => {
-      if(f.split('/')[0] === '.'){
-        f =  f.substring(1);
-      }
-      f = f.replace(/\?v=.+/, '');
-      try{
-        f = f + '?v=' + filemd5.sync('./web/' + f);
-        json.pro[i] = f;
-      } catch(e) {
-        console.log('需要再执行一次');
-      }
-    });
     fs.writeFileSync(loaderFile, JSON.stringify(json), 'utf8');
   });
 

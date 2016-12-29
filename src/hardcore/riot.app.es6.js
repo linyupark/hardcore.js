@@ -19,6 +19,7 @@ export class RiotApp {
       this.config = assign({
         id: 'app', // 项目id
         lang: 'cn',
+        version: '1.0',
         env: 'dev', // 环境
         staticBase: './static/',
         routeBase: '#!', // route解析分隔符
@@ -55,7 +56,7 @@ export class RiotApp {
     const cf = this.config;
     // 初始化必要资源
     cf.resource.push(this.config.env);
-    cacheJSON(`${cf.staticBase}${cf.id}.json`, {
+    cacheJSON(`${cf.staticBase}${cf.id}.json?v=${cf.version}`, {
       force: cf.env !== 'pro'
     })
     .done(resp => {
@@ -79,7 +80,7 @@ export class RiotApp {
         this.on('route::change', params => {
           let
             page = params[0] || cf.indexPage,
-            pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js`,
+            pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js?v=${cf.version}`,
             tagName = `${cf.id}-${page}`;
           this.route.params = params;
           this.route.path = '';

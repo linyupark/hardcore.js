@@ -3841,6 +3841,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.config = assign({
           id: 'app', // 项目id
           lang: 'cn',
+          version: '1.0',
           env: 'dev', // 环境
           staticBase: './static/',
           routeBase: '#!', // route解析分隔符
@@ -3881,7 +3882,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var cf = this.config;
         // 初始化必要资源
         cf.resource.push(this.config.env);
-        cacheJSON('' + cf.staticBase + cf.id + '.json', {
+        cacheJSON('' + cf.staticBase + cf.id + '.json?v=' + cf.version, {
           force: cf.env !== 'pro'
         }).done(function (resp) {
           // 记录方便不刷新情况下获取
@@ -3902,7 +3903,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // 设置路由控制
             _this13.on('route::change', function (params) {
               var page = params[0] || cf.indexPage,
-                  pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js',
+                  pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js?v=' + cf.version,
                   tagName = cf.id + '-' + page;
               _this13.route.params = params;
               _this13.route.path = '';

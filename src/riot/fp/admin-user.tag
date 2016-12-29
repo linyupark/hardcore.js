@@ -261,7 +261,7 @@
               <td>{real_name}</td>
               <td>{sex}</td>
               <td>{role_name||'-'}</td>
-              <td>{is_manager==1?'管理员':'非管理员'}</td>
+              <td>{is_manager==1?'管理员':'捐赠方'}</td>
               <td>{tel||'-'}</td>
               <td>{app.utils.time2str(created_at)}</td>
               <td>

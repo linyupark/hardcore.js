@@ -40,7 +40,7 @@
           <label class="top">详细内容</label>
           <tinymce-editor if="{editInited}" ref="edit" style="float: left" w="700px" h="300px" />
         </p>
-        <user-select if={pos.x} style="position: absolute; left: {pos.x+70||0}px; top: {pos.y+43||0}px;" ref="user"/>
+        <user-select if={pos.x} for="admin" style="position: absolute; left: {pos.x+70||0}px; top: {pos.y+43||0}px;" ref="user"/>
       </div>
       <br><br>
       <div class="c1 btn-line">
@@ -257,7 +257,7 @@
               <div class="comment">
                 <input ref="comment" type="text" placeholder="评论 {msg.user_name}: {msg.content}" onkeyup="{fn.cmtKeyup}" maxlength="100">
                 <!-- 复制内容获取坐标前的内容 -->
-                <user-select if={parent.atX} style="position: absolute; left: {parent.atX}px; top: 20px;" ref="atuser"/>
+                <user-select if={parent.atX} for="admin" style="position: absolute; left: {parent.atX}px; top: 20px;" ref="atuser"/>
                 <span class="count-px" ref="cloneTxt">{parent.cloneTxt}</span>
                 <input-valid ref="validComment" for="comment" rule="required" msg=""/>
                 <button type="button" onclick="{fn.send}">发送</button>

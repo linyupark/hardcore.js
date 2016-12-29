@@ -18,12 +18,14 @@
 
     <script>
     var
-      ie = navigator.appName=="Microsoft Internet Explorer" ?             Number(navigator.appVersion.split(";")[1].replace(/[ ]/g,"").replace("MSIE","")) :
-      0,
+      ie = navigator.appName=="Microsoft Internet Explorer" ?
+        Number(navigator.appVersion.split(";")[1].replace(/[ ]/g,"").replace("MSIE","")) :
+        0,
       init_app = function(){
         new RiotApp.FP({
           id: 'fp',
           lang: 'cn',
+          version: '0.1',
           env: RiotApp.FP.detectEnv('dev'),
           mountPage: '#main',
           resource: []
