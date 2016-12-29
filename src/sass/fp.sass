@@ -302,8 +302,22 @@ main.admin .summary
     background: #fff
     height: 320px
     border-radius: 5px
+    margin-bottom: 5px
   .logs
     +gridle(3.8 prefix .2)
+    .item
+      margin: 0 0 0 12px
+      list-style: none
+      padding: 0
+      li
+        padding: 8px 0
+        border-bottom: 1px solid $color-line1
+        &:last-child
+          border: none
+        .date, .user, .desc
+          display: inline-block
+          width: 32%
+          color: $color-txt2
   .pies
     +gridle(4.5)
     height: 178px
@@ -325,7 +339,6 @@ main.admin .summary
           letter-spacing: 2px
         span
           color: #ccc
-
   .donor-n
     +gridle(3)
     height: 178px
@@ -363,3 +376,52 @@ main.admin .summary
         display: inline-block
         width: 50px
         color: $color-txt2
+  table.base
+    height: auto
+    margin: 10px 0 5px
+    padding: 8px
+    th, td
+      font-weight: normal
+      &:last-child
+        border-right: none
+    .title
+      background: #fff
+      text-align: left
+      height: 20px
+      font-size: $font-m
+      font-weight: bold
+      position: relative
+      a
+        font-size: $font-xs
+        position: absolute
+        top: 15px
+        right: 15px
+        text-decoration: none
+        font-weight: normal
+        span
+          border-radius: 5px
+          position: absolute
+          top: -45px
+          right: 60px
+          width: 200px
+          font-weight: normal
+          color: $color-txt2
+          background: rgba(#ffc, .5)
+          padding: 5px 10px
+          border: 1px solid $color-line1
+          line-height: 150%
+          b
+            color: #1ea52e
+            display: inline-block
+            width: 70px
+            font-weight: normal
+        i
+          width: 15px
+          height: 15px
+          display: inline-block
+          background: #37ACE6
+          border-radius: 50%
+          color: #fff
+          line-height: 16px
+          text-align: center
+          font-size: 9px

@@ -121,7 +121,7 @@
           this.emit('setContent', data.content);
         });
         // 关联对象
-        data.relation.forEach(function(r,i){
+        data.relation && data.relation.forEach(function(r,i){
           var v = _this.refs.relValue[i] || _this.refs.relValue;
           // 机构
           if(r.type_id == 2){
@@ -236,9 +236,10 @@
               <a class="under-line" onclick="{fn.unfold}" href="javascript:;">{unfold?'收起':'展开'}</a>
             </div>
             <div class="handle-line">
-              <a href="javascript:;" onclick="{fn.read}" if={q.range=='information'}>标为已读</a>
+              <a href="javascript:;" onclick="{fn.read}" if={q.range=='information'} if="{myself}">标为已读</a>
               <a href="javascript:;" onclick="{fn.checkMsg}">评论({msgList[id].length})</a>
-              <a href="javascript:;" onclick="{fn.edit}">修改</a>
+              <a href="javascript:;" onclick="{fn.edit}" if="{myself}">修改</a>
+              <a href="javascript:;" onclick="{fn.remove}" if="{myself}">删除</a>
             </div>
             <div class="{fadein: checkMsgId==id}" if={checkMsgId==id}>
               <div class="comment">
@@ -260,7 +261,7 @@
                     <span class="c-name">{pname}:</span>
                     <span class="c-content">{data.content}</span>
                     <span class="c-time">{app.utils.time2str(data.created_at, {showtime:1})}</span>
-                    <a href="javascript:;" class="c-rm" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
+                    <a href="javascript:;" class="c-rm" if="{myself}" onclick={fn.rmCmt}><i class="icon-cancel"></i></a>
                   </p>
                 </li>
               </ul>
@@ -295,11 +296,20 @@
     {k: 'department', name: '本部门'}
   ];
   _this.fn = {
-    rmCmt: function(e){
+    // 删除日志
+    remove: function(e, name){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
+      .emit('open').once('ok', function(){
+        _this.app.api('GET', 'daily-manager/default/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert(name||'日志'+'删除成功', 'success');
+          _this.fn.getDailyList();
+        })
       });
+    },
+    rmCmt: function(e){
+      _this.fn.remove(e, '评论');
     },
     cmtKeyup: function(e){
       _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);

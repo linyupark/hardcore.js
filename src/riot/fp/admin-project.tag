@@ -1014,8 +1014,13 @@
   _this.fn = {
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
+      .emit('open').once('ok', function(){
+        _this.app.api('GET', 'project/default/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert('项目删除成功', 'success');
+          _this.fn.getProjectList();
+        })
       });
     },
     // 查看项目

@@ -14,6 +14,7 @@
           <div class="amount">
             <div class="pies">
               <p class="title">今年/历年项目总数</p>
+              <spinner-dot if="{!mounted}" top="50"/>
               <hc-pie-text if="{mounted}" ref="pjPie" w="130" h="130" color="orange" percent="{projectPercent}">
                 <strong>{parent.projectPercent}%</strong><br>
                 {parent.summary.project_current_year_total}/<span>{parent.summary.project_total}</span>
@@ -21,6 +22,7 @@
             </div>
             <div class="pies">
               <p class="title">今年/历年协议总数</p>
+              <spinner-dot if="{!mounted}" top="50"/>
               <hc-pie-text if="{mounted}" ref="agPie" w="130" h="130" color="blue" percent="{agreementPercent}">
                 <strong>{parent.agreementPercent}%</strong><br>
                 {parent.summary.agreement_current_year_total}/<span>{parent.summary.agreement_total}</span>
@@ -28,24 +30,23 @@
             </div>
             <div class="donor-n">
               <p class="title">捐赠方总数</p>
+              <spinner-dot if="{!mounted}" top="50"/>
               <br><br>
               <strong style="font-family: HelveticaNeue-Light" class="large-n">{summary.donor_total}</strong>
             </div>
             <div class="pay-n">
               <p class="title">今年到款总金额</p>
+              <spinner-dot if="{!mounted}" top="30"/>
               <br>
-              <strong class="large-n" style="font-family: HelveticaNeue-Light; text-align: left; text-indent: 12px">
+              <strong if="{mounted}" class="large-n" style="font-family: HelveticaNeue-Light; text-indent: -10px">
                 <small>￥</small>
-                {summary.payment_current_year_total}
+                {summary.payment_current_year_total||0}
               </strong>
             </div>
             <div class="ag-n">
               <p class="title">今年签约总金额</p>
+              <spinner-dot if="{!mounted}" top="30"/>
               <p class="cell">
-                <span each="{summary.sign_current_year_price}">
-                  <label>{label}:</label>
-                  {amount}
-                </span>
                 <span each="{summary.sign_current_year_price}">
                   <label>{label}:</label>
                   {amount}
@@ -55,7 +56,84 @@
           </div>
           <div class="logs">
             <p class="title">系统日志</p>
+            <spinner-dot if="{!mounted}" top="50"/>
+            <ul class="item">
+              <li each="{summary.system_logs}">
+                <span style="width: 32%"  class="date">{app.utils.time2str(created_at,{showtime:2})}</span>
+                <span class="user" style="width: 25%">{user_name}</span>
+                <span class="desc" style="width: 43%">{app.subText(description, 7)}</span>
+              </li>
+            </ul>
           </div>
+        </div>
+
+        <div class="row summary">
+          <table class="base">
+            <thead>
+              <tr>
+                <th width="100%" colspan="5" class="title">协议汇总</th>
+              </tr>
+              <tr>
+                <th width="20%">类型</th>
+                <th width="20%">本月协议（个）</th>
+                <th width="20%">上月协议（个）</th>
+                <th width="20%">本年协议（个）</th>
+                <th width="20%">历年协议（个）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr each="{ag in summary.agreement_daily}">
+                <td>{ag.label}</td>
+                <td>{ag.this_month}</td>
+                <td>{ag.last_month}</td>
+                <td>{ag.this_y}</td>
+                <td>{ag.over_y}</td>
+              </tr>
+              <tr if={!summary.agreement_daily}>
+                <td colspan="6"><spinner-dot/></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="base">
+            <thead>
+              <tr>
+                <th width="100%" colspan="6" class="title">
+                  项目汇总
+                  <a href="javascript:;" onmouseenter="{fn.helpme}" onmouseleave="{fn.helpme}" class="under-line">
+                    <i class="help">?</i> 帮助
+                    <span show="{helpme}">
+                      <b>已结束: </b>所有已结束的项目数<br>
+                      <b>执行中: </b>所有执行中的项目数<br>
+                      <b>未执行: </b>所有未执行的项目数<br>
+                      <b>今年执行: </b>当年发起执行的项目数
+                    </span>
+                  </a>
+                </th>
+              </tr>
+              <tr>
+                <th width="20%">类型</th>
+                <th width="16%">今年执行项目</th>
+                <th width="16%">已结束</th>
+                <th width="16%">进行中</th>
+                <th width="16%">未执行</th>
+                <th width="16%">历年项目数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr each="{pj in summary.project_daily}">
+                <td>{pj.label}</td>
+                <td>{pj.this_year}</td>
+                <td>{pj.finished}</td>
+                <td>{pj.running}</td>
+                <td>{pj.wating}</td>
+                <td>{pj.over_year}</td>
+              </tr>
+              <tr if={!summary.project_daily}>
+                <td colspan="6"><spinner-dot/></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
@@ -66,7 +144,11 @@
   <script>
   var _this = this;
   _this.summary = {};
+  _this.helpme = false;
   _this.fn = {
+    helpme: function(){
+      _this.helpme = !!!_this.helpme;
+    },
     getSummary: function(){
       _this.app.api('GET', 'backend/default/index')
       .on('done', function(data){

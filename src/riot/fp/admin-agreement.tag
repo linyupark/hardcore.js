@@ -442,8 +442,13 @@
     },
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
+      .emit('open').once('ok', function(){
+        _this.app.api('GET', 'agreement/default/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert('协议删除成功', 'success');
+          _this.fn.getList();
+        })
       });
     },
     getList: function(){

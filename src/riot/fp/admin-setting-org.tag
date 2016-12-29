@@ -105,9 +105,15 @@
   _this.fn = {
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
-      });
+      .once('ok', function(){
+        _this.app.api('GET', 'system-setting/organization/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert('组织机构删除成功', 'success');
+          _this.fn.getOrgList();
+        })
+      })
+      .emit('open');
     },
     back: function(e){
       var i = _this.parentList.indexOf(e.item);

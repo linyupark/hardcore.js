@@ -32,7 +32,7 @@ const phpstr2time = (str) => {
 /**
  * PHP给的时间戳转成字符
  * @param  {int} time     时间戳
- * @param  {bool} showtime 是否显示分时
+ * @param  {bool} showtime 显示分时规格1：年月日分秒2：月分
  * @return {str}          时间字符串
  */
 const phptime2str = (time, opts={}) => {
@@ -50,8 +50,11 @@ const phptime2str = (time, opts={}) => {
   h = h < 10 ? "0" + h : h;
   min = min < 10 ? "0" + min : min;
   sec = sec < 10 ? "0" + sec : sec;
-  if(opts.showtime){
+  if(opts.showtime == 1){
     return y+sp+m+sp+d+" "+h+":"+min+":"+sec;
+  }
+  if(opts.showtime == 2){
+    return m+sp+d+" "+h+":"+min;
   }
   return y+sp+m+sp+d;
 };

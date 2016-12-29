@@ -19,7 +19,7 @@
           </thead>
           <tbody>
             <tr each={tableList}>
-              <td>{app.utils.time2str(created_at, {showtime:true})}</td>
+              <td>{app.utils.time2str(created_at, {showtime:1})}</td>
               <td>{user_name}</td>
               <td>{user_role}</td>
               <td class="left">{description}</td>

@@ -319,7 +319,7 @@
       }
     }
   </style>
-  <div class="spinner">
+  <div class="spinner" style="margin-top: {opts.top||0}px">
     <div class="bounce1"></div>
     <div class="bounce2"></div>
     <div class="bounce3"></div>

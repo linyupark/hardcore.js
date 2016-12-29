@@ -98,9 +98,15 @@
   _this.fn = {
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
-      });
+      .once('ok', function(){
+        _this.app.api('GET', 'system-setting/project-type/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert('项目类型删除成功', 'success');
+          _this.fn.getTypeList();
+        })
+      })
+      .emit('open');
     },
     ok: function(e){
       var api = _this.pjtype.id ?

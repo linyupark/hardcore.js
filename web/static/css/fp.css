@@ -1814,11 +1814,25 @@ main.admin .summary .amount, main.admin .summary .logs {
   width: 66.66667%;
   background: #fff;
   height: 320px;
-  border-radius: 5px; }
+  border-radius: 5px;
+  margin-bottom: 5px; }
 
 main.admin .summary .logs {
   width: 31.66667%;
   margin-left: 1.66667%; }
+  main.admin .summary .logs .item {
+    margin: 0 0 0 12px;
+    list-style: none;
+    padding: 0; }
+    main.admin .summary .logs .item li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ebebeb; }
+      main.admin .summary .logs .item li:last-child {
+        border: none; }
+      main.admin .summary .logs .item li .date, main.admin .summary .logs .item li .user, main.admin .summary .logs .item li .desc {
+        display: inline-block;
+        width: 32%;
+        color: #999; }
 
 main.admin .summary .pies {
   width: 37.5%;
@@ -1884,3 +1898,53 @@ main.admin .summary .cell {
       display: inline-block;
       width: 50px;
       color: #999; }
+
+main.admin .summary table.base {
+  height: auto;
+  margin: 10px 0 5px;
+  padding: 8px; }
+  main.admin .summary table.base th, main.admin .summary table.base td {
+    font-weight: normal; }
+    main.admin .summary table.base th:last-child, main.admin .summary table.base td:last-child {
+      border-right: none; }
+  main.admin .summary table.base .title {
+    background: #fff;
+    text-align: left;
+    height: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    position: relative; }
+    main.admin .summary table.base .title a {
+      font-size: 13px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      text-decoration: none;
+      font-weight: normal; }
+      main.admin .summary table.base .title a span {
+        border-radius: 5px;
+        position: absolute;
+        top: -45px;
+        right: 60px;
+        width: 200px;
+        font-weight: normal;
+        color: #999;
+        background: rgba(255, 255, 204, 0.5);
+        padding: 5px 10px;
+        border: 1px solid #ebebeb;
+        line-height: 150%; }
+        main.admin .summary table.base .title a span b {
+          color: #1ea52e;
+          display: inline-block;
+          width: 70px;
+          font-weight: normal; }
+      main.admin .summary table.base .title a i {
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+        background: #37ACE6;
+        border-radius: 50%;
+        color: #fff;
+        line-height: 16px;
+        text-align: center;
+        font-size: 9px; }

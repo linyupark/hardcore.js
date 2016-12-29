@@ -203,20 +203,21 @@
   _this.fn = {
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
-      });
+      .once('ok', function(){
+        _this.app.api('GET', 'role-manager/default/delete', {
+          data: { name: e.item.name }
+        }).on('done', function(){
+          _this.app.alert('角色删除成功', 'success');
+          _this.fn.getList();
+        })
+      })
+      .emit('open');
     },
     add: function(){
       _this.app.route(_this.app.route.path + '/add');
     },
     edit: function(e){
       _this.app.route(_this.app.route.path + '/edit/' + e.item.name);
-    },
-    remove: function(e){
-      _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-      });
     },
     getList: function(){
       _this.app.api('GET', 'role-manager/default/index', {

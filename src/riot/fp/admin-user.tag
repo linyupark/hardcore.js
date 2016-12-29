@@ -302,8 +302,13 @@
   _this.fn = {
     remove: function(e){
       _this.tags['modal-remove']
-      .emit('open').on('ok', function(){
-        // 删除操作
+      .emit('open').once('ok', function(){
+        _this.app.api('GET', 'user-manager/default/delete', {
+          data: { id: e.item.id }
+        }).on('done', function(){
+          _this.app.alert('用户删除成功', 'success');
+          _this.fn.getUserList();
+        })
       });
     },
     // 编辑用户
