@@ -177,6 +177,8 @@
         })
         .on('done', function(data){
           _this.app.alert('捐赠方信息保存成功', 'success');
+          // 跳转到列表
+          !_this.form_id && _this.app.route('admin-donor');
         });
       })
       .catch(function(){

@@ -863,6 +863,8 @@
             }
           }).on('done', function(data){
             _this.app.alert('项目资料保存成功', 'success');
+            // 跳转到列表
+            !_this.project.id && _this.app.route('admin-project');
           });
         })
         .catch(function(e){

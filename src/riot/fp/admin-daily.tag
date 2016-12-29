@@ -78,6 +78,8 @@
           }
         }).on('done', function(){
           _this.app.alert('日志保存成功', 'success');
+          // 跳转到列表
+          !_this.did && _this.app.route('admin-daily');
         });
       };
       if(_this.did) api = 'daily-manager/default/update?id=' + _this.did;

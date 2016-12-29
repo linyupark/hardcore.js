@@ -232,6 +232,8 @@
           }
         }).on('done', function(){
           _this.app.alert('协议保存成功', 'success');
+          // 跳转到列表
+          !_this.form.id && _this.app.route('admin-agreement');
         });
       }).catch(function(){
         // 失败alert

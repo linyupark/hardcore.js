@@ -176,6 +176,8 @@
           }
         }).on('done', function(){
           _this.app.alert('用户信息保存成功', 'success');
+          // 跳转到列表
+          !_this.uid && _this.app.route('admin-user');
         });
       }).catch(function(){
         _this.app.alert('请检查表单', 'warning');

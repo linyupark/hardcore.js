@@ -79,6 +79,8 @@
           }
         }).on('done', function(){
           _this.app.alert('角色权限信息保存成功', 'success');
+          // 跳转到列表
+          !_this.role.name && _this.app.route('admin-setting-role');
         });
       }).catch(function(){
         _this.app.alert('请检查表单', 'warning');
