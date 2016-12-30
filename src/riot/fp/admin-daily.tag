@@ -423,11 +423,9 @@
     },
     getUnread: function(){
       // 获取未读新消息的数量
-      if(_this.app.data.unread)
-        return _this.app.data.unread;
-      _this.app.api('GET', 'daily-manager/default/information')
+      _this.app.api('GET', 'backend/default/remind')
       .on('done', function(data){
-        _this.app.data.unread = data.counts.total_items;
+        _this.app.data.unread = data.new_daily_message_num;
         _this.update();
       });
     },
@@ -443,9 +441,6 @@
         _this.pages = data.counts.total_page;
         _this.items = data.counts.total_items;
         _this.msgList = {};
-        if(_this.q.range === 'information'){
-          _this.app.data.unread = data.counts.total_items;
-        }
         data.items.forEach(function(daily){
           _this.fn.scanMessage(daily.id, daily.message, 0);
         });

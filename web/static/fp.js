@@ -478,7 +478,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * 寄存器
      * @type {[type]}
      */
-    el.__emited = el.__emited || {};
+    el._emitted = el._emitted || {};
 
     /**
      * object defineProperty 默认
@@ -490,7 +490,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function value(event, fn) {
         if (typeof fn == "function") {
           (_callbacks[event] = _callbacks[event] || []).push(fn);
-          el.__emited[event] && fn.apply(el, el.__emited[event]);
+          el._emitted[event] && fn.apply(el, el._emitted[event]);
         }
         return el;
       }
@@ -523,7 +523,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             delete _callbacks[event];
           }
-          delete el.__emited[event];
+          delete el._emitted[event];
         }
         return el;
       }
@@ -606,7 +606,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
         }
 
-        el.__emited[event] = [event].concat(args);
+        el._emitted[event] = [event].concat(args);
         if (_callbacks["*"] && event !== "*") el.emit.apply(el, ["*", event].concat(args));
         return el;
       }
