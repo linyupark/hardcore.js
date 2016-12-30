@@ -14,7 +14,7 @@ let EmitterPromise = class {
     this._resolve = (value) => {
       setTimeout(() => {
         this.emit("resolve", value);
-        this._emited_value = value;
+        this._emitted_value = value;
         this.off("reject");
       }, 0);
     };
@@ -63,7 +63,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   static resolve(value) {
-    if (value instanceof Promise) {
+    if (value instanceof EmitterPromise) {
       return value;
     }
     return new EmitterPromise((resolve) => {
@@ -95,11 +95,11 @@ let EmitterPromise = class {
   then(cb = () => {}, _catch) {
     this.once("resolve", value => {
       try {
-        if (this.__chain_value instanceof Promise) {
-          this.__chain_value.then(cb);
+        if (this._chain_value instanceof EmitterPromise) {
+          this._chain_value.then(cb);
           return;
         }
-        this.__chain_value = cb.call(null, this.__chain_value || value);
+        this._chain_value = cb.call(null, this._chain_value || value);
       } catch (e) {
         this.emit("reject", e);
       }
@@ -107,8 +107,8 @@ let EmitterPromise = class {
     if (typeof _catch === "function") {
       return this.catch(_catch);
     }
-    if(this._emited_value){
-      this.emit("resolve", this._emited_value);
+    if(this._emitted_value){
+      this.emit("resolve", this._emitted_value);
     }
     return this;
   }
@@ -122,13 +122,13 @@ let EmitterPromise = class {
     this.once("reject", reason => {
       let result;
       try {
-        if (this.__no_throw) return;
+        if (this._no_throw) return;
         result = cb.call(null, reason);
-        this.__no_throw = true;
+        this._no_throw = true;
         if (result) this.emit("resolve", result);
       } catch (e) {
         this.emit("reject", e);
-        if (!this.__no_throw) {
+        if (!this._no_throw) {
           throw e;
         }
       }

@@ -634,7 +634,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this._resolve = function (value) {
         setTimeout(function () {
           _this.emit("resolve", value);
-          _this._emited_value = value;
+          _this._emitted_value = value;
           _this.off("reject");
         }, 0);
       };
@@ -680,11 +680,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         this.once("resolve", function (value) {
           try {
-            if (_this2.__chain_value instanceof Promise) {
-              _this2.__chain_value.then(cb);
+            if (_this2._chain_value instanceof EmitterPromise) {
+              _this2._chain_value.then(cb);
               return;
             }
-            _this2.__chain_value = cb.call(null, _this2.__chain_value || value);
+            _this2._chain_value = cb.call(null, _this2._chain_value || value);
           } catch (e) {
             _this2.emit("reject", e);
           }
@@ -692,8 +692,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (typeof _catch === "function") {
           return this.catch(_catch);
         }
-        if (this._emited_value) {
-          this.emit("resolve", this._emited_value);
+        if (this._emitted_value) {
+          this.emit("resolve", this._emitted_value);
         }
         return this;
       }
@@ -714,13 +714,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.once("reject", function (reason) {
           var result = void 0;
           try {
-            if (_this3.__no_throw) return;
+            if (_this3._no_throw) return;
             result = cb.call(null, reason);
-            _this3.__no_throw = true;
+            _this3._no_throw = true;
             if (result) _this3.emit("resolve", result);
           } catch (e) {
             _this3.emit("reject", e);
-            if (!_this3.__no_throw) {
+            if (!_this3._no_throw) {
               throw e;
             }
           }
@@ -777,7 +777,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'resolve',
       value: function resolve(value) {
-        if (value instanceof Promise) {
+        if (value instanceof EmitterPromise) {
           return value;
         }
         return new EmitterPromise(function (resolve) {
@@ -4078,28 +4078,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (resp.errno == 0) {
             // this.log('api done');
             api.emit('done', resp.data || {});
-          } else {
-            // 403无权限
-            if (resp.errno == 403) window.location.replace(_this15.config.routeBase + 'admin-deny');
-            // 401要求重新登录
-            if (resp.errno == 401) {
-              window.location.replace('' + _this15.config.routeBase + _this15.config.lologinPage + '?ref=' + location.href);
-              // 删除cookie
-              _this15.utils.cookie.remove('user_name');
-              _this15.utils.cookie.remove('user_id');
-              _this15.utils.cookie.remove('role');
-            }
-            // this.log('api fail');
-            api.emit('error', {
-              code: resp.errno || '',
-              errmsg: resp.errmsg,
-              url: url || ''
-            });
           }
         }).progress(function (p) {
           api.emit('progress', p);
         }).fail(function (status) {
-          // this.log('api fail', status);
+          // 403无权限
+          if (status == 403) {
+            window.location.replace(_this15.config.routeBase + 'admin-deny');
+            return;
+          }
+          // 401要求重新登录
+          if (status == 401) {
+            window.location.replace('' + _this15.config.routeBase + _this15.config.lologinPage + '?ref=' + location.href);
+            // 删除cookie
+            _this15.utils.cookie.remove('user_name');
+            _this15.utils.cookie.remove('user_id');
+            _this15.utils.cookie.remove('role');
+            return;
+          }
           api.emit('fail', {
             code: status,
             errmsg: '',

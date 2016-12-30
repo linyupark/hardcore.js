@@ -544,7 +544,7 @@ let EmitterPromise = class {
     this._resolve = (value) => {
       setTimeout(() => {
         this.emit("resolve", value);
-        this._emited_value = value;
+        this._emitted_value = value;
         this.off("reject");
       }, 0);
     };
@@ -593,7 +593,7 @@ let EmitterPromise = class {
    * @return {EmitterPromise}
    */
   static resolve(value) {
-    if (value instanceof Promise) {
+    if (value instanceof EmitterPromise) {
       return value;
     }
     return new EmitterPromise((resolve) => {
@@ -625,11 +625,11 @@ let EmitterPromise = class {
   then(cb = () => {}, _catch) {
     this.once("resolve", value => {
       try {
-        if (this.__chain_value instanceof Promise) {
-          this.__chain_value.then(cb);
+        if (this._chain_value instanceof EmitterPromise) {
+          this._chain_value.then(cb);
           return;
         }
-        this.__chain_value = cb.call(null, this.__chain_value || value);
+        this._chain_value = cb.call(null, this._chain_value || value);
       } catch (e) {
         this.emit("reject", e);
       }
@@ -637,8 +637,8 @@ let EmitterPromise = class {
     if (typeof _catch === "function") {
       return this.catch(_catch);
     }
-    if(this._emited_value){
-      this.emit("resolve", this._emited_value);
+    if(this._emitted_value){
+      this.emit("resolve", this._emitted_value);
     }
     return this;
   }
@@ -652,13 +652,13 @@ let EmitterPromise = class {
     this.once("reject", reason => {
       let result;
       try {
-        if (this.__no_throw) return;
+        if (this._no_throw) return;
         result = cb.call(null, reason);
-        this.__no_throw = true;
+        this._no_throw = true;
         if (result) this.emit("resolve", result);
       } catch (e) {
         this.emit("reject", e);
-        if (!this.__no_throw) {
+        if (!this._no_throw) {
           throw e;
         }
       }
@@ -3867,29 +3867,23 @@ class FP extends RiotApp {
         // this.log('api done');
         api.emit('done', resp.data || {});
       }
-      else {
-        // 403无权限
-        if(resp.errno == 403)
-          window.location.replace(`${this.config.routeBase}admin-deny`);
-        // 401要求重新登录
-        if(resp.errno == 401){
-          window.location.replace(`${this.config.routeBase}${this.config.lologinPage}?ref=${location.href}`);
-          // 删除cookie
-          this.utils.cookie.remove('user_name');
-          this.utils.cookie.remove('user_id');
-          this.utils.cookie.remove('role');
-        }
-        // this.log('api fail');
-        api.emit('error', {
-          code: resp.errno || '',
-          errmsg: resp.errmsg,
-          url: url || ''
-        });
-      }
     }).progress(p => {
       api.emit('progress', p);
     }).fail(status => {
-      // this.log('api fail', status);
+      // 403无权限
+      if(status == 403){
+        window.location.replace(`${this.config.routeBase}admin-deny`);
+        return;
+      }
+      // 401要求重新登录
+      if(status == 401){
+        window.location.replace(`${this.config.routeBase}${this.config.lologinPage}?ref=${location.href}`);
+        // 删除cookie
+        this.utils.cookie.remove('user_name');
+        this.utils.cookie.remove('user_id');
+        this.utils.cookie.remove('role');
+        return;
+      }
       api.emit('fail', {
         code: status,
         errmsg: '',
