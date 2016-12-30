@@ -1,1 +1,14 @@
-riot.tag2("fp-index","","","",function(e){var t=this;t.role=t.app.utils.cookie.get("role"),t.on("mount",function(){t.role?t.app.route("admin"===t.role?"admin-index":"user-index"):t.app.route("login")})});
+riot.tag2('fp-index', '', '', '', function(opts) {
+  var _this = this;
+  _this.role = _this.app.utils.cookie.get('role');
+  _this.on('mount', function(){
+
+    if(!_this.role){
+      _this.app.route('login');
+    }
+    else{
+      _this.app.route(_this.role==='admin'?'admin-index':'user-index');
+    }
+  });
+
+});

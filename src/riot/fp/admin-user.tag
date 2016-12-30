@@ -54,7 +54,7 @@
       </div>
       <hr>
       <br>
-      <h4>执行信息</h4>
+      <h4>个人信息</h4>
       <div class="c2">
         <div class="row">
           <p>
@@ -118,7 +118,7 @@
         </p>
       </div>
       <div class="c1">
-        <label class="top">获奖条件说明</label>
+        <label class="top">个人介绍</label>
         <p>
           <textarea ref="profile">{user.profile}</textarea>
         </p>

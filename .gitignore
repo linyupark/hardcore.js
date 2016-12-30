@@ -3,3 +3,4 @@ logs
 .tern-project
 .DS_Store
 node_modules
+web/static/fp.rollup.js

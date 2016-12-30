@@ -68,6 +68,9 @@
     save: function(e){
       var api = 'daily-manager/default/create', relData = [],
       saveHandle = function(){
+        if(!_this.refs.edit.getContent()){
+          return _this.app.alert('请填写内容', 'warning');
+        }
         _this.app.api('POST', api, {
           trigger: e.target,
           data: {
