@@ -4042,7 +4042,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var prefix = {
           dev: 'dev.',
           test: 'test.',
-          pro: 'www.'
+          pro: 'www.',
+          local: ''
         }[this.config.env];
 
         var triggerText = void 0,

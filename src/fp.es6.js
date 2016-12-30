@@ -12,7 +12,8 @@ class FP extends RiotApp {
     const prefix = {
       dev: 'dev.',
       test: 'test.',
-      pro: 'www.'
+      pro: 'www.',
+      local: ''
     }[this.config.env];
 
     let
