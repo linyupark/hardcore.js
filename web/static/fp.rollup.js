@@ -3827,10 +3827,8 @@ class FP extends RiotApp {
   api(method, url, opts = {}) {
 
     const prefix = {
-      dev: 'dev.',
-      test: 'test.',
-      pro: 'www.',
-      local: ''
+      pro: '',
+      local: `//dev.fp.sosho.cn`
     }[this.config.env];
 
     let
@@ -3856,7 +3854,7 @@ class FP extends RiotApp {
       opts.trigger.disabled = true;
     }
 
-    this.xhr(`//${prefix}fp.sosho.cn/${url}`, {
+    this.xhr(`${prefix}/${url}`, {
       payload: opts.payload || false,
       formdata: opts.formdata || false,
       showProgress: opts.showProgress || false,
@@ -3998,7 +3996,7 @@ class FP extends RiotApp {
   static detectEnv(env) {
     if (env) return env;
     if (/localhost|127\.0|192\.168/.test(window.location.href)) {
-      return 'dev';
+      return 'local';
     }
     return 'pro';
   }

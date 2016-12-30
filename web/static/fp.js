@@ -4040,10 +4040,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
         var prefix = {
-          dev: 'dev.',
-          test: 'test.',
-          pro: 'www.',
-          local: ''
+          pro: '',
+          local: '//dev.fp.sosho.cn'
         }[this.config.env];
 
         var triggerText = void 0,
@@ -4068,7 +4066,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           opts.trigger.disabled = true;
         }
 
-        this.xhr('//' + prefix + 'fp.sosho.cn/' + url, {
+        this.xhr(prefix + '/' + url, {
           payload: opts.payload || false,
           formdata: opts.formdata || false,
           showProgress: opts.showProgress || false,
@@ -4233,7 +4231,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function detectEnv(env) {
         if (env) return env;
         if (/localhost|127\.0|192\.168/.test(window.location.href)) {
-          return 'dev';
+          return 'local';
         }
         return 'pro';
       }

@@ -53,7 +53,7 @@ gulp.task('build:fp', () => {
     let json;
     if(err) throw err;
     json = JSON.parse(data);
-    for(let n of ['pro', 'test', 'dev']){
+    for(let n of ['pro', 'local']){
       if(!json[n]){
         throw 'production files not found in json file:' + name+'.json';
       }
