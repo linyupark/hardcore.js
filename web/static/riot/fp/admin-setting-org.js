@@ -37,13 +37,17 @@ riot.tag2('fp-admin-setting-org', '<header for="admin"></header><main class="adm
       'system-setting/organization/create';
       _this.refs.saveOrg.refs.validOrg
       .once('valid', function(){
+        var sort = _this.refs.saveOrg.refs.org_sort.value;
+        if(!Number(sort) || Number(sort) < 0){
+          return this.emit('msg', '排序必须为正整数');
+        }
         _this.app.api('POST', api, {
           trigger: e.target,
           data: {
             data: JSON.stringify({
               parent_id: _this.parentList.slice(-1)[0].pid,
               name: _this.refs.saveOrg.refs.org_name.value,
-              sort: _this.refs.saveOrg.refs.org_sort.value
+              sort: Number(sort)
             })
           }
         })

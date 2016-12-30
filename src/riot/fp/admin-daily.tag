@@ -453,6 +453,7 @@
         _this.tags['pagination-number'].emit('render');
         _this.msg.content = '';
       });
+      _this.fn.getUnread();
     }
   };
   this.on('mount', function(){
@@ -463,7 +464,6 @@
       _this.app.query();
     });
     _this.fn.getDailyList();
-    _this.fn.getUnread();
   });
   </script>
 

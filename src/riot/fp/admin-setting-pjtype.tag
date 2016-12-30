@@ -114,12 +114,16 @@
       'system-setting/project-type/create';
       _this.refs.saveType.refs.validType
       .once('valid', function(){
+        var sort = _this.refs.saveType.refs.type_sort.value;
+        if(!Number(sort) || Number(sort) < 0){
+          return this.emit('msg', '排序必须为正整数');
+        }
         _this.app.api('POST', api, {
           trigger: e.target,
           data: {
             data: JSON.stringify({
               name: _this.refs.saveType.refs.type_name.value,
-              sort: _this.refs.saveType.refs.type_sort.value
+              sort: Number(sort)
             })
           }
         })

@@ -279,6 +279,7 @@ riot.tag2('fp-admin-daily', '<header for="admin"></header><main class="admin"><d
         _this.tags['pagination-number'].emit('render');
         _this.msg.content = '';
       });
+      _this.fn.getUnread();
     }
   };
   this.on('mount', function(){
@@ -289,6 +290,5 @@ riot.tag2('fp-admin-daily', '<header for="admin"></header><main class="admin"><d
       _this.app.query();
     });
     _this.fn.getDailyList();
-    _this.fn.getUnread();
   });
 });

@@ -21,12 +21,16 @@ riot.tag2('fp-admin-setting-place', '<header for="admin"></header><main class="a
       'system-setting/place/create';
       _this.refs.savePlace.refs.validPlace
       .once('valid', function(){
+        var sort = _this.refs.savePlace.refs.place_sort.value;
+        if(!Number(sort) || Number(sort) < 0){
+          return this.emit('msg', '排序必须为正整数');
+        }
         _this.app.api('POST', api, {
           trigger: e.target,
           data: {
             data: JSON.stringify({
               place_name: _this.refs.savePlace.refs.place_name.value,
-              sort: _this.refs.savePlace.refs.place_sort.value
+              sort: Number(sort)
             })
           }
         })
