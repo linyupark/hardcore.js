@@ -4,34 +4,39 @@
   <header for="{role}"></header>
 
   <main class="{role}">
-    <div class="container center" style="min-height: 350px">
-      <form class="account">
-        <h4>帐号设置</h4>
-        <br>
-        <div class="row">
-          <p>
-          <label>帐号名称</label>
-            <input type="text" style="border: none" ref="username" value="{username}" disabled>
-          </p>
-          <hr>
-          <p>
-          <label class="center">密码</label>
-            <input type="password" ref="password" placeholder="长度6-20、不能全为数字">
-            <input-valid ref="validOnSave" for="password" reg="(?!\d+$).\{6,20\}" msg="长度6-20、不能全为数字"/>
-          </p>
-          <hr>
-          <p>
-          <label>确认新密码</label>
-            <input type="password" ref="confirm_password">
-            <input-valid ref="validCFPassword" for="confirm_password" rule="required" msg=""/>
-          </p>
-        </div>
-        <br>
-        <div class="c1 btn-line" style="text-indent: 85px">
-          <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
-          <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
-        </div>
-      </form>
+    <div class="container {center: role=='user'}" style="min-height: 350px">
+      <admin-sidenav if={role=='admin'}></admin-sidenav>
+      <section style="margin-left: {role=='user'?'0':''}">
+        <h2 if={role=='admin'}></h2>
+        <form class="account" style="margin: {role=='admin'?'0':''}">
+          <h4>帐号设置</h4>
+          <br>
+          <div class="row">
+            <p>
+            <label>帐号名称</label>
+              <input type="text" style="border: none" ref="username" value="{username}" disabled>
+            </p>
+            <hr>
+            <p>
+            <label class="center">密码</label>
+              <input type="password" ref="password" placeholder="长度6-20、不能全为数字">
+              <input-valid ref="validOnSave" for="password" reg="(?!\d+$).\{6,20\}" msg="长度6-20、不能全为数字"/>
+            </p>
+            <hr>
+            <p>
+            <label>确认新密码</label>
+              <input type="password" ref="confirm_password">
+              <input-valid ref="validCFPassword" for="confirm_password" rule="required" msg=""/>
+            </p>
+          </div>
+          <br>
+          <div class="c1 btn-line" style="text-indent: 85px">
+            <button type="button" onclick={fn.save} class="btn-yellow">{app.lang.admin.btn.save}</button>
+            <button type="button" onclick={fn.cancel} class="btn-gray">{app.lang.admin.btn.back}</button>
+          </div>
+        </form>
+      </section>
+
     </div>
   </main>
 
