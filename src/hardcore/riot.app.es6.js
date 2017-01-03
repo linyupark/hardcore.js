@@ -80,7 +80,7 @@ export class RiotApp {
         this.on('route::change', params => {
           let
             page = params[0] || cf.indexPage,
-            pageFile = `${cf.staticBase}riot/${cf.id}/${page}.js?v=${cf.version}`,
+            pageFile = `${resp.pages[page]}`,
             tagName = `${cf.id}-${page}`;
           this.route.params = params;
           this.route.path = '';

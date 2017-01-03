@@ -3903,7 +3903,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // 设置路由控制
             _this13.on('route::change', function (params) {
               var page = params[0] || cf.indexPage,
-                  pageFile = cf.staticBase + 'riot/' + cf.id + '/' + page + '.js?v=' + cf.version,
+                  pageFile = '' + resp.pages[page],
                   tagName = cf.id + '-' + page;
               _this13.route.params = params;
               _this13.route.path = '';

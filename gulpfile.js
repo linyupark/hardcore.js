@@ -53,22 +53,40 @@ gulp.task('build:fp', () => {
     let json;
     if(err) throw err;
     json = JSON.parse(data);
-    for(let n of ['pro', 'local']){
+    for(let n of ['pro', 'local', 'pages']){
       if(!json[n]){
         throw 'production files not found in json file:' + name+'.json';
       }
-      json[n].forEach((f, i) => {
-        if(f.split('/')[0] === '.'){
-          f =  f.substring(1);
-        }
-        f = f.replace(/\?v=.+/, '');
-        try{
-          f = f + '?v=' + filemd5.sync('./web/' + f);
-          json[n][i] = f;
-        } catch(e) {
-          console.log('需要再执行一次');
-        }
-      });
+      if(n == 'pages'){
+        var keys = Object.keys(json[n]);
+        keys.forEach(_k => {
+          var _f = json[n][_k];
+          if(_f.split('/')[0] === '.'){
+            _f =  _f.substring(1);
+          }
+          _f = _f.replace(/\?v=.+/, '');
+          try{
+            _f = _f + '?v=' + filemd5.sync('./web/' + _f);
+            json[n][_k] = _f;
+          } catch(e) {
+            console.log('pages md5失败');
+          }
+        });
+      }
+      else{
+        json[n].forEach((f, i) => {
+          if(f.split('/')[0] === '.'){
+            f =  f.substring(1);
+          }
+          f = f.replace(/\?v=.+/, '');
+          try{
+            f = f + '?v=' + filemd5.sync('./web/' + f);
+            json[n][i] = f;
+          } catch(e) {
+            console.log('需要再执行一次');
+          }
+        });
+      }
     }
     fs.writeFileSync(loaderFile, JSON.stringify(json), 'utf8');
   });
