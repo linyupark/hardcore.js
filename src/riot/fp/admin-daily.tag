@@ -172,7 +172,7 @@
             }
             setTimeout(function(){
               _this.update({ pos: {} });
-            }, 101);
+            }, 201);
           });
         }
       });
@@ -352,7 +352,7 @@
           _this.refs.comment.focus();
           setTimeout(function(){
             _this.update({ atX: 0 });
-          }, 101)
+          }, 201);
         });
       }
     },

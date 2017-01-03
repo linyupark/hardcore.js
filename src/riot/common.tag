@@ -305,6 +305,12 @@
     // 请求数据
     _this.refs.agreement_name.on('pull', function(keyword){
 
+      // 暂存原有信息
+      _this._oldValues = {
+        id: _this.refs.agreement_id.value||'',
+        agreement_name: _this.refs.agreement_name.value||''
+      };
+
       _this.refs.validAgreement.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -326,8 +332,12 @@
     });
     // 选择了
     _this.refs.agreement_name.on('select', function(item){
-      _this.refs.agreement_id.value = item.id || '';
-      _this.refs.agreement_name.value = item.agreement_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.agreement_id.value = item.id || _this._oldValues.id;
+      _this.refs.agreement_name.value = item.agreement_name || _this._oldValues.agreement_name;
+      _this.refs.agreement_name.emit('value', _this.refs.agreement_name.value);
     });
   });
   // 检查数据
@@ -374,6 +384,12 @@
     // 请求数据
     _this.refs.user_name.on('pull', function(keyword){
 
+      // 暂存原有信息
+      _this._oldValues = {
+        user_id: _this.refs.user_id.value||'',
+        real_name: _this.refs.user_name.value||''
+      };
+
       _this.refs.validUser.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -395,8 +411,12 @@
     });
     // 选择了
     _this.refs.user_name.on('select', function(item){
-      _this.refs.user_id.value = item.user_id || '';
-      _this.refs.user_name.value = item.real_name || '';
+      if(item.user_id){
+        _this._oldValues = item;
+      }
+      _this.refs.user_id.value = item.user_id || _this._oldValues.user_id;
+      _this.refs.user_name.value = item.real_name || _this._oldValues.real_name;
+      _this.refs.user_name.emit('value', _this.refs.user_name.value);
       _this.emit('select', {
         user_id: _this.refs.user_id.value,
         real_name: _this.refs.user_name.value
@@ -542,6 +562,12 @@
     // 请求数据
     _this.refs.project.on('pull', function(keyword){
 
+      // 暂存原有信息
+      _this._oldValues = {
+        id: _this.refs.project_id.value||'',
+        name: _this.refs.project.value||''
+      };
+
       _this.refs.validProject.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -560,8 +586,12 @@
 
     // 选择了
     _this.refs.project.on('select', function(item){
-      _this.refs.project_id.value = item.id || '';
-      _this.refs.project.value = item.name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.project_id.value = item.id || _this._oldValues.id;
+      _this.refs.project.value = item.name ||_this._oldValues.name;
+      _this.refs.project.emit('value', _this.refs.project.value);
     });
 
   });
@@ -613,6 +643,12 @@
     // 请求数据
     _this.refs.project_type.on('pull', function(keyword){
 
+      // 暂存原有信息
+      _this._oldValues = {
+        name: _this.refs.project_type.value||'',
+        id: _this.refs.project_type_id.value||''
+      };
+
       _this.refs.validProjectType.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -631,8 +667,12 @@
 
     // 选择了
     _this.refs.project_type.on('select', function(item){
-      _this.refs.project_type_id.value = item.id || '';
-      _this.refs.project_type.value = item.name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.project_type_id.value = item.id || _this._oldValues.id;
+      _this.refs.project_type.value = item.name || _this._oldValues.name;
+      _this.refs.project_type.emit('value', _this.refs.project_type.value);
     });
 
   });
@@ -686,6 +726,11 @@
 
     // 请求角色数据
     _this.refs.description.on('pull', function(keyword){
+      // 暂存原有信息
+      _this._oldValues = {
+        name: _this.refs.name.value||'',
+        description: _this.refs.description.value||''
+      };
       _this.refs.validRole.emit('msg', '');
       if(_this.keywordCache[keyword]){
         return _this.refs.description.emit(
@@ -702,8 +747,12 @@
     });
     // 选择了职务
     _this.refs.description.on('select', function(item){
-      _this.refs.name.value = item.name || '';
-      _this.refs.description.value = item.description || '';
+      if(item.name){
+        _this._oldValues = item;
+      }
+      _this.refs.name.value = item.name || _this._oldValues.name;
+      _this.refs.description.value = item.description || _this._oldValues.description;
+      _this.refs.description.emit('value', _this.refs.description.value);
     });
   });
   // 检查数据
@@ -742,10 +791,15 @@
   };
   _this.on('mount', function(){
 
-    _this.refs.place_name.emit('value', opts.place_name);
+    _this.refs.place_name.emit('value', opts.place_name||'');
 
     // 请求职务数据
     _this.refs.place_name.on('pull', function(keyword){
+      // 暂存原有信息
+      _this._oldValues = {
+        id: _this.refs.place_id.value||'',
+        place_name: _this.refs.place_name.value||''
+      };
       _this.refs.validPlace.emit('msg', '');
       if(_this.keywordCache[keyword]){
         return _this.refs.place_name.emit(
@@ -762,8 +816,12 @@
     });
     // 选择了职务
     _this.refs.place_name.on('select', function(item){
-      _this.refs.place_id.value = item.id || '';
-      _this.refs.place_name.value = item.place_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.place_id.value = item.id || _this._oldValues.id;
+      _this.refs.place_name.value = item.place_name || _this._oldValues.place_name;
+      _this.refs.place_name.emit('value', _this.refs.place_name.value);
     });
   });
   // 检查数据
@@ -788,7 +846,7 @@
 
 <!-- 捐赠方下拉选择 -->
 <donor-select>
-  <input-select name="donor_name" ref="donor_name" placeholder="搜索捐赠方" value=""/>
+  <input-select name="donor_name" ref="donor_name" placeholder="搜索捐赠方"/>
   <input type="hidden" ref="donor_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"/>
   <script>
@@ -802,6 +860,12 @@
 
     // 请求捐赠方数据
     _this.refs.donor_name.on('pull', function(keyword){
+
+      // 暂存原有信息
+      _this._oldValues = {
+        id: _this.refs.donor_id.value||'',
+        name: _this.refs.donor_name.value||''
+      };
 
       _this.refs.validDonor.emit('msg', '');
 
@@ -822,8 +886,12 @@
 
     // 选择了捐赠方
     _this.refs.donor_name.on('select', function(item){
-      _this.refs.donor_id.value = item.id || '';
-      _this.refs.donor_name.value = item.donor_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.donor_id.value = item.id||_this._oldValues.id;
+      _this.refs.donor_name.value = item.donor_name|| _this._oldValues.name;
+      _this.refs.donor_name.emit('value', _this.refs.donor_name.value);
     });
   });
 
@@ -841,7 +909,7 @@
   _this.on('set', function(donor){
     _this.refs.donor_id.value = donor.id;
     _this.refs.donor_name.value = donor.name;
-    _this.refs.donor_name.emit('value', donor.name);
+    _this.refs.donor_name.emit('value', donor.name||'');
   })
   </script>
 </donor-select>

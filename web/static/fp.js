@@ -4081,7 +4081,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           } else {
             api.emit('error', {
               code: resp.errno,
-              errmsg: '',
+              errmsg: resp.errmsg,
               url: url
             });
           }

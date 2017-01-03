@@ -53,14 +53,14 @@ riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="
 
         if(Object.keys(_this.selected).length === 0){
           clearTimeout(_this.timer);
-          _this.selected = {};
-          _this.selectIndex = 0;
-          e.target.value = '';
-          delete _this.items;
+          _this.update({
+            selected: {},
+            selectIndex: 0,
+            items: []
+          });
           _this.emit("select", _this.selected);
-          _this.update();
         }
-      }, 100);
+      }, 200);
     },
     pull: function(e){
       e.target.value = '';
@@ -72,7 +72,7 @@ riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="
       _this.selected = e.item.item;
       _this.refs.keyword.value = _this.selected[opts.name];
       _this.selectIndex = 0;
-      delete _this.items;
+      _this.items = [];
       _this.emit("select", _this.selected);
     },
     keyup: function(e){
@@ -123,9 +123,7 @@ riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="
   });
   _this.on('value', function(value){
 
-    _this.update({
-      inputValue: value
-    });
+    _this.refs.keyword.value = value;
   });
   _this.on('disable', function(){
     _this.refs.keyword.disabled = true;

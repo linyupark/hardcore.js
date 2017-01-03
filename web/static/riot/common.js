@@ -227,6 +227,11 @@ riot.tag2('agreement-select', '<input-select name="agreement_name" ref="agreemen
 
     _this.refs.agreement_name.on('pull', function(keyword){
 
+      _this._oldValues = {
+        id: _this.refs.agreement_id.value||'',
+        agreement_name: _this.refs.agreement_name.value||''
+      };
+
       _this.refs.validAgreement.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -248,8 +253,12 @@ riot.tag2('agreement-select', '<input-select name="agreement_name" ref="agreemen
     });
 
     _this.refs.agreement_name.on('select', function(item){
-      _this.refs.agreement_id.value = item.id || '';
-      _this.refs.agreement_name.value = item.agreement_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.agreement_id.value = item.id || _this._oldValues.id;
+      _this.refs.agreement_name.value = item.agreement_name || _this._oldValues.agreement_name;
+      _this.refs.agreement_name.emit('value', _this.refs.agreement_name.value);
     });
   });
 
@@ -290,6 +299,11 @@ riot.tag2('user-select', '<input-select name="real_name" ref="user_name" placeho
 
     _this.refs.user_name.on('pull', function(keyword){
 
+      _this._oldValues = {
+        user_id: _this.refs.user_id.value||'',
+        real_name: _this.refs.user_name.value||''
+      };
+
       _this.refs.validUser.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -311,8 +325,12 @@ riot.tag2('user-select', '<input-select name="real_name" ref="user_name" placeho
     });
 
     _this.refs.user_name.on('select', function(item){
-      _this.refs.user_id.value = item.user_id || '';
-      _this.refs.user_name.value = item.real_name || '';
+      if(item.user_id){
+        _this._oldValues = item;
+      }
+      _this.refs.user_id.value = item.user_id || _this._oldValues.user_id;
+      _this.refs.user_name.value = item.real_name || _this._oldValues.real_name;
+      _this.refs.user_name.emit('value', _this.refs.user_name.value);
       _this.emit('select', {
         user_id: _this.refs.user_id.value,
         real_name: _this.refs.user_name.value
@@ -431,6 +449,11 @@ riot.tag2('project-select', '<input-select name="name" ref="project" placeholder
 
     _this.refs.project.on('pull', function(keyword){
 
+      _this._oldValues = {
+        id: _this.refs.project_id.value||'',
+        name: _this.refs.project.value||''
+      };
+
       _this.refs.validProject.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -448,8 +471,12 @@ riot.tag2('project-select', '<input-select name="name" ref="project" placeholder
     });
 
     _this.refs.project.on('select', function(item){
-      _this.refs.project_id.value = item.id || '';
-      _this.refs.project.value = item.name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.project_id.value = item.id || _this._oldValues.id;
+      _this.refs.project.value = item.name ||_this._oldValues.name;
+      _this.refs.project.emit('value', _this.refs.project.value);
     });
 
   });
@@ -493,6 +520,11 @@ riot.tag2('project-type-select', '<input-select name="name" ref="project_type" p
 
     _this.refs.project_type.on('pull', function(keyword){
 
+      _this._oldValues = {
+        name: _this.refs.project_type.value||'',
+        id: _this.refs.project_type_id.value||''
+      };
+
       _this.refs.validProjectType.emit('msg', '');
 
       if(_this.keywordCache[keyword]){
@@ -510,8 +542,12 @@ riot.tag2('project-type-select', '<input-select name="name" ref="project_type" p
     });
 
     _this.refs.project_type.on('select', function(item){
-      _this.refs.project_type_id.value = item.id || '';
-      _this.refs.project_type.value = item.name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.project_type_id.value = item.id || _this._oldValues.id;
+      _this.refs.project_type.value = item.name || _this._oldValues.name;
+      _this.refs.project_type.emit('value', _this.refs.project_type.value);
     });
 
   });
@@ -557,6 +593,11 @@ riot.tag2('role-select', '<input-select name="description" ref="description" pla
   _this.on('mount', function(){
 
     _this.refs.description.on('pull', function(keyword){
+
+      _this._oldValues = {
+        name: _this.refs.name.value||'',
+        description: _this.refs.description.value||''
+      };
       _this.refs.validRole.emit('msg', '');
       if(_this.keywordCache[keyword]){
         return _this.refs.description.emit(
@@ -573,8 +614,12 @@ riot.tag2('role-select', '<input-select name="description" ref="description" pla
     });
 
     _this.refs.description.on('select', function(item){
-      _this.refs.name.value = item.name || '';
-      _this.refs.description.value = item.description || '';
+      if(item.name){
+        _this._oldValues = item;
+      }
+      _this.refs.name.value = item.name || _this._oldValues.name;
+      _this.refs.description.value = item.description || _this._oldValues.description;
+      _this.refs.description.emit('value', _this.refs.description.value);
     });
   });
 
@@ -608,9 +653,14 @@ riot.tag2('place-select', '<input-select name="place_name" ref="place_name" plac
   };
   _this.on('mount', function(){
 
-    _this.refs.place_name.emit('value', opts.place_name);
+    _this.refs.place_name.emit('value', opts.place_name||'');
 
     _this.refs.place_name.on('pull', function(keyword){
+
+      _this._oldValues = {
+        id: _this.refs.place_id.value||'',
+        place_name: _this.refs.place_name.value||''
+      };
       _this.refs.validPlace.emit('msg', '');
       if(_this.keywordCache[keyword]){
         return _this.refs.place_name.emit(
@@ -627,8 +677,12 @@ riot.tag2('place-select', '<input-select name="place_name" ref="place_name" plac
     });
 
     _this.refs.place_name.on('select', function(item){
-      _this.refs.place_id.value = item.id || '';
-      _this.refs.place_name.value = item.place_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.place_id.value = item.id || _this._oldValues.id;
+      _this.refs.place_name.value = item.place_name || _this._oldValues.place_name;
+      _this.refs.place_name.emit('value', _this.refs.place_name.value);
     });
   });
 
@@ -651,7 +705,7 @@ riot.tag2('place-select', '<input-select name="place_name" ref="place_name" plac
 
 
 
-riot.tag2('donor-select', '<input-select name="donor_name" ref="donor_name" placeholder="搜索捐赠方" value=""></input-select><input type="hidden" ref="donor_id" value=""><input-valid riot-style="{opts.left&&\'left:\'+opts.left+\'px\'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"></input-valid>', '', '', function(opts) {
+riot.tag2('donor-select', '<input-select name="donor_name" ref="donor_name" placeholder="搜索捐赠方"></input-select><input type="hidden" ref="donor_id" value=""><input-valid riot-style="{opts.left&&\'left:\'+opts.left+\'px\'}" ref="validDonor" for="donor_id" rule="required" msg="请选择捐赠方"></input-valid>', '', '', function(opts) {
   var _this = this;
   _this.keywordCache = {};
 
@@ -661,6 +715,11 @@ riot.tag2('donor-select', '<input-select name="donor_name" ref="donor_name" plac
   _this.on('mount', function(){
 
     _this.refs.donor_name.on('pull', function(keyword){
+
+      _this._oldValues = {
+        id: _this.refs.donor_id.value||'',
+        name: _this.refs.donor_name.value||''
+      };
 
       _this.refs.validDonor.emit('msg', '');
 
@@ -680,8 +739,12 @@ riot.tag2('donor-select', '<input-select name="donor_name" ref="donor_name" plac
     });
 
     _this.refs.donor_name.on('select', function(item){
-      _this.refs.donor_id.value = item.id || '';
-      _this.refs.donor_name.value = item.donor_name || '';
+      if(item.id){
+        _this._oldValues = item;
+      }
+      _this.refs.donor_id.value = item.id||_this._oldValues.id;
+      _this.refs.donor_name.value = item.donor_name|| _this._oldValues.name;
+      _this.refs.donor_name.emit('value', _this.refs.donor_name.value);
     });
   });
 
@@ -698,7 +761,7 @@ riot.tag2('donor-select', '<input-select name="donor_name" ref="donor_name" plac
   _this.on('set', function(donor){
     _this.refs.donor_id.value = donor.id;
     _this.refs.donor_name.value = donor.name;
-    _this.refs.donor_name.emit('value', donor.name);
+    _this.refs.donor_name.emit('value', donor.name||'');
   })
 });
 

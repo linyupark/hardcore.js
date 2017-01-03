@@ -148,37 +148,44 @@
     save: function(e){
       _this.app.validAll(_this.refs.validOnSave)
       .then(function(){
-        var api;
+        var api,
+        promise = _this.app.Promise.resolve(true);
         if(_this.form_id > 0){
           api = 'donor/default/update?id=' + _this.form_id;
         }
         else{
           api = 'donor/default/create';
         }
-        _this.app.api('POST', api, {
-          trigger: e.target,
-          data: {
-            data: JSON.stringify({
-              donor_name: _this.refs.donor_name.value,
-              type: _this.refs.donor_type.value,
-              company: _this.refs.company.value,
-              address: _this.refs.address.value,
-              tel: _this.refs.tel.value,
-              email: _this.refs.email.value,
-              website: _this.refs.website.value,
-              weibo: _this.refs.weibo.value,
-              head: _this.refs.head.value,
-              head_tel: _this.refs.head_tel.value,
-              contact: _this.refs.contact.value,
-              contact_tel: _this.refs.contact_tel.value,
-              donor_member: _this.form.donor_member
-            })
-          }
-        })
-        .on('done', function(data){
-          _this.app.alert('捐赠方信息保存成功', 'success');
-          // 跳转到列表
-          !_this.form_id && _this.app.route('admin-donor');
+        if(_this.refs.member_username.value){
+          // 有成员信息则需要校验
+          promise = _this.fn.addMember();
+        }
+        promise.then(function(){
+          _this.app.api('POST', api, {
+            trigger: e.target,
+            data: {
+              data: JSON.stringify({
+                donor_name: _this.refs.donor_name.value,
+                type: _this.refs.donor_type.value,
+                company: _this.refs.company.value,
+                address: _this.refs.address.value,
+                tel: _this.refs.tel.value,
+                email: _this.refs.email.value,
+                website: _this.refs.website.value,
+                weibo: _this.refs.weibo.value,
+                head: _this.refs.head.value,
+                head_tel: _this.refs.head_tel.value,
+                contact: _this.refs.contact.value,
+                contact_tel: _this.refs.contact_tel.value,
+                donor_member: _this.form.donor_member
+              })
+            }
+          })
+          .on('done', function(data){
+            _this.app.alert('捐赠方信息保存成功', 'success');
+            // 跳转到列表
+            !_this.form_id && _this.app.route('admin-donor');
+          });
         });
       })
       .catch(function(){
@@ -197,26 +204,31 @@
     },
     // 增加成员
     addMember: function(){
-      // 检查信息
-      _this.app.validAll(
-        _this.refs.validOnAddMember.concat(_this.refs.member_place)
-      )
-      .then(function(){
-        _this.form.donor_member.push({
-          username: _this.refs.member_username.value,
-          place_id: _this.refs.member_place.getId(),
-          place_name: _this.refs.member_place.getName(),
-          tel: _this.refs.member_tel.value,
-          email: _this.refs.member_email.value
+      return new _this.app.Promise(function(resolve, reject){
+        // 检查信息
+        _this.app.validAll(
+          _this.refs.validOnAddMember.concat(_this.refs.member_place)
+        )
+        .then(function(){
+          _this.form.donor_member.push({
+            username: _this.refs.member_username.value,
+            place_id: _this.refs.member_place.getId(),
+            place_name: _this.refs.member_place.getName(),
+            tel: _this.refs.member_tel.value,
+            email: _this.refs.member_email.value
+          });
+          _this.refs.member_place.emit('set', {
+            id: '', name: ''
+          });
+          _this.refs.member_username.value =
+          _this.refs.member_tel.value =
+          _this.refs.member_email.value = '';
+          _this.update();
+          resolve();
+        }).catch(function(){
+          reject();
         });
-        _this.refs.member_place.emit('set', {
-          id: '', name: ''
-        });
-        _this.refs.member_username.value =
-        _this.refs.member_tel.value =
-        _this.refs.member_email.value = '';
-        _this.update();
-      }).catch(function(){});
+      });
     },
     // 获取捐赠方信息
     getDonor: function(id){

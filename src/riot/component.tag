@@ -91,14 +91,14 @@
         // 失去焦点时候如果输入框内的数据不是下拉框中的，则清空数据
         if(Object.keys(_this.selected).length === 0){
           clearTimeout(_this.timer);
-          _this.selected = {};
-          _this.selectIndex = 0;
-          e.target.value = '';
-          delete _this.items;
+          _this.update({
+            selected: {},
+            selectIndex: 0,
+            items: []
+          });
           _this.emit("select", _this.selected);
-          _this.update();
         }
-      }, 100);
+      }, 200);
     },
     pull: function(e){
       e.target.value = '';
@@ -110,7 +110,7 @@
       _this.selected = e.item.item;
       _this.refs.keyword.value = _this.selected[opts.name];
       _this.selectIndex = 0;
-      delete _this.items;
+      _this.items = [];
       _this.emit("select", _this.selected);
     },
     keyup: function(e){
@@ -161,9 +161,7 @@
   });
   _this.on('value', function(value){
     // 更新value显示数据
-    _this.update({
-      inputValue: value
-    });
+    _this.refs.keyword.value = value;
   });
   _this.on('disable', function(){
     _this.refs.keyword.disabled = true;

@@ -192,7 +192,8 @@
         _this.refs.validOnSave.concat(_this.refs.donor)
       ).then(function(){
         // 检测通过, 整理数据
-        var api, alumni_donations, project_type = [];
+        var api, alumni_donations, project_type = [],
+        promise = _this.app.Promise.resolve(true);
         if(_this.refs.alumni_donations[0].checked){
           alumni_donations = 1
         }
@@ -210,30 +211,35 @@
         else{
           api = 'agreement/default/create';
         }
-        _this.app.api('POST', api, {
-          trigger: e.target,
-          data: {
-            data: JSON.stringify({
-              agreement_number: _this.refs.agreement_number.value,
-              agreement_name: _this.refs.agreement_name.value,
-              donor_id: _this.refs.donor.getId(),
-              deadline: parseInt(_this.refs.deadline.value, 10),
-              contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
-              due_date: _this.app.utils.str2time(_this.refs.due_date.value),
-              award_condition: _this.refs.award_condition.value,
-              donor_nature: _this.refs.donor_nature.value,
-              alumni_donations: alumni_donations,
-              sources_funding: _this.refs.sources_funding.value,
-              remark: _this.refs.remark.value,
-              file: _this.form.file || [],
-              price: _this.form.price || [],
-              project_type: project_type
-            })
-          }
-        }).on('done', function(){
-          _this.app.alert('协议保存成功', 'success');
-          // 跳转到列表
-          !_this.form.id && _this.app.route('admin-agreement');
+        if(_this.refs.addPriceNumber.value){
+          promise = _this.fn.addPrice();
+        }
+        promise.then(function(){
+          _this.app.api('POST', api, {
+            trigger: e.target,
+            data: {
+              data: JSON.stringify({
+                agreement_number: _this.refs.agreement_number.value,
+                agreement_name: _this.refs.agreement_name.value,
+                donor_id: _this.refs.donor.getId(),
+                deadline: parseInt(_this.refs.deadline.value, 10),
+                contract_date: _this.app.utils.str2time(_this.refs.contract_date.value),
+                due_date: _this.app.utils.str2time(_this.refs.due_date.value),
+                award_condition: _this.refs.award_condition.value,
+                donor_nature: _this.refs.donor_nature.value,
+                alumni_donations: alumni_donations,
+                sources_funding: _this.refs.sources_funding.value,
+                remark: _this.refs.remark.value,
+                file: _this.form.file || [],
+                price: _this.form.price || [],
+                project_type: project_type
+              })
+            }
+          }).on('done', function(){
+            _this.app.alert('协议保存成功', 'success');
+            // 跳转到列表
+            !_this.form.id && _this.app.route('admin-agreement');
+          });
         });
       }).catch(function(){
         // 失败alert
@@ -259,16 +265,19 @@
       _this.form.price.splice(_this.form.price.indexOf(e.item.p), 1);
     },
     addPrice: function(e){
-      _this.refs.validPrice
-      .once('valid', function(){
-        _this.form.price.push({
-          currency_sign: _this.refs.addPriceType.value,
-          amount: Number(_this.refs.addPriceNumber.value)
-        });
-        _this.refs.addPriceNumber.value = '';
-        _this.refs.addPriceType.value = 'CNY';
-        _this.update();
-      }).emit('check');
+      return new _this.app.Promise(function(resolve){
+        _this.refs.validPrice
+        .once('valid', function(){
+          _this.form.price.push({
+            currency_sign: _this.refs.addPriceType.value,
+            amount: Number(_this.refs.addPriceNumber.value)
+          });
+          _this.refs.addPriceNumber.value = '';
+          _this.refs.addPriceType.value = 'CNY';
+          _this.update();
+          resolve();
+        }).emit('check');
+      });
     },
     currencyCode: function(){
       // 货币种类

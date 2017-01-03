@@ -53,7 +53,7 @@ class FP extends RiotApp {
       else{
         api.emit('error', {
           code: resp.errno,
-          errmsg: '',
+          errmsg: resp.errmsg,
           url: url
         });
       }
