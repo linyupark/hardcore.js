@@ -286,9 +286,7 @@
               </ul>
             </div>
           </div>
-
         </form>
-
         <pagination-number page={page} pages={pages} select="y"/>
 
       </section>
