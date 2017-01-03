@@ -50,6 +50,13 @@ class FP extends RiotApp {
         // this.log('api done');
         api.emit('done', resp.data || {});
       }
+      else{
+        api.emit('error', {
+          code: resp.errno,
+          errmsg: '',
+          url: url
+        });
+      }
     }).progress(p => {
       api.emit('progress', p);
     }).fail(status => {

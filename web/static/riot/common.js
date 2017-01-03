@@ -107,6 +107,7 @@ riot.tag2('tinymce-editor', '<textarea></textarea>', 'tinymce-editor [aria-label
     eda.setContent(content);
     eda.selection.select(eda.getBody(), true);
     eda.selection.collapse(false);
+    eda.focus();
   });
   _this.on('insertContent', function(content){
     tinymce.activeEditor.insertContent(content);

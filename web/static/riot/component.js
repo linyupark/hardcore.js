@@ -40,7 +40,7 @@ riot.tag2('alert', '<p each="{m in message}" class="{center: message.length==1}"
 });
 
 
-riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="text" riot-value="{inputValue}" placeholder="{opts.placeholder}" onclick="{fn.pull}" onkeyup="{fn.keyup}" onblur="{fn.blur}"><ul ref="list" if="{items&&items.length > 0}"><li each="{item, i in items}" class="{active: i==selectIndex-1}" onclick="{fn.select}"> {item[parent.opts.name]} </li></ul></div>', 'input-select .input-select,[data-is="input-select"] .input-select{ display: inline-block; position: relative; } input-select .input-select ul,[data-is="input-select"] .input-select ul{ padding: 0; position: absolute; list-style: none; }', '', function(opts) {
+riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="text" riot-value="{inputValue}" placeholder="{opts.placeholder}" onclick="{fn.pull}" onkeyup="{fn.keyup}" onblur="{fn.blur}"><ul ref="list" show="{items&&items.length > 0}"><li each="{item, i in items}" class="{active: i==selectIndex-1}" onclick="{fn.select}"> {item[parent.opts.name]} </li></ul></div>', 'input-select .input-select,[data-is="input-select"] .input-select{ display: inline-block; position: relative; } input-select .input-select ul,[data-is="input-select"] .input-select ul{ padding: 0; position: absolute; list-style: none; }', '', function(opts) {
   var _this = this;
   _this.selected = {};
   _this.selectIndex = 0;
@@ -60,7 +60,7 @@ riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="
           _this.emit("select", _this.selected);
           _this.update();
         }
-      }, 200);
+      }, 100);
     },
     pull: function(e){
       e.target.value = '';

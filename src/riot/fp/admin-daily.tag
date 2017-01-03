@@ -167,8 +167,12 @@
           .emit('focus')
           .once('select', function(user){
             _this.refs.edit.emit('setContent', content);
-            _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>&nbsp;');
-            _this.update({ pos: {} });
+            if(user.real_name){
+              _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>，');
+            }
+            setTimeout(function(){
+              _this.update({ pos: {} });
+            }, 101);
           });
         }
       });
@@ -260,7 +264,7 @@
               <div class="comment">
                 <input ref="comment" type="text" placeholder="评论 {msg.user_name}: {msg.content}" onkeyup="{fn.cmtKeyup}" maxlength="100">
                 <!-- 复制内容获取坐标前的内容 -->
-                <user-select if={parent.atX} for="admin" style="position: absolute; left: {parent.atX}px; top: 20px;" ref="atuser"/>
+                <user-select if={parent.atX} for="admin" style="position: absolute; left: {parent.atX}px; top: 20px" ref="atuser"/>
                 <span class="count-px" ref="cloneTxt">{parent.cloneTxt}</span>
                 <input-valid ref="validComment" for="comment" rule="required" msg=""/>
                 <button type="button" onclick="{fn.send}">发送</button>
@@ -329,19 +333,28 @@
     cmtKeyup: function(e){
       _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);
       if(e.shiftKey && e.keyCode == 50){
-        _this.atX = (_this.refs.cloneTxt.clientWidth >
-        _this.refs.comment.clientWidth ? _this.refs.comment.clientWidth : _this.refs.cloneTxt.clientWidth)+22;
+        _this.atX = _this.refs.cloneTxt.clientWidth >=
+        _this.refs.comment.clientWidth ?  _this.refs.comment.clientWidth : (_this.refs.cloneTxt.clientWidth+23);
         _this.update();
         _this.refs.atuser
         .emit('focus')
         .once('select', function(user){
-          _this.refs.comment.value =
-          _this.refs.comment.value.replace(
-            _this.cloneTxt,
-            _this.cloneTxt+user.real_name+' '
-          );
+          if(!user.real_name){
+            _this.refs.comment.value =
+            e.target.value.slice(0, -1);
+          }
+          else{
+            _this.refs.comment.value =
+            _this.refs.comment.value.replace(
+              _this.cloneTxt,
+              _this.cloneTxt+user.real_name+'，'
+            );
+          }
+          _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);
           _this.refs.comment.focus();
-          _this.update({ atX: 0 });
+          setTimeout(function(){
+            _this.update({ atX: 0 });
+          }, 101)
         });
       }
     },

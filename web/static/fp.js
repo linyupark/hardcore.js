@@ -4078,6 +4078,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           if (resp.errno == 0) {
             // this.log('api done');
             api.emit('done', resp.data || {});
+          } else {
+            api.emit('error', {
+              code: resp.errno,
+              errmsg: '',
+              url: url
+            });
           }
         }).progress(function (p) {
           api.emit('progress', p);

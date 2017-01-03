@@ -1116,8 +1116,7 @@ form.user-daily table-filter {
 
 .daily-box {
   border-bottom: 1px solid #ebebeb;
-  overflow: hidden;
-  padding-bottom: 20px; }
+  padding-bottom: 40px; }
 
 @-webkit-keyframes fadeIn {
   from {
@@ -1175,7 +1174,8 @@ form.user-daily table-filter {
       visibility: hidden; }
     .daily-box .comment input[type=text] {
       width: 85%;
-      height: 30px; }
+      height: 30px;
+      font-family: "Arial", "SimHei", "STHeiti"; }
     .daily-box .comment button {
       cursor: pointer;
       background: #FEAD50;
