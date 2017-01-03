@@ -4095,7 +4095,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           }
           // 401要求重新登录
           if (status == 401) {
-            window.location.replace('' + _this15.config.routeBase + _this15.config.loginPage + '?ref=' + location.href);
+            window.location.replace('' + _this15.config.routeBase + _this15.config.loginPage);
             // 删除cookie
             _this15.utils.cookie.remove('user_name');
             _this15.utils.cookie.remove('user_id');

@@ -67,7 +67,7 @@ class FP extends RiotApp {
       }
       // 401要求重新登录
       if(status == 401){
-        window.location.replace(`${this.config.routeBase}${this.config.loginPage}?ref=${location.href}`);
+        window.location.replace(`${this.config.routeBase}${this.config.loginPage}`);
         // 删除cookie
         this.utils.cookie.remove('user_name');
         this.utils.cookie.remove('user_id');
