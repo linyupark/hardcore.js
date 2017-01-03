@@ -9,7 +9,7 @@
           <p>
             <label style="text-align: center;">帐号</label>
             <input type="text" ref="username" value="{user.username}" placeholder="数字或字母，长度6-50">
-            <input-valid ref="validOnSave" for="username" reg="[\d|\w]\{6,50\}" msg="数字或字母，长度6-50"/>
+            <input-valid ref="validOnSave" for="username" reg="[\d|\w|\_]\{6,50\}" msg="数字或字母或下划线，长度6-50"/>
           </p>
         </div>
         <div class="row">
