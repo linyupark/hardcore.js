@@ -151,14 +151,15 @@
         _this.fn.getDaily();
       }
       _this.refs.edit.on('keyup', function(e, data){
+        var content = _this.refs.edit.getContent();
         if(e.keyCode == 8){
           // 删除的时候
           if(data.edit.selection.getNode().getAttribute('class') === 'atuser'){
             data.edit.selection.select(data.edit.selection.getNode());
           }
         }
-        if(e.shiftKey && e.keyCode == 50){
-          var content = _this.refs.edit.getContent().slice(0, -1);
+        if(content.slice(-1) == '@'){
+          content = content.slice(0, -1);
           // @弹出用户下拉
           _this.update({
             pos: data.pos
@@ -330,9 +331,9 @@
     },
     cmtKeyup: function(e){
       _this.cloneTxt = e.target.value.slice(0, e.target.selectionEnd);
-      if(e.shiftKey && e.keyCode == 50){
+      if(_this.cloneTxt.slice(-1) == '@'){
         _this.atX = _this.refs.cloneTxt.clientWidth >=
-        _this.refs.comment.clientWidth ?  _this.refs.comment.clientWidth : (_this.refs.cloneTxt.clientWidth+23);
+        _this.refs.comment.clientWidth ?  _this.refs.comment.clientWidth : (_this.refs.cloneTxt.clientWidth+22);
         _this.update();
         _this.refs.atuser
         .emit('focus')
