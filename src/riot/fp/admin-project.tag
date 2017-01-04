@@ -103,7 +103,8 @@
           </p>
           <p>
             <label>项目状态:</label>
-            <span class="txt-success">{app.getProjectStatus(project['base-info'].status)}</span>
+            <span class="txt-success">
+            {['已结束','执行中'][project['base-info'].status]}</span>
           </p>
         </div>
         <div class="row">
@@ -805,13 +806,7 @@
             <p>
               <label>{app.lang.admin.project.status}</label>
               <select ref="status">
-                <option each={[{
-                  "name": "已结束",
-                  "key": 0
-                }, {
-                  "name": "执行中",
-                  "key": 1
-                }]} selected="{project.baseinfo.status==key}" value={key}>{name}</option>
+                <option each="{statusList}"  selected="{project.baseinfo.status==key}" value="{key}">{name}</option>
               </select>
             </p>
           </div>
@@ -903,6 +898,13 @@
       is_public: 1
     }
   };
+  _this.statusList = [{
+    "name": "已结束",
+    "key": 0
+  }, {
+    "name": "执行中",
+    "key": 1
+  }];
   _this.fn = {
     save: function(e){
       // 修改添加基础信息
@@ -1045,7 +1047,7 @@
               <td class="left">{name}</td>
               <td>{app.getProjectType(project_types_id)}</td>
               <td>{amount}</td>
-              <td>{app.getProjectStatus(status)}</td>
+              <td>{['已结束','执行中'][status]}</td>
               <td>{created_at&&app.utils.time2str(created_at)||'-'}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">

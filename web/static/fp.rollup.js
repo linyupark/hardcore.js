@@ -3971,14 +3971,14 @@ class FP extends RiotApp {
   }
 
   // 项目状态
-  getProjectStatus(status) {
-    let name;
-    this.lang.admin.project['filter:status']
-    .forEach((item) => {
-      if(item.key == status) name = item.name;
-    });
-    return name || '';
-  }
+  // getProjectStatus(status) {
+  //   let name;
+  //   this.lang.admin.project['filter:status']
+  //   .forEach((item) => {
+  //     if(item.key == status) name = item.name;
+  //   });
+  //   return name || '';
+  // }
 
   // 校验同名input-valid全部通过
   validAll(validList) {

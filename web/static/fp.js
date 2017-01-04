@@ -4199,16 +4199,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
 
       // 项目状态
-
-    }, {
-      key: 'getProjectStatus',
-      value: function getProjectStatus(status) {
-        var name = void 0;
-        this.lang.admin.project['filter:status'].forEach(function (item) {
-          if (item.key == status) name = item.name;
-        });
-        return name || '';
-      }
+      // getProjectStatus(status) {
+      //   let name;
+      //   this.lang.admin.project['filter:status']
+      //   .forEach((item) => {
+      //     if(item.key == status) name = item.name;
+      //   });
+      //   return name || '';
+      // }
 
       // 校验同名input-valid全部通过
 
