@@ -661,7 +661,7 @@
       <thead>
         <tr>
           <th width="10%">{app.lang.admin.agreement.id}</th>
-          <th width="15%">{app.lang.admin.project.number}</th>
+          <th width="15%">{app.lang.admin.agreement.number}</th>
           <th width="50%">{app.lang.admin.agreement.name}</th>
           <th width="15%">关联日期</th>
           <th width="10%">{app.lang.admin.handle}</th>
