@@ -51,6 +51,7 @@
                   <label>{label}:</label>
                   {amount}
                 </span>
+                <span if="{mounted && !summary.sign_current_year_price.length}">无</span>
               </p>
             </div>
           </div>
