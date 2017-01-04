@@ -32,7 +32,7 @@
             <role-select ref="role"/>
           </p>
           <p>
-            <label>捐赠方</label>
+            <label>所属捐赠方</label>
             <donor-select ref="donor"/>
           </p>
         </div>
