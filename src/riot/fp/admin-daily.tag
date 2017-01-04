@@ -165,9 +165,13 @@
           _this.refs.user
           .emit('focus')
           .once('select', function(user){
-            _this.refs.edit.emit('undo');
             if(user.real_name){
-              _this.refs.edit.emit('insertContent', '<span class="atuser">@'+user.real_name+'</span>，');
+              var endId = data.edit.dom.uniqueId();
+              _this.refs.edit.emit('insertContent', user.real_name+'，<span id="'+endId+'">&nbsp;</span>');
+              var content = data.edit.getContent();
+              content = content.replace('@'+user.real_name+'，', '<span class="atuser">@'+user.real_name+'</span>，');
+              _this.refs.edit.emit('setContent', content);
+              data.edit.selection.select(data.edit.dom.select('span#' + endId)[0]);
             }
             setTimeout(function(){
               _this.update({ pos: {} });
@@ -443,7 +447,8 @@
       var api = 'daily-manager/default/'+_this.q.range;
       _this.app.api('GET', api, {
         data: {
-          page: _this.q.page || 1
+          page: _this.q.page || 1,
+          keyword: _this.q.keyword
         }
       }).on('done', function(data){
         _this.dailyList = data.items;
