@@ -70,7 +70,7 @@
       placeholder="{opts.placeholder}"
       onclick={fn.pull}
       onkeyup={fn.keyup}
-      onblur={fn.blur}>
+      onblur={fn.blur} autocomplete="off">
     <ul ref="list" show={items&&items.length > 0}>
       <li each={item, i in items} class="{active: i==selectIndex-1}" onclick={fn.select}>
         {item[parent.opts.name]}

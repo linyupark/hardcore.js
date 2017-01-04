@@ -1046,7 +1046,7 @@
               <td>{app.getProjectType(project_types_id)}</td>
               <td>{amount}</td>
               <td>{app.getProjectStatus(status)}</td>
-              <td>{createAt&&app.utils.time2str(createAt)||'-'}</td>
+              <td>{created_at&&app.utils.time2str(created_at)||'-'}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
                   <i onclick={fn.edit}  class="btn-icon icon-pencil"></i>
