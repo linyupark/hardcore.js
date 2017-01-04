@@ -38,7 +38,7 @@
         </div>
         <div class="row c4">
           <p style="width: 100%">
-            <label>组织结构</label>
+            <label>组织机构</label>
             <org-select ref="organization"/>
           </p>
         </div>

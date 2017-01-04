@@ -492,7 +492,7 @@
       var parentId = id || 0;
       var level = lv || 0;
       var list = [{
-        lv: level, id: -1, name: '--选择结构--'
+        lv: level, id: -1, name: '--选择机构--'
       }];
       var orgList = data || _this.orgList;
       orgList.forEach(function(org, i){
