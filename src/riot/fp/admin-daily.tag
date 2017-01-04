@@ -299,7 +299,7 @@
   <footer class="admin"></footer>
 
   <!-- 删除记录弹窗 -->
-  <modal-remove/>
+  <modal-confirm type="delete"/>
 
   <script>
   var _this = this;
@@ -318,7 +318,7 @@
   _this.fn = {
     // 删除日志
     remove: function(e, name){
-      _this.tags['modal-remove']
+      _this.tags['modal-confirm']
       .emit('open').once('ok', function(){
         _this.app.api('GET', 'daily-manager/default/delete', {
           data: { id: e.item.id||e.item.data.id }

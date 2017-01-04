@@ -154,14 +154,16 @@
       items[0].id = -1;
     }
     // 如果有重名的带上opts.id里的值
-    items.forEach(function(item, i){
-      var name = item[opts.name];
-      items.forEach(function(itemCheck, j){
-        if(itemCheck[opts.name] == name){
-          items[i][opts.name] = name+'(id:'+items[i][opts.id]+')';
-        }
+    if(opts.id){
+      items.forEach(function(item, i){
+        var name = item[opts.name];
+        items.forEach(function(itemCheck, j){
+          if(itemCheck[opts.name] == name && i!=j){
+            items[i][opts.name] = name+'(id:'+items[i][opts.id]+')';
+          }
+        });
       });
-    });
+    }
     // 查询到数据渲染到下拉表中
     _this.update({
       items: items,

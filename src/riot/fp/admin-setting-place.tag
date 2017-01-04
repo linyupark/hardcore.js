@@ -63,7 +63,7 @@
   <footer class="admin"></footer>
 
   <!-- 删除记录弹窗 -->
-  <modal-remove/>
+  <modal-confirm type="delete"/>
 
   <!-- 添加修改组织机构 -->
   <modal ref="savePlace" w="400" h="260">
@@ -97,7 +97,7 @@
   _this.place = {};
   _this.fn = {
     remove: function(e){
-      _this.tags['modal-remove']
+      _this.tags['modal-confirm']
       .once('ok', function(){
         _this.app.api('GET', 'system-setting/place/delete', {
           data: { id: e.item.id }

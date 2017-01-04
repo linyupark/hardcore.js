@@ -193,7 +193,7 @@ riot.tag2('modal-agreement', '<modal ref="modal" w="640" h="520" top="15%"><yiel
 
 
 
-riot.tag2('modal-remove', '<modal><yield to="title">{app.lang.admin.confirm.tips}</yield><yield to="content">{app.lang.admin.confirm.delete}</yield><yield to="button"><button type="button" onclick="{parent.fn.ok}" class="btn-main">{app.lang.admin.btn.ok}</button></yield><yield to="close">{app.lang.admin.btn.cancel}</yield></modal>', '', '', function(opts) {
+riot.tag2('modal-confirm', '<modal><yield to="title">{app.lang.admin.confirm.tips}</yield><yield to="content">{app.lang.admin.confirm[parent.opts.type]}</yield><yield to="button"><button type="button" onclick="{parent.fn.ok}" class="btn-main">{app.lang.admin.btn.ok}</button></yield><yield to="close">{app.lang.admin.btn.cancel}</yield></modal>', '', '', function(opts) {
   var _this = this;
   _this.fn = {
     ok: function(){

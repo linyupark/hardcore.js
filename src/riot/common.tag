@@ -256,10 +256,10 @@
 
 
 <!-- 确认删除框 -->
-<modal-remove>
+<modal-confirm>
   <modal>
     <yield to="title">{app.lang.admin.confirm.tips}</yield>
-    <yield to="content">{app.lang.admin.confirm.delete}</yield>
+    <yield to="content">{app.lang.admin.confirm[parent.opts.type]}</yield>
     <yield to="button">
       <button type="button" onclick="{parent.fn.ok}"  class="btn-main">{app.lang.admin.btn.ok}</button>
     </yield>
@@ -280,7 +280,7 @@
     _this.tags.modal.emit('close');
   });
   </script>
-</modal-remove>
+</modal-confirm>
 
 
 <!-- 协议搜索 -->

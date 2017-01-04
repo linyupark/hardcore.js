@@ -309,6 +309,8 @@
     需要先创建项目后才能编辑此页
     <a href="#!{app.route.path}?tab=baseinfo">返回创建</a>
   </div>
+  <!-- 支付确认提示 -->
+  <modal-confirm ref="cf_payment" type="payment"/>
 
   <script>
   var _this = this;
@@ -358,12 +360,15 @@
     },
     // 确认到账
     CFPayment: function(e){
-      _this.app.api('POST', 'project/perform/payment?id='+opts.pid, {
-        trigger: e.target
-      })
-      .on('done', function(data){
-        _this.fn.getPerform(function(){
-          _this.app.alert('确认到账成功', 'success');
+      _this.refs.cf_payment
+      .emit('open').once('ok', function(){
+        _this.app.api('POST', 'project/perform/payment?id='+opts.pid, {
+          trigger: e.target
+        })
+        .on('done', function(data){
+          _this.fn.getPerform(function(){
+            _this.app.alert('确认到账成功', 'success');
+          });
         });
       });
     },
@@ -465,7 +470,7 @@
         <div class="row">
           <p>
             <label>记录人:</label>
-            <input type="text" value="{app.data.user_name}">
+            <input type="text" value="{app.data.user_name}" disabled>
           </p>
         </div>
       </div>
@@ -511,7 +516,7 @@
           <p>
             <label>记录人:</label>
             <span if="{!payment.editMode}">{payment.operator_name}</span>
-            <input if="{payment.editMode}" type="text" value="{app.data.user_name}">
+            <input if="{payment.editMode}" type="text" value="{payment.operator_name}" disabled>
           </p>
         </div>
       </div>
@@ -539,7 +544,7 @@
   </div>
 
   <!-- 删除记录 -->
-  <modal-remove ref="rmmodal"/>
+  <modal-confirm type="delete" ref="rmmodal"/>
 
   <script>
   var _this = this;
@@ -708,7 +713,7 @@
   <modal-agreement pid="{opts.pid}" ref="agmodal"/>
 
   <!-- 取消关联弹窗 -->
-  <modal-remove ref="rmmodal"/>
+  <modal-confirm type="delete" ref="rmmodal"/>
 
   <script>
   var _this = this;
@@ -899,11 +904,11 @@
     }
   };
   _this.statusList = [{
-    "name": "已结束",
-    "key": 0
-  }, {
-    "name": "执行中",
+    "name": "开始",
     "key": 1
+  }, {
+    "name": "完成",
+    "key": 0
   }];
   _this.fn = {
     save: function(e){
@@ -1047,7 +1052,7 @@
               <td class="left">{name}</td>
               <td>{app.getProjectType(project_types_id)}</td>
               <td>{amount}</td>
-              <td>{['已结束','执行中'][status]}</td>
+              <td>{['完成','开始'][status]}</td>
               <td>{created_at&&app.utils.time2str(created_at)||'-'}</td>
               <td>
                 <a href="javascript:;" aria-label="{app.lang.admin.handles.edit}" class="c-tooltip--top">
@@ -1084,7 +1089,7 @@
   <footer class="admin"></footer>
 
   <!-- 删除记录弹窗 -->
-  <modal-remove/>
+  <modal-confirm type="delete"/>
 
   <script>
   var _this = this;
@@ -1096,7 +1101,7 @@
   _this.filterRange = _this.app.lang.admin.project['filter:range'];
   _this.fn = {
     remove: function(e){
-      _this.tags['modal-remove']
+      _this.tags['modal-confirm']
       .emit('open').once('ok', function(){
         _this.app.api('GET', 'project/default/delete', {
           data: { id: e.item.id }

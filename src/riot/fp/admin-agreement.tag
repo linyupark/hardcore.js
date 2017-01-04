@@ -158,7 +158,7 @@
       <div class="c1">
         <label class="top">协议录入人</label>
         <p>
-          <input type="text" ref="user_name" value="{form.user_name||app.data.user_name}">
+          <input type="text" ref="user_name" value="{form.user_name||app.data.user_name}" disabled>
         </p>
       </div>
       <div class="c1">
@@ -438,7 +438,7 @@
   </main>
 
   <!-- 删除记录弹窗 -->
-  <modal-remove/>
+  <modal-confirm type="delete"/>
 
   <script>
   var _this = this;
@@ -452,7 +452,7 @@
       _this.app.route(_this.app.route.path + '/edit/' + e.item.id);
     },
     remove: function(e){
-      _this.tags['modal-remove']
+      _this.tags['modal-confirm']
       .emit('open').once('ok', function(){
         _this.app.api('GET', 'agreement/default/delete', {
           data: { id: e.item.id }
