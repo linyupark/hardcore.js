@@ -254,7 +254,7 @@ export const tagRemove = (tag, str) => {
  * @return {[type]}      [description]
  */
 export const pureText = (html) => {
-  return html.replace(/<.*?>/g,"");
+  return html.replace(/<.*?>|\&\w+\;/g,"");
 }
 
 /**

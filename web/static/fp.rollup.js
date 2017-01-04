@@ -247,7 +247,7 @@ const xhr = (url, options = {}) => {
  * @return {[type]}      [description]
  */
 const pureText = (html) => {
-  return html.replace(/<.*?>/g,"");
+  return html.replace(/<.*?>|\&\w+\;/g,"");
 };
 
 /**

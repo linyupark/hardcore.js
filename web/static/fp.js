@@ -253,7 +253,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @return {[type]}      [description]
    */
   var pureText = function pureText(html) {
-    return html.replace(/<.*?>/g, "");
+    return html.replace(/<.*?>|\&\w+\;/g, "");
   };
 
   /**
