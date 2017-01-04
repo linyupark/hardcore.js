@@ -116,6 +116,15 @@ riot.tag2('input-select', '<div class="input-select"><input ref="keyword" type="
       items[0].id = -1;
     }
 
+    items.forEach(function(item, i){
+      var name = item[opts.name];
+      items.forEach(function(itemCheck, j){
+        if(itemCheck[opts.name] == name){
+          items[i][opts.name] = name+'(id:'+items[i][opts.id]+')';
+        }
+      });
+    });
+
     _this.update({
       items: items,
       selected: {}

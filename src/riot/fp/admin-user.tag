@@ -245,7 +245,7 @@
         <table class="base">
           <thead>
             <tr>
-              <th width="10%">序号</th>
+              <th width="10%">ID</th>
               <th width="15%">姓名</th>
               <th width="10%">性别</th>
               <th width="20%">系统角色</th>

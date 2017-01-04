@@ -134,6 +134,9 @@
   _this.on('insertContent', function(content){
     tinymce.activeEditor.insertContent(content);
   });
+  _this.on('undo', function(){
+    tinymce.activeEditor.undoManager.undo();
+  })
   </script>
 </tinymce-editor>
 
@@ -361,7 +364,7 @@
 
 <!-- 用户搜索 -->
 <user-select>
-  <input-select name="real_name" ref="user_name" placeholder="搜索选择用户" value=""/>
+  <input-select name="real_name" id="user_id" ref="user_name" placeholder="搜索选择用户" value=""/>
   <input type="hidden" ref="user_id" value=""/>
   <input-valid style="{opts.left&&'left:'+opts.left+'px'}" ref="validUser" for="user_id" rule="required" msg="请选择用户"/>
   <script>
